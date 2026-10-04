@@ -18,13 +18,10 @@ export function HomePage() {
         <About />
       </main>
 
-      <div className="py-6 text-center">
-        <p className="text-sm tracking-wide text-star-white/60">
-          Developed by <span className="text-star-white">Elihle & Minenhle</span>
-        </p>
-      </div>
-
-      <Footer />
-    </div>
+      <div className="mt-8 text-center">
+  <p className="text-sm tracking-wide text-star-white/60">
+    Developed by <span className="text-star-white">Elihle, Minenhle & Kwanele</span>
+  </p>
+</div>
   );
 }
