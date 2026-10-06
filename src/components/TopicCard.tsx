@@ -1,4 +1,5 @@
 import { ArrowUpRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { PhysicsTopic } from '@/data/topics';
 import { useReveal } from '@/hooks/useReveal';
 
@@ -43,12 +44,22 @@ export function TopicCard({ topic, index }: TopicCardProps) {
 
       <div className="relative mt-auto flex flex-wrap gap-1.5 pt-2">
         {topic.topics.slice(0, 4).map((t) => (
-          <span
-            key={t}
-            className="rounded-md border border-surface-border bg-space-800/40 px-2.5 py-1 font-mono text-[0.7rem] text-star-white/40"
-          >
-            {t}
-          </span>
+          topic.id === 'mechanics' && t === 'Kinematics' ? (
+            <Link
+              key={t}
+              to="/lessons/kinematics"
+              className="rounded-md border border-accent-cyan/25 bg-accent-cyan/5 px-2.5 py-1 font-mono text-[0.7rem] text-accent-ice transition-colors hover:border-accent-cyan/50 hover:bg-accent-cyan/10"
+            >
+              {t} · Start lesson
+            </Link>
+          ) : (
+            <span
+              key={t}
+              className="rounded-md border border-surface-border bg-space-800/40 px-2.5 py-1 font-mono text-[0.7rem] text-star-white/40"
+            >
+              {t}
+            </span>
+          )
         ))}
         {topic.topics.length > 4 && (
           <span className="rounded-md px-2.5 py-1 font-mono text-[0.7rem] text-star-white/30">

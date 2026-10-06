@@ -10,6 +10,15 @@ export interface LessonModule {
 
 export const lessonModules: LessonModule[] = [
   {
+    id: 'kinematics',
+    title: 'Kinematics',
+    discipline: 'Mechanics',
+    equation: 'Δx = vᵢt + ½at²',
+    description: 'Build an accurate motion model with vectors, graphs, constant-acceleration equations, free fall, and guided practice.',
+    duration: '25–35 min',
+    level: 'Introductory',
+  },
+  {
     id: 'newtons-second-law',
     title: "Newton's Second Law",
     discipline: 'Mechanics',

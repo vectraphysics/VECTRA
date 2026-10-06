@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, Compass, Gauge, LineChart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { MotionLab } from '@/components/kinematics/MotionLab';
@@ -16,6 +18,18 @@ const mistakes = [
 ];
 
 export function KinematicsPage() {
+  useEffect(() => {
+    const previousTitle = document.title;
+    const description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    const previousDescription = description?.content;
+    document.title = 'Kinematics | VECTRA Physics';
+    if (description) description.content = 'Learn kinematics with worked examples, interactive motion graphs, free fall, and a guided physics checkpoint.';
+    return () => {
+      document.title = previousTitle;
+      if (description && previousDescription) description.content = previousDescription;
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-space-900 text-star-white">
       <header className="sticky top-0 z-40 border-b border-surface-border bg-space-900/90 backdrop-blur-xl">
@@ -96,6 +110,6 @@ export function KinematicsPage() {
   );
 }
 
-function HeroStat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) { return <div className="rounded-xl border border-surface-border bg-space-900/45 p-4"><span className="text-accent-cyan">{icon}</span><p className="mt-3 font-mono text-[0.62rem] uppercase tracking-widest text-star-white/35">{label}</p><p className="mt-1 font-display text-sm font-medium text-star-white/80">{value}</p></div>; }
+function HeroStat({ icon, label, value }: { icon: ReactNode; label: string; value: string }) { return <div className="rounded-xl border border-surface-border bg-space-900/45 p-4"><span className="text-accent-cyan">{icon}</span><p className="mt-3 font-mono text-[0.62rem] uppercase tracking-widest text-star-white/35">{label}</p><p className="mt-1 font-display text-sm font-medium text-star-white/80">{value}</p></div>; }
 function Foundation({ title, text }: { title: string; text: string }) { return <article className="rounded-xl border border-surface-border bg-space-800/35 p-4"><h2 className="font-mono text-xs text-accent-ice">{title}</h2><p className="mt-2 text-sm leading-6 text-star-white/50">{text}</p></article>; }
 function GraphMeaning({ title, equation, meaning }: { title: string; equation: string; meaning: string }) { return <article className="rounded-xl border border-surface-border bg-space-800/35 p-4"><h3 className="font-display text-sm font-semibold text-star-white">{title}</h3><p className="mt-2 font-mono text-sm text-accent-ice">{equation}</p><p className="mt-2 text-sm leading-6 text-star-white/50">{meaning}</p></article>; }

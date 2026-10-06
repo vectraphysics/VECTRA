@@ -1,4 +1,5 @@
-import { Clock, BookOpen } from 'lucide-react';
+import { Clock, BookOpen, ArrowUpRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { LessonModule } from '@/data/lessons';
 import { useReveal } from '@/hooks/useReveal';
 
@@ -47,15 +48,22 @@ export function LessonCard({ lesson, index }: LessonCardProps) {
         </p>
       </div>
 
-      <div className="mt-auto flex items-center gap-4 pt-2 text-star-white/30">
-        <span className="flex items-center gap-1.5 font-mono text-xs">
-          <Clock className="h-3.5 w-3.5" strokeWidth={1.5} />
-          {lesson.duration}
-        </span>
-        <span className="flex items-center gap-1.5 font-mono text-xs">
-          <BookOpen className="h-3.5 w-3.5" strokeWidth={1.5} />
-          Guided
-        </span>
+      <div className="mt-auto flex flex-wrap items-center justify-between gap-4 pt-2">
+        <div className="flex items-center gap-4 text-star-white/30">
+          <span className="flex items-center gap-1.5 font-mono text-xs">
+            <Clock className="h-3.5 w-3.5" strokeWidth={1.5} />
+            {lesson.duration}
+          </span>
+          <span className="flex items-center gap-1.5 font-mono text-xs">
+            <BookOpen className="h-3.5 w-3.5" strokeWidth={1.5} />
+            Guided
+          </span>
+        </div>
+        {lesson.id === 'kinematics' && (
+          <Link to="/lessons/kinematics" className="inline-flex min-h-10 items-center gap-2 rounded-full border border-accent-cyan/25 px-4 py-2 text-xs font-medium text-accent-ice transition-colors hover:border-accent-cyan/50 hover:bg-accent-cyan/10">
+            Start lesson <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
+        )}
       </div>
     </article>
   );

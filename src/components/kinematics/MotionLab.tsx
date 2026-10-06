@@ -13,11 +13,14 @@ export function MotionLab() {
   const [running, setRunning] = useState(false);
 
   useEffect(() => {
-    if (!running || elapsed >= duration) return;
-    const timer = window.setTimeout(() => setElapsed((value) => Math.min(duration, value + 0.05)), 50);
+    if (!running) return;
+    const timer = window.setTimeout(() => {
+      const nextTime = Math.min(duration, elapsed + 0.05);
+      setElapsed(nextTime);
+      if (nextTime >= duration) setRunning(false);
+    }, 50);
     return () => window.clearTimeout(timer);
   }, [elapsed, running]);
-  useEffect(() => { if (elapsed >= duration) setRunning(false); }, [elapsed]);
 
   const position = initialVelocity * elapsed + 0.5 * acceleration * elapsed ** 2;
   const velocity = initialVelocity + acceleration * elapsed;
@@ -30,12 +33,18 @@ export function MotionLab() {
       acceleration,
     };
   }), [initialVelocity, acceleration]);
-  const domain = Math.max(20, Math.abs(position) + 5);
+  const turningTime = acceleration === 0 ? -1 : -initialVelocity / acceleration;
+  const extremeTimes = [0, duration, ...(turningTime > 0 && turningTime < duration ? [turningTime] : [])];
+  const domain = Math.max(20, ...extremeTimes.map((time) => Math.abs(initialVelocity * time + 0.5 * acceleration * time ** 2))) + 5;
   const markerX = 52 + ((position + domain) / (2 * domain)) * 536;
 
   const play = () => {
-    if (elapsed >= duration) setElapsed(0);
-    setRunning((value) => !value && elapsed < duration);
+    if (elapsed >= duration) {
+      setElapsed(0);
+      setRunning(true);
+      return;
+    }
+    setRunning((value) => !value);
   };
 
   return (
@@ -46,7 +55,7 @@ export function MotionLab() {
       </div>
       <div className="grid gap-5 xl:grid-cols-[0.85fr_1.15fr]">
         <div className="glass-panel p-5 sm:p-6">
-          <p className="text-sm leading-6 text-star-white/55">Set the initial velocity and constant acceleration. The object’s position and velocity are calculated from the same equations used in the graphs.</p>
+          <p className="text-sm leading-6 text-star-white/55">Set the initial velocity and constant acceleration. Position is measured from x = 0 at t = 0; the object and all three graphs follow the same kinematics equations.</p>
           <div className="mt-6 space-y-5">
             <RangeControl label="Initial velocity, vᵢ" value={initialVelocity} min={-8} max={8} step={0.5} unit="m/s" onChange={setInitialVelocity} />
             <RangeControl label="Acceleration, a" value={acceleration} min={-3} max={3} step={0.1} unit="m/s²" onChange={setAcceleration} />
@@ -83,7 +92,7 @@ export function MotionLab() {
               {(['position', 'velocity', 'acceleration'] as GraphMode[]).map((mode) => <button key={mode} type="button" aria-pressed={graphMode === mode} onClick={() => setGraphMode(mode)} className={`rounded-lg px-3 py-2 text-xs capitalize transition-colors ${graphMode === mode ? 'bg-accent-cyan/15 text-accent-ice' : 'text-star-white/45 hover:text-star-white'}`}>{mode}</button>)}
             </div>
           </div>
-          <GraphSvg data={graphValues} mode={graphMode} />
+          <GraphSvg data={graphValues} mode={graphMode} elapsed={elapsed} />
           <p className="mt-3 rounded-lg border border-surface-border bg-space-900/35 px-3 py-2 text-xs leading-5 text-star-white/45">
             {graphMode === 'position' ? 'The curve is x(t) = vᵢt + ½at². Its tangent gradient at the marker’s time is velocity.' : graphMode === 'velocity' ? 'The line is v(t) = vᵢ + at. Its gradient is acceleration; signed area from 0 to t is displacement.' : 'With constant acceleration, a(t) is horizontal. Its signed area from 0 to t is the change in velocity.'}
           </p>
@@ -101,7 +110,7 @@ function Metric({ label, value }: { label: string; value: string }) {
   return <div><p className="font-mono text-[0.6rem] uppercase tracking-widest text-star-white/35">{label}</p><p className="mt-1 font-mono text-xs text-accent-ice sm:text-sm">{value}</p></div>;
 }
 
-function GraphSvg({ data, mode }: { data: { time: number; position: number; velocity: number; acceleration: number }[]; mode: GraphMode }) {
+function GraphSvg({ data, mode, elapsed }: { data: { time: number; position: number; velocity: number; acceleration: number }[]; mode: GraphMode; elapsed: number }) {
   const values = data.map((point) => point[mode]);
   const minValue = Math.min(0, ...values);
   const maxValue = Math.max(0, ...values);
@@ -113,13 +122,11 @@ function GraphSvg({ data, mode }: { data: { time: number; position: number; velo
   const path = data.map((point, index) => `${index ? 'L' : 'M'} ${x(point.time).toFixed(1)} ${y(point[mode]).toFixed(1)}`).join(' ');
   const zeroY = y(0);
   const axisLabel = mode === 'position' ? 'Position x (m)' : mode === 'velocity' ? 'Velocity v (m/s)' : 'Acceleration a (m/s²)';
-  const activeTime = Number(document.querySelector<HTMLInputElement>('input[type="range"]:nth-of-type(3)')?.value ?? 0);
-  const marker = data[Math.max(0, Math.min(data.length - 1, Math.round((activeTime / duration) * (data.length - 1))))];
+  const marker = data[Math.max(0, Math.min(data.length - 1, Math.round((elapsed / duration) * (data.length - 1))))];
   return <svg className="mt-5 w-full" viewBox="0 0 640 224" role="img" aria-label={`${axisLabel} against time graph`}>
     {[0, 0.25, 0.5, 0.75, 1].map((fraction) => { const yy = 35 + fraction * 145; return <g key={fraction}><line x1="58" y1={yy} x2="606" y2={yy} stroke="rgba(168,213,232,0.09)" /><text x="50" y={yy + 4} textAnchor="end" fill="rgba(232,237,245,0.4)" fontSize="10">{format(high - fraction * (high - low), 1)}</text></g>; })}
     <line x1="58" y1="35" x2="58" y2="180" stroke="rgba(168,213,232,0.3)" /><line x1="58" y1={zeroY} x2="606" y2={zeroY} stroke="rgba(232,237,245,0.35)" />
-    <line x1="58" y1="180" x2="606" y2="180" stroke="rgba(168,213,232,0.3)" />
-    {[0, 2, 4, 6, 8].map((tick) => <g key={tick}><line x1={x(tick)} y1="180" x2={x(tick)} y2="185" stroke="rgba(168,213,232,0.4)" /><text x={x(tick)} y="202" textAnchor="middle" fill="rgba(232,237,245,0.4)" fontSize="10">{tick}</text></g>)}
+    {[0, 2, 4, 6, 8].map((tick) => <g key={tick}><line x1={x(tick)} y1={zeroY - 3} x2={x(tick)} y2={zeroY + 3} stroke="rgba(168,213,232,0.4)" /><text x={x(tick)} y={Math.min(202, zeroY + 17)} textAnchor="middle" fill="rgba(232,237,245,0.4)" fontSize="10">{tick}</text></g>)}
     <path d={path} fill="none" stroke="#5ec8d8" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
     <circle cx={x(marker.time)} cy={y(marker[mode])} r="5" fill="#e8c87a" stroke="#04060d" strokeWidth="2" />
     <text x="60" y="18" fill="rgba(232,237,245,0.58)" fontSize="11">{axisLabel}</text><text x="606" y="218" textAnchor="end" fill="rgba(232,237,245,0.58)" fontSize="11">Time t (s)</text>
