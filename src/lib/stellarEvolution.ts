@@ -48,7 +48,7 @@ export interface StellarStage {
 export function getStagesForMass(mass: number): StellarStage[] {
   const isHighMass = mass >= 8;
   const baseStages = getCommonStages(mass);
-  return isHighMass ? [...baseStages, ...getHighMassStages(mass)] : [...baseStages, ...getLowMassStages()];
+  return isHighMass ? [...baseStages, ...getHighMassStages(mass)] : [...baseStages, ...getLowMassStages(mass)];
 }
 
 function getCommonStages(mass: number): StellarStage[] {
