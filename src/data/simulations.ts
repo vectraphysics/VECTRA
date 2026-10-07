@@ -68,7 +68,8 @@ export const simulations: Simulation[] = [
     icon: Flame,
     category: 'Thermodynamics',
     description: 'Observe conduction, convection, and radiation as heat flows through different materials.',
-    status: 'coming-soon',
-    tags: ['Heat', 'Conduction', 'Convection'],
+    status: 'preview',
+    tags: ['Conduction', 'Convection', 'Radiation'],
+    route: '/simulations/heat-transfer',
   },
 ];
