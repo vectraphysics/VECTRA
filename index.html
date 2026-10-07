@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vectra.svg" />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%vectra.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="VECTRA — an interactive physics and space-science platform. Explore, simulate, and understand the universe through beautiful visualizations." />
     <title>VECTRA — Interactive Physics & Space Science</title>
@@ -42,8 +42,8 @@
   // Origin of the editor that last messaged us; every post goes there (null = post nothing).
   var editorOrigin = null;
   var EDITOR_ORIGINS = ["https://blink.new","https://staging.blink.new","https://dev.blink.new","https://blink-preview.vercel.app","https://blink-staging.vercel.app","http://localhost:3000"];
-  var TEAM_PREVIEW_ORIGIN = new RegExp("^https:\\/\\/[a-z0-9-]+-blinkdotnew\\.vercel\\.app$");
-  var LOCAL_EDITOR_ORIGIN = new RegExp("^http:\\/\\/localhost:\\d+$");
+  var TEAM_PREVIEW_ORIGIN = new RegExp("^https:\/\/[a-z0-9-]+-blinkdotnew\.vercel\.app$");
+  var LOCAL_EDITOR_ORIGIN = new RegExp("^http:\/\/localhost:\d+$");
   var INLINE_EDIT_DENY = { INPUT: 1, TEXTAREA: 1, SELECT: 1, OPTION: 1, SCRIPT: 1, STYLE: 1, SVG: 1, PATH: 1, IMG: 1, CODE: 1, PRE: 1 };
   var INLINE_EDIT_SINGLE_LINE = { H1: 1, H2: 1, H3: 1, H4: 1, H5: 1, H6: 1, BUTTON: 1, A: 1, LABEL: 1, SUMMARY: 1 };
 
@@ -119,7 +119,7 @@
 
   function findById(id){
     if (typeof id !== 'string' || !id) return null;
-    if (id.slice(0, 3) !== 'rt:') return document.querySelector('[data-blnk-id="' + id.replace(/"/g, '\\"') + '"]');
+    if (id.slice(0, 3) !== 'rt:') return document.querySelector('[data-blnk-id="' + id.replace(/"/g, '\"') + '"]');
     var known = elementsById[id];
     if (known && known.isConnected) return known;
     if (known) delete elementsById[id];
@@ -529,7 +529,7 @@
   function resolveAttrsTarget(payload){
     if (typeof payload.id === 'string') return findById(payload.id);
     if (payload.id && payload.id.path) {
-      return document.querySelector('[data-blnk-id^="' + payload.id.path.replace(/"/g, '\\"') + ':"]');
+      return document.querySelector('[data-blnk-id^="' + payload.id.path.replace(/"/g, '\"') + ':"]');
     }
     return null;
   }
