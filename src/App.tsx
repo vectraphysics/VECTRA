@@ -26,6 +26,10 @@ const StellarLifecyclePage = lazy(() =>
   import('@/pages/StellarLifecyclePage').then((m) => ({ default: m.StellarLifecyclePage }))
 );
 
+const HeatTransferPage = lazy(() =>
+  import('@/pages/HeatTransferPage').then((m) => ({ default: m.HeatTransferPage }))
+);
+
 function App() {
   return (
    <BrowserRouter basename={import.meta.env.BASE_URL}>
@@ -100,6 +104,18 @@ function App() {
               </div>
             }>
               <StellarLifecyclePage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/simulations/heat-transfer"
+          element={
+            <Suspense fallback={
+              <div className="flex min-h-screen items-center justify-center bg-space-900">
+                <span className="font-mono text-sm text-star-white/40">Loading simulation…</span>
+              </div>
+            }>
+              <HeatTransferPage />
             </Suspense>
           }
         />
