@@ -22,10 +22,10 @@ import { createFileRoute } from '@tanstack/react-router'
  * - Routes are files under `src/routes/` that `export const Route =
  *   createFileRoute('/path')({ component })`. NEVER `export default` a route.
  *   Navigate with `Link` from `@tanstack/react-router` (there is no `NavLink`).
- * - Reading Blink auth/SDK state (`blink.auth`), `localStorage`, or `window` at
+ * - Reading `localStorage`, or `window` at
  *   render CRASHES SSR / hydration-mismatches and ships a blank first page. Wrap
- *   that subtree in `<BlinkClientBoundary fallback={…}>` (from
- *   `@/components/BlinkClientBoundary`) — wrap the whole tree if the entire page
+ *   that subtree in `<ClientOnlyBoundary fallback={…}>` (from
+ *   `@/components/ClientOnlyBoundary`) — wrap the whole tree if the entire page
  *   needs the browser. Keep static content outside the boundary. Do NOT use the
  *   route's `ssr: false`: a client-only route in this template hits Start's
  *   server-context `node:async_hooks` path (a throwing browser stub) and ships a
@@ -34,8 +34,8 @@ import { createFileRoute } from '@tanstack/react-router'
 export const Route = createFileRoute('/')({
   head: () => ({
     meta: [
-      { title: 'Home · Blink App' },
-      { name: 'description', content: 'Welcome — an app built with Blink.' },
+      { title: 'Home · VECTRA' },
+      { name: 'description', content: 'Explore physics through interactive simulations, visualizations, and guided learning.' },
     ],
   }),
   component: Home,
@@ -44,7 +44,7 @@ export const Route = createFileRoute('/')({
 function Home() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-3 px-6 text-center">
-      <h1 className="text-2xl font-semibold tracking-tight">Your Blink app is ready</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">VECTRA</h1>
       <p className="max-w-md text-sm text-muted-foreground">
         This is the full-bleed starter home with no sidebar. Edit{' '}
         <code className="rounded bg-muted px-1">src/routes/index.tsx</code> to build your

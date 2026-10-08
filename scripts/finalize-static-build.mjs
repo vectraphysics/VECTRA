@@ -1,22 +1,4 @@
-/**
- * Flatten the TanStack Start build into a static `dist/` that Blink hosting serves.
- *
- * TanStack Start's `vite build` (configured with `build.outDir: '.vite-out'`)
- * emits:
- *   .vite-out/client/   ← prerendered HTML + assets (what we want, STATIC)
- *   .vite-out/server/   ← SSR Nitro server (NOT used by Blink's static S3 hosting)
- *
- * Blink uploads `dist/` and serves `dist/index.html` (see src/constants/publish.ts
- * BUILD_PATHS['vite-react'] = 'dist'). So we copy `.vite-out/client/*` up into a
- * flat `dist/` and drop the server.
- *
- * Why build into `.vite-out` instead of `dist/` directly: sandboxes created before the
- * platform stopped injecting `_redirects` still carry a read-only copy owned by another
- * user, and Start's client build tries to EMPTY its out dir first → `EACCES: unlink
- * _redirects`. Building into a clean temp dir avoids that entirely; here we only COPY
- * into `dist/` (never delete), so a legacy read-only `_redirects` is tolerated. Nothing
- * injects that file any more and nothing executes it — see skills/blink-hosting.
- */
+/** Flatten the prerendered client build into the static dist directory. */
 import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 

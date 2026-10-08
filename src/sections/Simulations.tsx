@@ -15,7 +15,7 @@ export function Simulations() {
         aria-hidden="true"
       >
         <div
-          className="absolute left-1/2 top-0 h-[300px] w-[600px] -translate-x-1/2 rounded-full opacity-10 blur-[120px]"
+          className="absolute left-1/2 top-0 h-[300px] w-full max-w-[600px] -translate-x-1/2 rounded-full opacity-10 blur-[120px]"
           style={{ background: 'radial-gradient(ellipse, #2d4a7a 0%, transparent 70%)' }}
         />
       </div>

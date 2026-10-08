@@ -29,10 +29,10 @@ export function Hero() {
       <div className="container-vectra relative z-10">
         <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-8">
           {/* Left: content */}
-          <div className="flex flex-col gap-6 animate-fade-up">
+          <div className="flex min-w-0 flex-col gap-6 animate-fade-up">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-accent-cyan" strokeWidth={1.5} />
-              <span className="eyebrow">Interactive Physics & Space Science</span>
+              <Sparkles className="h-4 w-4 shrink-0 text-accent-cyan" strokeWidth={1.5} />
+              <span className="eyebrow min-w-0">Interactive Physics & Space Science</span>
             </div>
 
             <h1 className="font-display text-hero text-star-white">
@@ -58,7 +58,7 @@ export function Hero() {
             </div>
 
             {/* Stats */}
-            <div className="mt-8 flex gap-8 border-t border-surface-border pt-6">
+            <div className="mt-8 flex flex-wrap justify-between gap-2 border-t border-surface-border pt-6 sm:justify-start sm:gap-8">
               <Stat value="7" label="Disciplines" />
               <Stat value="6+" label="Simulations" />
               <Stat value="∞" label="Curiosity" />
@@ -66,7 +66,7 @@ export function Hero() {
           </div>
 
           {/* Right: orbital system visual */}
-          <div className="flex items-center justify-center animate-fade-in">
+          <div className="flex min-w-0 items-center justify-center animate-fade-in">
             <OrbitalSystem />
           </div>
         </div>

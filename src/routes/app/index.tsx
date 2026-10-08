@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 export const Route = createFileRoute('/app/')({
   head: () => ({
     meta: [
-      { title: 'Dashboard · Blink App' },
+      { title: 'Dashboard · VECTRA' },
       { name: 'description', content: 'Your app dashboard.' },
     ],
   }),
