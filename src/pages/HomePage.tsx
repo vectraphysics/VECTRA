@@ -21,7 +21,7 @@ export function HomePage() {
         <div className="mt-8 text-center">
           <p className="text-sm tracking-wide text-star-white/60">
             Developed by{' '}
-            <span className="text-star-white">
+            <span className="text-glowing-rainbow">
               Elihle, Minenhle & Kwanele
             </span>
           </p>
