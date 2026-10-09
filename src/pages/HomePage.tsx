@@ -28,6 +28,3 @@ export function HomePage() {
 <div className="mt-8 text-center">
 </div>
         
-.vectra-dev-team .vectra-dev-name {
-  font-size: clamp(1.3rem, 4vw, 2rem);
-}
