@@ -118,3 +118,64 @@
     transform-style: preserve-3d;
   }
 }
+/* VECTRA — Iridescent Developer Names */
+
+.vectra-dev-name {
+  display: inline-block;
+  position: relative;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+
+  color: #c4b5fd;
+
+  background: linear-gradient(
+    110deg,
+    #ffffff 0%,
+    #c4b5fd 18%,
+    #8be9ff 35%,
+    #f0abfc 52%,
+    #ffffff 65%,
+    #a5b4fc 82%,
+    #ffffff 100%
+  );
+
+  background-size: 250% 100%;
+  background-position: 0% 50%;
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  filter: drop-shadow(0 0 8px rgb(167 139 250 / 20%));
+
+  transition: filter 300ms ease, transform 300ms ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .vectra-dev-name {
+    animation: vectra-name-shimmer 7s ease-in-out infinite;
+  }
+}
+
+@keyframes vectra-name-shimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.vectra-dev-name:hover {
+  filter: drop-shadow(0 0 14px rgb(139 233 255 / 45%));
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vectra-dev-name {
+    animation: none;
+    background-position: 50% 50%;
+    transition: none;
+  }
+}
