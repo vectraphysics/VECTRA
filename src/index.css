@@ -179,3 +179,13 @@
     transition: none;
   }
 }
+
+.vectra-dev-team {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px 28px;
+  padding: 12px 0;
+}
+
