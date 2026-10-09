@@ -24,16 +24,10 @@ export function HomePage() {
   <span className="vectra-dev-name">Minenhle</span>
   <span className="vectra-dev-name">Kwanele</span>
 </div>
- <div className="mt-8 text-center">
-.vectra-dev-team {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 12px 28px;
-  padding: 12px 0;
-}
 
+<div className="mt-8 text-center">
+</div>
+        
 .vectra-dev-team .vectra-dev-name {
   font-size: clamp(1.3rem, 4vw, 2rem);
 }
