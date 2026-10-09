@@ -1,3 +1,4 @@
+
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { Hero } from '@/sections/Hero';
@@ -18,13 +19,16 @@ export function HomePage() {
         <Learn />
         <About />
 
-       
-<div className="vectra-dev-team">
-  <span className="vectra-dev-name">Elihle</span>
-  <span className="vectra-dev-name">Minenhle</span>
-  <span className="vectra-dev-name">Kwanele</span>
-</div>
+        <div className="mt-8 text-center">
+          <div className="vectra-dev-team">
+            <span className="vectra-dev-name">Elihle</span>
+            <span className="vectra-dev-name">Minenhle</span>
+            <span className="vectra-dev-name">Kwanele</span>
+          </div>
+        </div>
+      </main>
 
-<div className="mt-8 text-center">
-</div>
-        
+      <Footer />
+    </div>
+  );
+}
