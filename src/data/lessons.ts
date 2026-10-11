@@ -19,12 +19,12 @@ export const lessonModules: LessonModule[] = [
     level: 'Introductory',
   },
   {
-    id: 'newtons-second-law',
-    title: "Newton's Second Law",
+    id: 'newtons-laws',
+    title: "Newton's Laws of Motion",
     discipline: 'Mechanics',
-    equation: 'F = ma',
-    description: 'Understand the relationship between force, mass, and acceleration — the cornerstone of classical mechanics.',
-    duration: '12 min',
+    equation: 'F⃗net = m a⃗',
+    description: 'Explore inertia, resultant force, acceleration, and interaction pairs through worked examples and three interactive experiments.',
+    duration: '25–35 min',
     level: 'Introductory',
   },
   {

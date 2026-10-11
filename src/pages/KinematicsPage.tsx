@@ -102,7 +102,7 @@ export function KinematicsPage() {
 
           <section className="mb-12 flex flex-col gap-5 rounded-2xl border border-surface-border bg-space-800/35 p-6 sm:mb-16 sm:flex-row sm:items-center sm:justify-between sm:p-8">
             <div><p className="eyebrow">Next · Mechanics</p><h2 className="mt-3 font-display text-xl font-semibold text-star-white sm:text-2xl">You can describe the motion. Now ask what causes it.</h2><p className="mt-2 max-w-xl text-sm leading-6 text-star-white/50">Continue to Newton’s Laws to connect acceleration with force and mass.</p></div>
-            <Link to="/#learn" className="btn-primary min-h-12 shrink-0 justify-center">Continue to Newton’s Laws <ArrowUpRight className="h-4 w-4" /></Link>
+            <Link to="/lessons/mechanics/newtons-laws" className="btn-primary min-h-12 shrink-0 justify-center">Continue to Newton’s Laws <ArrowUpRight className="h-4 w-4" /></Link>
           </section>
         </div>
       </main>

@@ -16,6 +16,11 @@ const levelColors: Record<LessonModule['level'], string> = {
 
 export function LessonCard({ lesson, index }: LessonCardProps) {
   const { ref, isVisible } = useReveal();
+  const lessonHref = lesson.id === 'kinematics'
+    ? '/lessons/kinematics'
+    : lesson.id === 'newtons-laws'
+      ? '/lessons/mechanics/newtons-laws'
+      : undefined;
 
   return (
     <article
@@ -59,8 +64,8 @@ export function LessonCard({ lesson, index }: LessonCardProps) {
             Guided
           </span>
         </div>
-        {lesson.id === 'kinematics' && (
-          <Link to="/lessons/kinematics" className="inline-flex min-h-10 items-center gap-2 rounded-full border border-accent-cyan/25 px-4 py-2 text-xs font-medium text-accent-ice transition-colors hover:border-accent-cyan/50 hover:bg-accent-cyan/10">
+        {lessonHref && (
+          <Link to={lessonHref} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-accent-cyan/25 px-4 py-2 text-xs font-medium text-accent-ice transition-colors hover:border-accent-cyan/50 hover:bg-accent-cyan/10">
             Start lesson <ArrowUpRight className="h-3.5 w-3.5" />
           </Link>
         )}
