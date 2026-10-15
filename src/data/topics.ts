@@ -16,7 +16,7 @@ export const physicsTopics: PhysicsTopic[] = [
     icon: Atom,
     description:
       "The study of motion, forces, and energy. From Newton's laws to rotational dynamics — the foundation of classical physics.",
-    topics: ["Kinematics", "Newton's Laws", "Energy & Work", "Momentum", "Rotational Motion", "Gravitation"],
+    topics: ["Kinematics", "Newton's Laws", "Energy, Work & Power", "Momentum", "Rotational Motion", "Gravitation"],
     accent: 'from-amber-400/20 to-orange-500/5',
   },
   {

@@ -20,6 +20,8 @@ export function LessonCard({ lesson, index }: LessonCardProps) {
     ? '/lessons/kinematics'
     : lesson.id === 'newtons-laws'
       ? '/lessons/mechanics/newtons-laws'
+      : lesson.id === 'energy-work-power'
+        ? '/lessons/mechanics/energy-work-power'
       : undefined;
 
   return (

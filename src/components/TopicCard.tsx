@@ -44,10 +44,10 @@ export function TopicCard({ topic, index }: TopicCardProps) {
 
       <div className="relative mt-auto flex flex-wrap gap-1.5 pt-2">
         {topic.topics.slice(0, 4).map((t) => (
-          topic.id === 'mechanics' && (t === 'Kinematics' || t === "Newton's Laws") ? (
+          topic.id === 'mechanics' && (t === 'Kinematics' || t === "Newton's Laws" || t === 'Energy, Work & Power') ? (
             <Link
               key={t}
-              to={t === 'Kinematics' ? '/lessons/kinematics' : '/lessons/mechanics/newtons-laws'}
+              to={t === 'Kinematics' ? '/lessons/kinematics' : t === "Newton's Laws" ? '/lessons/mechanics/newtons-laws' : '/lessons/mechanics/energy-work-power'}
               className="rounded-md border border-accent-cyan/25 bg-accent-cyan/5 px-2.5 py-1 font-mono text-[0.7rem] text-accent-ice transition-colors hover:border-accent-cyan/50 hover:bg-accent-cyan/10"
             >
               {t} · Start lesson

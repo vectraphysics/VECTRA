@@ -28,6 +28,15 @@ export const lessonModules: LessonModule[] = [
     level: 'Introductory',
   },
   {
+    id: 'energy-work-power',
+    title: 'Energy, Work and Power',
+    discipline: 'Mechanics',
+    equation: 'W = Fd cos θ · Ek = ½mv²',
+    description: 'Connect work, motion, gravitational energy, power, and efficiency through interactive models and worked problems.',
+    duration: '35–45 min',
+    level: 'Introductory',
+  },
+  {
     id: 'maxwell-equations',
     title: "Maxwell's Equations",
     discipline: 'Electromagnetism',

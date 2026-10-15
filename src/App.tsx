@@ -10,6 +10,10 @@ const NewtonsLawsPage = lazy(() =>
   import('@/pages/NewtonsLawsPage').then((m) => ({ default: m.NewtonsLawsPage }))
 );
 
+const EnergyWorkPowerPage = lazy(() =>
+  import('@/pages/EnergyWorkPowerPage').then((m) => ({ default: m.EnergyWorkPowerPage }))
+);
+
 const OrbitalMechanicsPage = lazy(() =>
   import('@/pages/OrbitalMechanicsPage').then((m) => ({ default: m.OrbitalMechanicsPage }))
 );
@@ -60,6 +64,18 @@ function App() {
               </div>
             }>
               <NewtonsLawsPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/lessons/mechanics/energy-work-power"
+          element={
+            <Suspense fallback={
+              <div className="flex min-h-screen items-center justify-center bg-space-900">
+                <span className="font-mono text-sm text-star-white/40">Loading lesson…</span>
+              </div>
+            }>
+              <EnergyWorkPowerPage />
             </Suspense>
           }
         />
