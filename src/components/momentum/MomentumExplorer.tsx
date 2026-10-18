@@ -27,7 +27,7 @@ export function MomentumExplorer() {
         </div>
         <div className="flex flex-col justify-between rounded-xl border border-surface-border bg-space-900/45 p-5">
           <div className="relative flex h-32 items-center overflow-hidden rounded-lg border border-surface-border bg-[linear-gradient(90deg,transparent_49.8%,rgba(94,200,216,0.24)_50%,transparent_50.2%)]">
-            <div className={`flex h-14 items-center justify-center rounded-lg border border-accent-cyan/35 bg-accent-cyan/10 text-center font-mono text-xs text-accent-ice transition-all duration-300 ${direction > 0 ? 'ml-4' : 'ml-auto mr-4'}`} style={{ width: `${Math.min(140, 44 + Math.sqrt(mass) * 9)}px'` }}>
+            <div className={`flex h-14 items-center justify-center rounded-lg border border-accent-cyan/35 bg-accent-cyan/10 text-center font-mono text-xs text-accent-ice transition-all duration-300 ${direction > 0 ? 'ml-4' : 'ml-auto mr-4'}`} style={{ width: `${Math.min(140, 44 + Math.sqrt(mass) * 9)}px` }}>
               {mass.toFixed(1)} kg
             </div>
             <span className={`absolute top-3 font-mono text-xs text-star-white/45 ${direction > 0 ? 'left-4' : 'right-4'}`} aria-hidden="true">{speed === 0 ? 'v = 0' : direction > 0 ? '→' : '←'}</span>
