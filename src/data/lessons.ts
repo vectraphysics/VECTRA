@@ -22,7 +22,7 @@ export const lessonModules: LessonModule[] = [
     id: 'newtons-laws',
     title: "Newton's Laws of Motion",
     discipline: 'Mechanics',
-    equation: 'F⃗net = m a⃗',
+    equation: 'F⃗net = m.a',
     description: 'Explore inertia, resultant force, acceleration, and interaction pairs through worked examples and three interactive experiments.',
     duration: '25–35 min',
     level: 'Introductory',
