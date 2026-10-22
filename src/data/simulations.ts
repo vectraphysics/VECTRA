@@ -1,75 +1,66 @@
-import { Orbit, Atom, Waves, Magnet, Telescope, Flame, type LucideIcon } from 'lucide-react';
-
-export interface Simulation {
+export interface LessonModule {
   id: string;
   title: string;
-  icon: LucideIcon;
-  category: string;
+  discipline: string;
+  equation: string;
   description: string;
-  status: 'coming-soon' | 'preview';
-  tags: string[];
-  route?: string;
+  duration: string;
+  level: 'Introductory' | 'Intermediate' | 'Advanced';
 }
 
-export const simulations: Simulation[] = [
+export const lessonModules: LessonModule[] = [
   {
-    id: 'orbital-mechanics',
-    title: 'Orbital Mechanics',
-    icon: Orbit,
-    category: 'Mechanics',
-    description: "Explore how gravity shapes planetary orbits. Adjust mass and velocity to see Kepler's laws in action.",
-    status: 'preview',
-    tags: ['Gravity', 'Orbits', 'Kepler'],
-    route: '/simulations/orbital-mechanics',
+    id: 'kinematics',
+    title: 'Kinematics',
+    discipline: 'Mechanics',
+    equation: 'Δx = vᵢt + ½at²',
+    description: 'Build an accurate motion model with vectors, graphs, constant-acceleration equations, free fall, and guided practice.',
+    duration: '25–35 min',
+    level: 'Introductory',
   },
   {
-    id: 'wave-interference',
-    title: 'Waves',
-    icon: Waves,
-    category: 'Waves',
-    description: 'Explore how wavelength, frequency, amplitude and wave speed shape a travelling wave.',
-    status: 'preview',
-    tags: ['Wavelength', 'Frequency', 'Amplitude'],
-    route: '/simulations/waves',
+    id: 'newtons-laws',
+    title: "Newton's Laws of Motion",
+    discipline: 'Mechanics',
+    equation: 'F⃗net = m.a',
+    description: 'Explore inertia, resultant force, acceleration, and interaction pairs through worked examples and three interactive experiments.',
+    duration: '25–35 min',
+    level: 'Introductory',
   },
   {
-    id: 'double-slit',
-    title: 'Double-Slit Experiment',
-    icon: Atom,
-    category: 'Modern Physics',
-    description: 'The iconic experiment revealing wave-particle duality. Watch the interference pattern emerge.',
-    status: 'preview',
-    tags: ['Quantum', 'Duality'],
-    route: '/simulations/double-slit',
+    id: 'energy-work-power',
+    title: 'Energy, Work and Power',
+    discipline: 'Mechanics',
+    equation: 'W = Fd cos θ · Ek = ½mv²',
+    description: 'Connect work, motion, gravitational energy, power, and efficiency through interactive models and worked problems.',
+    duration: '35–45 min',
+    level: 'Introductory',
   },
   {
-    id: 'magnetic-field',
-    title: 'Magnetic Field Lines',
-    icon: Magnet,
-    category: 'Electromagnetism',
-    description: 'Explore the 3D magnetic field of a dipole. Trace field lines, move a probe, and visualize field vectors.',
-    status: 'preview',
-    tags: ['Fields', 'Magnetism', 'Dipole'],
-    route: '/simulations/magnetic-fields',
+    id: 'maxwell-equations',
+    title: "Maxwell's Equations",
+    discipline: 'Electromagnetism',
+    equation: '∇ · E = ρ/ε₀',
+    description: 'Four equations that unified electricity, magnetism, and light into a single elegant framework.',
+    duration: '25 min',
+    level: 'Advanced',
   },
   {
-    id: 'stellar-lifecycle',
-    title: 'Stellar Life Cycle',
-    icon: Telescope,
-    category: 'Astrophysics',
-    description: 'Trace the journey of a star from nebula to main sequence to supernova or white dwarf — its mass decides its fate.',
-    status: 'preview',
-    tags: ['Stars', 'Evolution', 'Supernova'],
-    route: '/simulations/stellar-life-cycle',
+    id: 'schrodinger-equation',
+    title: 'The Schrödinger Equation',
+    discipline: 'Modern Physics',
+    equation: 'iℏ ∂ψ/∂t = Ĥψ',
+    description: 'The wave equation at the heart of quantum mechanics, describing how quantum states evolve.',
+    duration: '20 min',
+    level: 'Advanced',
   },
   {
-    id: 'heat-transfer',
-    title: 'Heat Transfer',
-    icon: Flame,
-    category: 'Thermodynamics',
-    description: 'Observe conduction, convection, and radiation as heat flows through different materials.',
-    status: 'preview',
-    tags: ['Conduction', 'Convection', 'Radiation'],
-    route: '/simulations/heat-transfer',
+    id: 'thermo-entropy',
+    title: 'Entropy & The Second Law',
+    discipline: 'Thermodynamics',
+    equation: 'ΔS ≥ 0',
+    description: 'Why time flows in one direction - the statistical nature of irreversibility and disorder.',
+    duration: '15 min',
+    level: 'Intermediate',
   },
 ];

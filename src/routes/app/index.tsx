@@ -1,49 +1,75 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Orbit, Atom, Waves, Magnet, Telescope, Flame, type LucideIcon } from 'lucide-react';
 
-/**
- * Dashboard home — `/app` (this file is the index of the `/app` segment, so its
- * path is `/app`, NOT `/app/index`). Rendered inside the sidebar shell defined in
- * `src/routes/app.tsx`.
- *
- * Add sibling pages as files in this folder: `src/routes/app/orders.tsx` → /app/orders.
- * Every page you add must also get a matching sidebar link (see AppSidebarShell),
- * and every sidebar link must have a real page — never ship a nav link to a 404.
- *
- * Replace this placeholder body with the real dashboard.
- */
-export const Route = createFileRoute('/app/')({
-  head: () => ({
-    meta: [
-      { title: 'Dashboard · VECTRA' },
-      { name: 'description', content: 'Your app dashboard.' },
-    ],
-  }),
-  component: DashboardHome,
-})
-
-function DashboardHome() {
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Replace this with your real dashboard. Add pages under{' '}
-          <code className="rounded bg-muted px-1">src/routes/app/</code>.
-        </p>
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {['Overview', 'Activity', 'Getting started'].map(title => (
-          <Card key={title}>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">{title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Placeholder card — swap in real data.</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
-  )
+export interface Simulation {
+  id: string;
+  title: string;
+  icon: LucideIcon;
+  category: string;
+  description: string;
+  status: 'coming-soon' | 'preview';
+  tags: string[];
+  route?: string;
 }
+
+export const simulations: Simulation[] = [
+  {
+    id: 'orbital-mechanics',
+    title: 'Orbital Mechanics',
+    icon: Orbit,
+    category: 'Mechanics',
+    description: "Explore how gravity shapes planetary orbits. Adjust mass and velocity to see Kepler's laws in action.",
+    status: 'preview',
+    tags: ['Gravity', 'Orbits', 'Kepler'],
+    route: '/simulations/orbital-mechanics',
+  },
+  {
+    id: 'wave-interference',
+    title: 'Waves',
+    icon: Waves,
+    category: 'Waves',
+    description: 'Explore how wavelength, frequency, amplitude and wave speed shape a travelling wave.',
+    status: 'preview',
+    tags: ['Wavelength', 'Frequency', 'Amplitude'],
+    route: '/simulations/waves',
+  },
+  {
+    id: 'double-slit',
+    title: 'Double-Slit Experiment',
+    icon: Atom,
+    category: 'Modern Physics',
+    description: 'The iconic experiment revealing wave-particle duality. Watch the interference pattern emerge.',
+    status: 'preview',
+    tags: ['Quantum', 'Duality'],
+    route: '/simulations/double-slit',
+  },
+  {
+    id: 'magnetic-field',
+    title: 'Magnetic Field Lines',
+    icon: Magnet,
+    category: 'Electromagnetism',
+    description: 'Explore the 3D magnetic field of a dipole. Trace field lines, move a probe, and visualize field vectors.',
+    status: 'preview',
+    tags: ['Fields', 'Magnetism', 'Dipole'],
+    route: '/simulations/magnetic-fields',
+  },
+  {
+    id: 'stellar-lifecycle',
+    title: 'Stellar Life Cycle',
+    icon: Telescope,
+    category: 'Astrophysics',
+    description: 'Trace the journey of a star from nebula to main sequence to supernova or white dwarf - its mass decides its fate.',
+    status: 'preview',
+    tags: ['Stars', 'Evolution', 'Supernova'],
+    route: '/simulations/stellar-life-cycle',
+  },
+  {
+    id: 'heat-transfer',
+    title: 'Heat Transfer',
+    icon: Flame,
+    category: 'Thermodynamics',
+    description: 'Observe conduction, convection, and radiation as heat flows through different materials.',
+    status: 'preview',
+    tags: ['Conduction', 'Convection', 'Radiation'],
+    route: '/simulations/heat-transfer',
+  },
+];
