@@ -1,94 +1,70 @@
-import { Play, Lock } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import type { Simulation } from '@/data/simulations';
+import type { PhysicsTopic } from '@/data/topics';
 import { useReveal } from '@/hooks/useReveal';
 
-interface SimulationCardProps {
-  simulation: Simulation;
+interface TopicCardProps {
+  topic: PhysicsTopic;
   index: number;
 }
 
-export function SimulationCard({ simulation, index }: SimulationCardProps) {
+export function TopicCard({ topic, index }: TopicCardProps) {
   const { ref, isVisible } = useReveal();
-  const Icon = simulation.icon;
-  const isPreview = simulation.status === 'preview';
+  const Icon = topic.icon;
 
-  const content = (
+  return (
     <article
       ref={ref}
-      className={`glass-panel glass-panel-hover group relative flex flex-col overflow-hidden section-fade ${
-        isVisible ? 'is-visible' : ''
-      }`}
+      className={`glass-panel glass-panel-hover card-glow group relative flex flex-col gap-5 p-6 sm:p-7 reveal reveal-up parallax-panel ${isVisible ? 'is-visible' : ''}`}
       style={{ transitionDelay: `${(index % 3) * 80}ms` }}
     >
-      {/* Visual preview area */}
-      <div className="relative flex h-36 items-center justify-center overflow-hidden border-b border-surface-border bg-space-800/40">
-        <div
-          className="absolute inset-0 opacity-30 transition-opacity duration-500 group-hover:opacity-50"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at 30% 40%, rgba(94,200,216,0.15) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(168,213,232,0.1) 0%, transparent 50%)',
-          }}
-          aria-hidden="true"
-        />
+      <div
+        className={`pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br ${topic.accent} opacity-0 transition-opacity duration-500 group-hover:opacity-100`}
+        aria-hidden="true"
+      />
 
-        {/* Animated orbit decoration */}
-        <div className="relative flex h-20 w-20 items-center justify-center" aria-hidden="true">
-          <div className="absolute inset-0 rounded-full border border-accent-cyan/20 group-hover:border-accent-cyan/40 transition-colors duration-500" />
-          <div
-            className="absolute inset-0 rounded-full border border-star-white/10"
-            style={{ transform: 'scale(1.3) rotate(30deg)' }}
-          />
-          <div
-            className="absolute h-1.5 w-1.5 rounded-full bg-accent-cyan shadow-[0_0_8px_rgba(94,200,216,0.6)]"
-            style={{
-              animation: 'orbit 6s linear infinite',
-              ['--orbit-r' as string]: '36px',
-            }}
-          />
-          <Icon className="h-7 w-7 text-accent-cyan/60 transition-colors duration-500 group-hover:text-accent-cyan" strokeWidth={1.2} />
+      <div className="relative flex items-start justify-between">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-surface-border bg-space-700/50 text-accent-cyan transition-colors duration-500 group-hover:border-accent-cyan/40 group-hover:text-accent-ice">
+          <Icon className="h-6 w-6" strokeWidth={1.5} />
         </div>
-
-        {/* Status badge */}
-        <span
-          className={`absolute right-3 top-3 flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[0.65rem] uppercase tracking-widest-2 ${
-            isPreview
-              ? 'border border-accent-cyan/30 bg-accent-cyan/10 text-accent-cyan'
-              : 'border border-surface-border bg-space-800/60 text-star-white/35'
-          }`}
-        >
-          {isPreview ? <Play className="h-2.5 w-2.5" strokeWidth={2} /> : <Lock className="h-2.5 w-2.5" strokeWidth={2} />}
-          {isPreview ? 'Preview' : 'Soon'}
-        </span>
+        <ArrowUpRight
+          className="h-5 w-5 text-star-white/20 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent-cyan"
+          strokeWidth={1.5}
+        />
       </div>
 
-      {/* Content */}
-      <div className="flex flex-1 flex-col gap-3 p-5">
-        <div className="flex items-center justify-between">
-          <span className="font-mono text-[0.7rem] uppercase tracking-widest-2 text-star-white/35">
-            {simulation.category}
-          </span>
-        </div>
-        <h3 className="font-display text-lg font-medium text-star-white">{simulation.title}</h3>
+      <div className="relative flex flex-col gap-3">
+        <h3 className="font-display text-xl font-medium text-star-white">{topic.title}</h3>
         <p className="font-body text-sm leading-relaxed text-star-white/50">
-          {simulation.description}
+          {topic.description}
         </p>
-        <div className="mt-auto flex flex-wrap gap-1.5 pt-2">
-          {simulation.tags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-md border border-surface-border bg-space-800/40 px-2 py-0.5 font-mono text-[0.65rem] text-star-white/35"
+      </div>
+
+      <div className="relative mt-auto flex flex-wrap gap-1.5 pt-2">
+        {topic.topics.slice(0, 4).map((t) => (
+          topic.id === 'mechanics' && (t === 'Kinematics' || t === "Newton's Laws" || t === 'Energy, Work & Power') ? (
+            <Link
+              key={t}
+              to={t === 'Kinematics' ? '/lessons/kinematics' : t === "Newton's Laws" ? '/lessons/mechanics/newtons-laws' : '/lessons/mechanics/energy-work-power'}
+              className="rounded-md border border-accent-cyan/25 bg-accent-cyan/5 px-2.5 py-1 font-mono text-[0.7rem] text-accent-ice transition-colors hover:border-accent-cyan/50 hover:bg-accent-cyan/10"
             >
-              {tag}
+              {t} · Start lesson
+            </Link>
+          ) : (
+            <span
+              key={t}
+              className="rounded-md border border-surface-border bg-space-800/40 px-2.5 py-1 font-mono text-[0.7rem] text-star-white/40"
+            >
+              {t}
             </span>
-          ))}
-        </div>
+          )
+        ))}
+        {topic.topics.length > 4 && (
+          <span className="rounded-md px-2.5 py-1 font-mono text-[0.7rem] text-star-white/30">
+            +{topic.topics.length - 4} more
+          </span>
+        )}
       </div>
     </article>
   );
-
-  if (simulation.route) {
-    return <Link to={simulation.route}>{content}</Link>;
-  }
-  return content;
 }
