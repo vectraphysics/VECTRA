@@ -313,3 +313,48 @@
     transform: none;
   }
 }
+
+
+/* Restrained Glare Hover-inspired sheen for interactive cards only. */
+@media (prefers-reduced-motion: no-preference) {
+  .glare-card {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .glare-card::after {
+    content: '';
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    bottom: 0;
+    left: -65%;
+    width: 230%;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(-48%);
+    background: linear-gradient(
+      108deg,
+      transparent 42%,
+      rgba(255, 255, 255, 0.025) 46%,
+      rgba(139, 233, 255, 0.105) 50%,
+      rgba(255, 255, 255, 0.045) 53%,
+      transparent 58%
+    );
+    transition: transform 850ms cubic-bezier(0.22, 1, 0.36, 1), opacity 250ms ease;
+  }
+
+  .glare-card:hover::after,
+  .glare-card:focus-within::after {
+    opacity: 1;
+    transform: translateX(48%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glare-card::after {
+    content: none;
+  }
+}
