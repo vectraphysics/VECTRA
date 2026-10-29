@@ -1,4 +1,5 @@
 import { ArrowUpRight, Orbit, Waves, SlidersHorizontal, Magnet, Star, Thermometer } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { SectionHeading } from '@/components/SectionHeading';
 import { useReveal } from '@/hooks/useReveal';
 
@@ -31,7 +32,7 @@ export function Simulations() {
           {simulationItems.map((sim, index) => {
             const Icon = sim.icon;
             return (
-              <a key={sim.id} href={sim.href} className="glass-panel glass-panel-hover card-glow group relative flex min-w-0 flex-col gap-5 p-6 sm:p-7 reveal reveal-up" style={{ transitionDelay: `${index * 90}ms` }}>
+              <Link key={sim.id} to={sim.href} className="glass-panel glass-panel-hover card-glow group relative flex min-w-0 flex-col gap-5 p-6 sm:p-7 reveal reveal-up" style={{ transitionDelay: `${index * 90}ms` }}>
                 <div className="flex items-start justify-between">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-surface-border bg-space-700/50 text-accent-cyan">
                     <Icon className="h-6 w-6" strokeWidth={1.5} />
@@ -43,7 +44,7 @@ export function Simulations() {
                   <p className="font-body text-sm leading-relaxed text-star-white/50">{sim.description}</p>
                 </div>
                 <span className="mt-auto self-start rounded-md border border-accent-cyan/25 bg-accent-cyan/5 px-2.5 py-1 font-mono text-[0.7rem] text-accent-ice">{sim.label}</span>
-              </a>
+              </Link>
             );
           })}
         </div>
