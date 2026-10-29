@@ -34,23 +34,23 @@ export function HomePage() {
       {/* React Bits starfield: a quiet, continuous layer behind the existing iridescent hero. */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
         <Particles
-          particleCount={42}
+          particleCount={60}
           particleSpread={10}
           speed={0.12}
           particleColors={['#8be9ff', '#8099cc', '#c4b5fd']}
           moveParticlesOnHover={false}
           alphaParticles
-          particleBaseSize={2}
-          sizeRandomness={0.65}
-          pixelRatio={0.55}
+          particleBaseSize={32}
+          sizeRandomness={0.55}
+          pixelRatio={0.8}
           shape="circle"
-          glow={0.18}
-          twinkle={0.18}
+          glow={0.24}
+          twinkle={0.22}
           depthOfField={0.12}
           connections={false}
           drift="none"
           intro
-          opacity={0.55}
+          opacity={0.78}
           className="vectra-particles-canvas"
           style={{ width: '100%', height: '100%' }}
         />
