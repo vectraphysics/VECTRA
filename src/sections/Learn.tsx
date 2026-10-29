@@ -14,7 +14,7 @@ export function Learn() {
   const { ref, isVisible } = useReveal();
 
   return (
-    <section id="learn" className="relative py-20 sm:py-28 lg:py-32">
+    <section id="learn" className="relative isolate vectra-section-flow py-20 sm:py-28 lg:py-32">
       <div className="container-vectra">
         <div ref={ref} className={`reveal reveal-up ${isVisible ? 'is-visible' : ''}`}>
           <SectionHeading
