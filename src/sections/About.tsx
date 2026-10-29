@@ -1,14 +1,14 @@
 import { BookOpen, FunctionSquare, Lightbulb } from 'lucide-react';
 import { SectionHeading } from '@/components/SectionHeading';
 import { LessonCard } from '@/components/LessonCard';
-import { lessonModules } from '@/data/lessons';
+import { lessonModules } from '@/data/simulations';
 import { useReveal } from '@/hooks/useReveal';
 
 const features = [
   {
     icon: FunctionSquare,
     title: 'Equations explained',
-    description: 'Every formula is broken down — what it means, where it comes from, and when to use it.',
+    description: 'Every formula is broken down: what it means, where it comes from, and when to use it.',
   },
   {
     icon: Lightbulb,
@@ -22,18 +22,18 @@ const features = [
   },
 ];
 
-export function Learn() {
+export function About() {
   const { ref, isVisible } = useReveal();
 
   return (
-    <section id="learn" className="relative py-20 sm:py-28 lg:py-32">
+    <section id="about" className="relative py-20 sm:py-28 lg:py-32">
       <div className="container-vectra">
         <div
           ref={ref}
           className={`reveal reveal-up ${isVisible ? 'is-visible' : ''}`}
         >
           <SectionHeading
-            eyebrow="Learn"
+            eyebrow="About VECTRA"
             title="Understand the why, not just the what"
             description="Guided lessons combine clear explanations, mathematical foundations, and visual demonstrations to build genuine intuition."
           />
@@ -44,7 +44,7 @@ export function Learn() {
             const Icon = feature.icon;
             return (
               <div
-                key={i}
+                key={feature.title}
                 className="glass-panel flex items-start gap-4 p-5 reveal reveal-up parallax-panel"
                 style={{ transitionDelay: `${i * 140}ms` }}
               >
