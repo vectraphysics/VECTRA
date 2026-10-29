@@ -45,7 +45,7 @@ export function Hero() {
             <span className="eyebrow">Interactive Physics &amp; Space Science</span>
           </div>
 
-          <h1 className="font-display text-hero text-star-white">
+          <h1 className="font-display text-hero text-star-white vectra-title-focus">
             <span className="text-gradient">VECTRA</span>
           </h1>
 
