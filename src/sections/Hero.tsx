@@ -27,13 +27,13 @@ export function Hero() {
           clickSwirl={false}
           grain={0}
           fade={0}
-          opacity={0.62}
+          opacity={0.7}
           resolution={0.65}
           style={{
             width: '100%',
             height: '100%',
-            maskImage: 'linear-gradient(to bottom, #000 0%, #000 82%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, #000 0%, #000 82%, transparent 100%)',
+            maskImage: 'linear-gradient(to bottom, #000 0%, #000 88%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, #000 0%, #000 88%, transparent 100%)',
           }}
         />
       </div>
