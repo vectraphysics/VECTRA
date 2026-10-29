@@ -1,4 +1,5 @@
 import { BookOpen, FunctionSquare, Lightbulb } from 'lucide-react';
+import SpotlightCard from '@/components/SpotlightCard';
 import { SectionHeading } from '@/components/SectionHeading';
 import { LessonCard } from '@/components/LessonCard';
 import { lessonModules } from '@/data/simulations';
@@ -28,10 +29,7 @@ export function About() {
   return (
     <section id="about" className="relative isolate vectra-section-flow py-20 sm:py-28 lg:py-32">
       <div className="container-vectra">
-        <div
-          ref={ref}
-          className={`reveal reveal-up ${isVisible ? 'is-visible' : ''}`}
-        >
+        <div ref={ref} className={`reveal reveal-up ${isVisible ? 'is-visible' : ''}`}>
           <SectionHeading
             eyebrow="About VECTRA"
             title="Understand the why, not just the what"
@@ -45,20 +43,26 @@ export function About() {
             return (
               <div
                 key={feature.title}
-                className="glass-panel glass-panel-hover card-glow glare-card group relative flex items-start gap-4 p-5 reveal reveal-up parallax-panel"
+                className="reveal reveal-up"
                 style={{ transitionDelay: `${i * 140}ms` }}
               >
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-surface-border bg-space-700/40 text-accent-cyan">
-                  <Icon className="h-5 w-5" strokeWidth={1.5} />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <h3 className="font-display text-sm font-medium text-star-white">
-                    {feature.title}
-                  </h3>
-                  <p className="font-body text-sm leading-relaxed text-star-white/45">
-                    {feature.description}
-                  </p>
-                </div>
+                <SpotlightCard
+                  className="glass-panel glass-panel-hover group relative flex h-full items-start gap-4 p-5"
+                  spotlightColor="rgba(139, 233, 255, 0.9)"
+                  intensity={0.16}
+                  spotlightSize={210}
+                  borderGlow={0.5}
+                  proximity={80}
+                  smoothing={0.24}
+                >
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-surface-border bg-space-700/40 text-accent-cyan">
+                    <Icon className="h-5 w-5" strokeWidth={1.5} />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <h3 className="font-display text-sm font-medium text-star-white">{feature.title}</h3>
+                    <p className="font-body text-sm leading-relaxed text-star-white/45">{feature.description}</p>
+                  </div>
+                </SpotlightCard>
               </div>
             );
           })}
