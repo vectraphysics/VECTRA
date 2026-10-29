@@ -18,18 +18,23 @@ export function Hero() {
           amplitude={0.06}
           scale={1.15}
           detail={5}
-          brightness={1.25}
-          saturation={1.15}
-          contrast={1.05}
+          brightness={1.32}
+          saturation={1.25}
+          contrast={1.08}
           mouseReact={false}
           stir={0.18}
           sheen={0.18}
           clickSwirl={false}
           grain={0}
-          fade={0.14}
-          opacity={0.4}
-          resolution={0.5}
-          style={{ width: '100%', height: '100%' }}
+          fade={0}
+          opacity={0.62}
+          resolution={0.65}
+          style={{
+            width: '100%',
+            height: '100%',
+            maskImage: 'linear-gradient(to bottom, #000 0%, #000 82%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, #000 0%, #000 82%, transparent 100%)',
+          }}
         />
       </div>
 
