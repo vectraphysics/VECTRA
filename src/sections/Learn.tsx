@@ -1,5 +1,6 @@
 import { ArrowRight, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import SpotlightCard from '@/components/SpotlightCard';
 import { SectionHeading } from '@/components/SectionHeading';
 import { lessonModules } from '@/data/simulations';
 import { useReveal } from '@/hooks/useReveal';
@@ -43,12 +44,25 @@ export function Learn() {
                 {href && <span className="mt-auto inline-flex items-center gap-2 pt-2 text-sm text-accent-cyan">Start lesson <ArrowRight className="h-4 w-4" /></span>}
               </>
             );
+            const card = (
+              <SpotlightCard
+                className="glass-panel glass-panel-hover group relative flex h-full min-w-0 flex-col gap-5 p-6 sm:p-7"
+                spotlightColor="rgba(139, 233, 255, 0.9)"
+                intensity={0.18}
+                spotlightSize={230}
+                borderGlow={0.55}
+                proximity={90}
+                smoothing={0.24}
+              >
+                {content}
+              </SpotlightCard>
+            );
             return (
               <div key={lesson.id} className="reveal reveal-up" style={{ transitionDelay: `${index * 90}ms` }}>
                 {href ? (
-                  <Link to={href} className="glass-panel glass-panel-hover card-glow glare-card group relative flex h-full min-w-0 flex-col gap-5 p-6 sm:p-7">{content}</Link>
+                  <Link to={href} className="group block h-full min-w-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-space-900">{card}</Link>
                 ) : (
-                  <article className="glass-panel flex h-full min-w-0 flex-col gap-5 p-6">{content}</article>
+                  card
                 )}
               </div>
             );
