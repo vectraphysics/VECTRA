@@ -45,7 +45,7 @@ export function About() {
             return (
               <div
                 key={feature.title}
-                className="glass-panel flex items-start gap-4 p-5 reveal reveal-up parallax-panel"
+                className="glass-panel glass-panel-hover card-glow glare-card group relative flex items-start gap-4 p-5 reveal reveal-up parallax-panel"
                 style={{ transitionDelay: `${i * 140}ms` }}
               >
                 <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-surface-border bg-space-700/40 text-accent-cyan">
