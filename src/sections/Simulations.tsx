@@ -1,5 +1,6 @@
 import { ArrowUpRight, Orbit, Waves, SlidersHorizontal, Magnet, Star, Thermometer } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import SpotlightCard from '@/components/SpotlightCard';
 import { SectionHeading } from '@/components/SectionHeading';
 import { useReveal } from '@/hooks/useReveal';
 
@@ -32,18 +33,28 @@ export function Simulations() {
           {simulationItems.map((sim, index) => {
             const Icon = sim.icon;
             return (
-              <Link key={sim.id} to={sim.href} className="glass-panel glass-panel-hover card-glow glare-card group relative flex min-w-0 flex-col gap-5 p-6 sm:p-7 reveal reveal-up" style={{ transitionDelay: `${index * 90}ms` }}>
-                <div className="flex items-start justify-between">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-surface-border bg-space-700/50 text-accent-cyan">
-                    <Icon className="h-6 w-6" strokeWidth={1.5} />
+              <Link key={sim.id} to={sim.href} className="group relative block min-w-0 reveal reveal-up focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-space-900" style={{ transitionDelay: `${index * 90}ms` }}>
+                <SpotlightCard
+                  className="glass-panel glass-panel-hover relative flex h-full min-w-0 flex-col gap-5 p-6 sm:p-7"
+                  spotlightColor="rgba(139, 233, 255, 0.9)"
+                  intensity={0.2}
+                  spotlightSize={250}
+                  borderGlow={0.55}
+                  proximity={90}
+                  smoothing={0.24}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-surface-border bg-space-700/50 text-accent-cyan">
+                      <Icon className="h-6 w-6" strokeWidth={1.5} />
+                    </div>
+                    <ArrowUpRight className="h-5 w-5 text-star-white/30 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent-cyan" strokeWidth={1.5} />
                   </div>
-                  <ArrowUpRight className="h-5 w-5 text-star-white/30 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent-cyan" strokeWidth={1.5} />
-                </div>
-                <div className="flex flex-col gap-3">
-                  <h3 className="font-display text-xl font-medium text-star-white">{sim.title}</h3>
-                  <p className="font-body text-sm leading-relaxed text-star-white/50">{sim.description}</p>
-                </div>
-                <span className="mt-auto self-start rounded-md border border-accent-cyan/25 bg-accent-cyan/5 px-2.5 py-1 font-mono text-[0.7rem] text-accent-ice">{sim.label}</span>
+                  <div className="flex flex-col gap-3">
+                    <h3 className="font-display text-xl font-medium text-star-white">{sim.title}</h3>
+                    <p className="font-body text-sm leading-relaxed text-star-white/50">{sim.description}</p>
+                  </div>
+                  <span className="mt-auto self-start rounded-md border border-accent-cyan/25 bg-accent-cyan/5 px-2.5 py-1 font-mono text-[0.7rem] text-accent-ice">{sim.label}</span>
+                </SpotlightCard>
               </Link>
             );
           })}
