@@ -403,3 +403,27 @@
     transition: none;
   }
 }
+
+
+/* Shared interaction language across the landing page: one restrained card finish. */
+.vectra-landing-flow .glass-panel {
+  background-color: rgba(16, 23, 43, 0.58);
+  border-color: rgba(148, 171, 211, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.018);
+}
+
+.vectra-landing-flow .glass-panel-hover:hover {
+  border-color: rgba(94, 200, 216, 0.28);
+  background-color: rgba(21, 32, 55, 0.72);
+  box-shadow: 0 16px 44px -32px rgba(94, 200, 216, 0.24);
+}
+
+.vectra-landing-flow .glass-panel:focus-within {
+  border-color: rgba(94, 200, 216, 0.32);
+}
+
+@media (hover: none) {
+  .vectra-landing-flow .glass-panel-hover:hover {
+    box-shadow: none;
+  }
+}
