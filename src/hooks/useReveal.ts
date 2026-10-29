@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 export function useReveal<T extends HTMLElement = HTMLDivElement>(
-  options?: IntersectionObserverInit & {
-    triggerOnce?: boolean;
-  }
+  options?: IntersectionObserverInit & { triggerOnce?: boolean }
 ) {
   const ref = useRef<T>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -12,21 +10,17 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>(
     const element = ref.current;
     if (!element) return;
 
-    const { triggerOnce = false, threshold = 0.12, rootMargin = '0px 0px -8% 0px', ...observerOptions } = options ?? {};
+    const {
+      triggerOnce = false,
+      threshold = 0.01,
+      rootMargin = '0px',
+      ...observerOptions
+    } = options ?? {};
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          requestAnimationFrame(() => setIsVisible(true));
-          if (triggerOnce) {
-            observer.unobserve(entry.target);
-          }
-        } else if (!triggerOnce) {
-          setIsVisible(false);
-        }
-      },
-      { threshold, rootMargin, ...observerOptions }
-    );
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsVisible(entry.isIntersecting);
+      if (entry.isIntersecting && triggerOnce) observer.unobserve(entry.target);
+    }, { threshold, rootMargin, ...observerOptions });
 
     observer.observe(element);
     return () => observer.disconnect();

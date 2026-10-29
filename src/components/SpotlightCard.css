@@ -1,82 +1,134 @@
+/* Dark, fine-grained glass surface for VECTRA. Spotlight interaction follows React Bits. */
 .spotlight-card {
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --spotlight-opacity: 0;
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  padding: 0;
-  border-radius: 1.35rem;
-  background-color: var(--spotlight-card-surface);
-  background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.035), transparent 38%, rgba(115, 145, 210, 0.018));
-  box-shadow: var(--spotlight-card-shadow);
-  -webkit-backdrop-filter: blur(22px) saturate(145%);
-  backdrop-filter: blur(22px) saturate(145%);
-  transition: border-color 280ms ease, box-shadow 320ms ease, transform 320ms ease, background-color 320ms ease;
+  min-width: 0;
+  border: 1px solid rgba(178, 201, 245, 0.19);
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.075) 0%, rgba(255, 255, 255, 0.018) 24%, transparent 58%),
+    linear-gradient(155deg, rgba(14, 23, 47, 0.93), rgba(5, 9, 22, 0.96) 70%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.085),
+    inset 0 -1px 0 rgba(1, 4, 14, 0.8),
+    0 18px 44px -30px rgba(0, 0, 0, 0.92),
+    0 1px 0 rgba(173, 199, 255, 0.035);
+  -webkit-backdrop-filter: blur(18px) saturate(155%);
+  backdrop-filter: blur(18px) saturate(155%);
+  transition:
+    border-color 180ms ease,
+    box-shadow 220ms ease,
+    transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    background-color 220ms ease;
+  transform: translateZ(0);
 }
 
-.spotlight-card.glass-panel {
-  border-color: rgba(151, 177, 224, 0.15);
-  background-color: var(--spotlight-card-surface);
-  -webkit-backdrop-filter: blur(22px) saturate(145%);
-  backdrop-filter: blur(22px) saturate(145%);
+.spotlight-card::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--spotlight-opacity);
+  background: radial-gradient(
+    250px circle at var(--mouse-x) var(--mouse-y),
+    var(--spotlight-color) 0%,
+    rgba(40, 63, 121, 0.12) 34%,
+    transparent 72%
+  );
+  transition: opacity 160ms ease;
+}
+
+.spotlight-card::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    210px circle at var(--mouse-x) var(--mouse-y),
+    rgba(148, 183, 255, 0.55),
+    rgba(117, 150, 220, 0.12) 42%,
+    transparent 76%
+  );
+  opacity: var(--spotlight-opacity);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  transition: opacity 180ms ease;
+}
+
+.spotlight-card > :not(.spotlight-card__texture):not(.spotlight-card__border) {
+  position: relative;
+  z-index: 1;
+}
+
+.spotlight-card__texture {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0.075;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.24'/%3E%3C/svg%3E");
+  background-size: 120px 120px;
+  mix-blend-mode: soft-light;
+}
+
+.spotlight-card__border {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+  border: 1px solid rgba(202, 219, 255, 0.055);
+  border-radius: inherit;
 }
 
 .spotlight-card.glass-panel-hover:hover,
 .spotlight-card.glass-panel-hover:focus-within {
-  border-color: rgba(105, 145, 221, 0.34);
-  background-color: rgba(9, 15, 32, 0.84);
-  box-shadow: 0 22px 54px -32px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(220, 232, 255, 0.045);
-  transform: translateY(-2px);
+  border-color: rgba(154, 185, 255, 0.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.11),
+    inset 0 -1px 0 rgba(1, 4, 14, 0.8),
+    0 22px 48px -28px rgba(0, 0, 0, 0.95),
+    0 0 0 1px rgba(115, 150, 225,  0.045);
+  transform: translateY(-2px) translateZ(0);
 }
 
-.spotlight-card__light,
-.spotlight-card__grain,
-.spotlight-card__border,
-.spotlight-card__edge {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-}
+@media (hover: none), (pointer: coarse) {
+  .spotlight-card::before,
+  .spotlight-card::after {
+    background: none;
+    opacity: 0;
+  }
 
-.spotlight-card__light,
-.spotlight-card__grain {
-  z-index: -1;
-  opacity: 0;
-}
-
-.spotlight-card__grain {
-  background-size: 160px 160px;
-  mix-blend-mode: overlay;
-}
-
-.spotlight-card__border,
-.spotlight-card__edge {
-  z-index: 1;
-  padding: 1px;
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask:
-    linear-gradient(#000 0 0) content-box exclude,
-    linear-gradient(#000 0 0);
-}
-
-.spotlight-card__border {
-  background: var(--spotlight-card-border);
-}
-
-.spotlight-card__edge {
-  opacity: 0;
-}
-
-@media (hover: none) {
   .spotlight-card.glass-panel-hover:hover {
     transform: none;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
+@media (max-width: 640px) {
   .spotlight-card {
+    border-radius: 1rem;
+    -webkit-backdrop-filter: blur(14px) saturate(145%);
+    backdrop-filter: blur(14px) saturate(145%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.075),
+      0 14px 32px -25px rgba(0, 0, 0, 0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spotlight-card,
+  .spotlight-card::before,
+  .spotlight-card::after {
     transition: none;
   }
 }
