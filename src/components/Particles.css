@@ -5,6 +5,67 @@
   overflow: hidden;
 }
 
+/* Always-visible CSS star layer behind the WebGL canvas.
+   This keeps the landing background visible if WebGL2 fails on a device. */
+.particles-container.vectra-particles-canvas::before,
+.particles-container.vectra-particles-canvas::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-repeat: no-repeat;
+}
+
+.particles-container.vectra-particles-canvas::before {
+  opacity: 0.72;
+  background-image:
+    radial-gradient(circle, rgba(139, 233, 255, 0.95) 0 1px, transparent 1.7px),
+    radial-gradient(circle, rgba(196, 181, 253, 0.8) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(220, 235, 255, 0.85) 0 1px, transparent 1.7px),
+    radial-gradient(circle, rgba(128, 153, 204, 0.9) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(139, 233, 255, 0.8) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(220, 235, 255, 0.7) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(196, 181, 253, 0.85) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(139, 233, 255, 0.75) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(220, 235, 255, 0.8) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(128, 153, 204, 0.85) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(196, 181, 253, 0.75) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(139, 233, 255, 0.8) 0 1px, transparent 1.8px);
+  background-size:
+    100% 100%, 100% 100%, 100% 100%, 100% 100%,
+    100% 100%, 100% 100%, 100% 100%, 100% 100%,
+    100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  background-position:
+    7% 14%, 17% 63%, 28% 32%, 39% 82%,
+    48% 18%, 57% 54%, 68% 27%, 74% 76%,
+    83% 43%, 92% 19%, 94% 87%, 12% 91%;
+  animation: vectra-star-twinkle 7s ease-in-out infinite alternate;
+}
+
+.particles-container.vectra-particles-canvas::after {
+  opacity: 0.38;
+  background-image:
+    radial-gradient(circle, rgba(139, 233, 255, 0.8) 0 1.2px, transparent 2px),
+    radial-gradient(circle, rgba(196, 181, 253, 0.7) 0 1.2px, transparent 2px),
+    radial-gradient(circle, rgba(220, 235, 255, 0.8) 0 1.2px, transparent 2px),
+    radial-gradient(circle, rgba(128, 153, 204, 0.75) 0 1.2px, transparent 2px);
+  background-size: 100% 100%;
+  background-position: 22% 42%, 44% 68%, 77% 11%, 88% 61%;
+  animation: vectra-star-twinkle 9s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes vectra-star-twinkle {
+  from { opacity: 0.28; }
+  to { opacity: 0.78; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .particles-container.vectra-particles-canvas::before,
+  .particles-container.vectra-particles-canvas::after {
+    animation: none;
+  }
+}
+
 .particles-canvas {
   position: absolute;
   inset: 0;
