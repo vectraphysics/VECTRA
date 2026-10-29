@@ -1,7 +1,6 @@
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { Starfield } from '@/components/Starfield';
 import { OrbitalSystem } from '@/components/OrbitalSystem';
-import Iridescence from '@/components/Iridescence';
 
 export function Hero() {
   return (
@@ -9,11 +8,6 @@ export function Hero() {
       id="top"
       className="relative flex min-h-screen items-center overflow-hidden pt-16 sm:pt-20"
     >
-      {/* Subtle iridescent motion layer behind the existing starfield */}
-      <div className="pointer-events-none absolute inset-0 z-0 opacity-35" aria-hidden="true">
-        <Iridescence color="#3b82f6" speed={0.65} amplitude={0.1} scale={1} detail={6} brightness={1.5} saturation={1} contrast={1} mouseReact={true} stir={0.5} sheen={0.3} clickSwirl={true} grain={0} fade={0} resolution={0.6} style={{ width: '100%', height: '100%' }} />
-      </div>
-
       {/* Background starfield */}
       <Starfield density={1.2} />
 
