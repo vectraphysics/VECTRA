@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import Iridescence from '@/components/Iridescence';
-import Iridescence from '@/components/Iridescence';
 
 interface NavLink {
   label: string;
@@ -60,29 +59,6 @@ export function Navbar() {
             height: '100%',
             maskImage: 'linear-gradient(to bottom, #000 0%, #000 76%, transparent 100%)',
             WebkitMaskImage: 'linear-gradient(to bottom, #000 0%, #000 76%, transparent 100%)',
-          }}
-        />
-      </div>
-        <Iridescence
-          color="#8099cc"
-          speed={0.22}
-          amplitude={0.06}
-          scale={1.15}
-          detail={5}
-          brightness={1.32}
-          saturation={1.25}
-          contrast={1.08}
-          mouseReact={false}
-          stir={0.18}
-          sheen={0.18}
-          clickSwirl={false}
-          grain={0}
-          fade={0}
-          opacity={0.92}
-          resolution={0.35}
-          style={{
-            width: '100%',
-            height: '100%',
           }}
         />
       </div>
