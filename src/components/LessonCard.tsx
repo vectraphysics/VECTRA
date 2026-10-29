@@ -27,7 +27,7 @@ export function LessonCard({ lesson, index }: LessonCardProps) {
   return (
     <article
       ref={ref}
-      className={`glass-panel glass-panel-hover group relative flex flex-col gap-5 p-6 sm:p-7 section-fade ${isVisible ? 'is-visible' : ''}`}
+      className={`glass-panel glass-panel-hover card-glow glare-card group relative flex flex-col gap-5 p-6 sm:p-7 section-fade ${isVisible ? 'is-visible' : ''}`}
       style={{ transitionDelay: `${(index % 2) * 80}ms` }}
     >
       <div className="flex items-center justify-between">
