@@ -12,7 +12,7 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>(
     const element = ref.current;
     if (!element) return;
 
-    const { triggerOnce = true, threshold = 0.12, rootMargin = '0px 0px -8% 0px', ...observerOptions } = options ?? {};
+    const { triggerOnce = false, threshold = 0.12, rootMargin = '0px 0px -8% 0px', ...observerOptions } = options ?? {};
 
     const observer = new IntersectionObserver(
       ([entry]) => {
