@@ -29,7 +29,7 @@ export function HomePage() {
   }, []);
 
   return (
-    <div className="relative bg-space-900">
+    <div className="relative bg-space-900 vectra-landing-flow">
       <Navbar />
 
       <main>
