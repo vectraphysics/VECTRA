@@ -1,91 +1,29 @@
-import { ArrowRight, Sparkles } from 'lucide-react';
-import { Starfield } from '@/components/Starfield';
-import { OrbitalSystem } from '@/components/OrbitalSystem';
+import { SectionHeading } from '@/components/SectionHeading';
+import { TopicCard } from '@/components/TopicCard';
+import { physicsTopics } from '@/data/topics';
+import { useReveal } from '@/hooks/useReveal';
 
-export function Hero() {
+export function Explore() {
+  const { ref, isVisible } = useReveal();
+
   return (
-    <section
-      id="top"
-      className="relative flex min-h-screen items-center overflow-hidden pt-16 sm:pt-20"
-    >
-      <Starfield density={1.2} />
-
-      <div
-        className="pointer-events-none absolute inset-0"
-        aria-hidden="true"
-      >
-        <div
-          className="absolute left-1/4 top-1/3 h-[400px] w-[400px] rounded-full opacity-20 blur-[120px] pulse-glow-soft"
-          style={{ background: 'radial-gradient(circle, #2d4a7a 0%, transparent 70%)' }}
-        />
-        <div
-          className="absolute right-1/4 bottom-1/4 h-[350px] w-[350px] rounded-full opacity-15 blur-[100px] pulse-glow-soft"
-          style={{ background: 'radial-gradient(circle, #1a4a55 0%, transparent 70%)' }}
-        />
-      </div>
-
-      <div className="container-vectra relative z-10">
-        <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-8">
-          <div className="reveal reveal-up flex min-w-0 flex-col gap-6" style={{ transitionDelay: '120ms' }}>
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 shrink-0 text-accent-cyan" strokeWidth={1.5} />
-              <span className="eyebrow min-w-0">Interactive Physics & Space Science</span>
+    <section id="explore" className="relative py-20 sm:py-28 lg:py-32">
+      <div className="container-vectra">
+        <div ref={ref} className={`reveal reveal-up ${isVisible ? 'is-visible' : ''}`}>
+          <SectionHeading
+            eyebrow="Explore"
+            title="Physics, organized by discipline"
+            description="Seven major areas of physics, each with its own set of topics, simulations, and guided lessons. Start anywhere and follow your curiosity."
+          />
+        </div>
+        <div className="mt-12 grid gap-5 sm:mt-14 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3">
+          {physicsTopics.map((topic, index) => (
+            <div key={topic.id} className="reveal reveal-up" style={{ transitionDelay: `${index * 120}ms` }}>
+              <TopicCard topic={topic} index={index} />
             </div>
-
-            <h1 className="font-display text-hero text-star-white">
-              <span className="text-gradient">VECTRA</span>
-            </h1>
-
-            <p className="max-w-xl font-body text-lg leading-relaxed text-star-white/60 sm:text-xl">
-              Explore the laws of the universe through interactive simulations,
-              visual explanations, and guided learning. Physics, made intuitive.
-            </p>
-
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <a href="#explore" className="btn-primary group">
-                Explore Physics
-                <ArrowRight
-                  className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
-                  strokeWidth={2}
-                />
-              </a>
-              <a href="#simulations" className="btn-ghost">
-                View Simulations
-              </a>
-            </div>
-
-            <div className="mt-8 flex flex-wrap justify-between gap-2 border-t border-surface-border pt-6 sm:justify-start sm:gap-8">
-              <Stat value="7" label="Disciplines" />
-              <Stat value="6+" label="Simulations" />
-              <Stat value="∞" label="Curiosity" />
-            </div>
-          </div>
-
-          <div className="reveal reveal-right flex min-w-0 items-center justify-center" style={{ transitionDelay: '220ms' }}>
-            <div className="parallax-panel float-medium">
-              <OrbitalSystem />
-            </div>
-          </div>
+          ))}
         </div>
       </div>
-
-      <div className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 lg:flex">
-        <span className="font-mono text-[0.65rem] uppercase tracking-widest-2 text-star-white/30">
-          Scroll
-        </span>
-        <div className="h-10 w-px bg-gradient-to-b from-star-white/20 to-transparent" />
-      </div>
     </section>
-  );
-}
-
-function Stat({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span className="font-display text-2xl font-semibold text-star-white">{value}</span>
-      <span className="font-mono text-[0.7rem] uppercase tracking-widest-2 text-star-white/35">
-        {label}
-      </span>
-    </div>
   );
 }
