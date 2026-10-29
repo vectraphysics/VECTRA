@@ -37,8 +37,8 @@
   background: radial-gradient(
     250px circle at var(--mouse-x) var(--mouse-y),
     var(--spotlight-color) 0%,
-    rgba(40, 63, 121, 0.12) 34%,
-    transparent 72%
+    rgba(40, 63, 121, 0.22) 38%,
+    transparent 78%
   );
   transition: opacity 160ms ease;
 }
@@ -53,8 +53,8 @@
   padding: 1px;
   background: radial-gradient(
     210px circle at var(--mouse-x) var(--mouse-y),
-    rgba(148, 183, 255, 0.55),
-    rgba(117, 150, 220, 0.12) 42%,
+    rgba(170, 200, 255, 0.72),
+    rgba(117, 150, 220, 0.22) 42%,
     transparent 76%
   );
   opacity: var(--spotlight-opacity);
@@ -93,13 +93,15 @@
 
 .spotlight-card.glass-panel-hover:hover,
 .spotlight-card.glass-panel-hover:focus-within {
-  border-color: rgba(154, 185, 255, 0.3);
+  border-color: rgba(154, 185, 255, 0.48);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.11),
     inset 0 -1px 0 rgba(1, 4, 14, 0.8),
     0 22px 48px -28px rgba(0, 0, 0, 0.95),
-    0 0 0 1px rgba(115, 150, 225,  0.045);
-  transform: translateY(-2px) translateZ(0);
+    0 0 0 1px rgba(115, 150, 225, 0.12),
+    0 0 26px -10px rgba(80, 125, 235, 0.32),
+    0 0 54px -24px rgba(88, 123, 219, 0.28);
+  transform: translateY(-3px) translateZ(0);
 }
 
 @media (hover: none), (pointer: coarse) {
