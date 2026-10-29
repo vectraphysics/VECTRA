@@ -475,9 +475,8 @@
 }
 
 
-/* Section typography: a quiet Blur Text-inspired focus reveal, triggered by the existing scroll observer. */
+/* Section eyebrow and supporting copy retain the existing scroll fade. React Bits BlurText owns the heading reveal. */
 .vectra-heading-eyebrow,
-.vectra-heading-title,
 .vectra-heading-description {
   transition:
     opacity 680ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -491,14 +490,6 @@
   transition-delay: 40ms;
 }
 
-.vectra-heading-title {
-  opacity: 0;
-  filter: blur(8px);
-  transform: translate3d(0, 10px, 0);
-  transition-delay: 90ms;
-  will-change: opacity, filter, transform;
-}
-
 .vectra-heading-description {
   opacity: 0;
   filter: blur(3px);
@@ -507,7 +498,6 @@
 }
 
 .reveal.is-visible .vectra-heading-eyebrow,
-.reveal.is-visible .vectra-heading-title,
 .reveal.is-visible .vectra-heading-description {
   opacity: 1;
   filter: blur(0);
@@ -516,7 +506,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .vectra-heading-eyebrow,
-  .vectra-heading-title,
   .vectra-heading-description {
     opacity: 1;
     filter: none;
