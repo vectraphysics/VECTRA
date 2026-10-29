@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import Iridescence from '@/components/Iridescence';
 
 interface NavLink {
   label: string;
@@ -35,7 +36,30 @@ export function Navbar() {
           : 'border-b border-transparent bg-transparent'
       }`}
     >
-      <div className={`vectra-nav-iridescence ${scrolled ? 'is-scrolled' : ''}`} aria-hidden="true" />
+      <div className={`vectra-nav-iridescence ${scrolled ? 'is-scrolled' : ''}`} aria-hidden="true">
+        <Iridescence
+          color="#8099cc"
+          speed={0.22}
+          amplitude={0.06}
+          scale={1.15}
+          detail={5}
+          brightness={1.32}
+          saturation={1.25}
+          contrast={1.08}
+          mouseReact={false}
+          stir={0.18}
+          sheen={0.18}
+          clickSwirl={false}
+          grain={0}
+          fade={0}
+          opacity={0.92}
+          resolution={0.35}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+        />
+      </div>
       <nav className="container-vectra relative z-10 flex h-16 items-center justify-between sm:h-20" aria-label="Main navigation">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5" onClick={closeMobile}>
