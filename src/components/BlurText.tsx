@@ -253,7 +253,7 @@ const BlurText = ({
   fromColor,
   focusOnHover = false
 }: BlurTextProps) => {
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRef<HTMLElement | null>(null);
   const [phase, setPhase] = useState<Phase>(() => startPhase(trigger));
   const firstPhase = useRef(phase).current;
   const [focusWord, setFocusWord] = useState(-1);
