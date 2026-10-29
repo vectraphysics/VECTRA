@@ -379,3 +379,27 @@
     content: none;
   }
 }
+
+
+/* VECTRA landing continuity: a restrained ambient field shared by the hero and content. */
+.vectra-landing-flow {
+  background-image:
+    radial-gradient(ellipse 72% 32rem at 50% 0%, rgba(94, 200, 216, 0.045), transparent 72%),
+    radial-gradient(ellipse 60% 34rem at 0% 42%, rgba(73, 104, 170, 0.035), transparent 72%),
+    radial-gradient(ellipse 60% 32rem at 100% 74%, rgba(94, 200, 216, 0.025), transparent 72%);
+}
+
+.vectra-section-bridge {
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 76% 72% at 50% 0%, rgba(94, 200, 216, 0.085), transparent 72%),
+    linear-gradient(180deg, rgba(12, 22, 42, 0.24) 0%, rgba(8, 11, 26, 0) 88%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 35%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 35%, transparent 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vectra-section-bridge {
+    transition: none;
+  }
+}
