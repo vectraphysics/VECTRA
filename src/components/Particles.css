@@ -6,46 +6,65 @@
   isolation: isolate;
 }
 
-/* Soft deep-space nebula fallback beneath the WebGL layer.
-   No stars or particle dots: just slow, low-contrast atmospheric colour. */
+/* Low-contrast aurora haze: more visible colour, but no hard edges behind text. */
 .particles-container.vectra-particles-canvas::before,
 .particles-container.vectra-particles-canvas::after {
   content: "";
   position: absolute;
-  inset: -12%;
+  inset: -18%;
   pointer-events: none;
   background-repeat: no-repeat;
-  will-change: transform;
+  will-change: transform, background-position;
 }
 
 .particles-container.vectra-particles-canvas::before {
   background-image:
-    radial-gradient(ellipse at 18% 34%, rgba(42, 65, 142, 0.34) 0%, rgba(30, 43, 101, 0.18) 28%, transparent 58%),
-    radial-gradient(ellipse at 78% 26%, rgba(73, 47, 126, 0.25) 0%, rgba(41, 35, 91, 0.12) 30%, transparent 58%),
-    radial-gradient(ellipse at 61% 82%, rgba(22, 76, 119, 0.22) 0%, rgba(18, 48, 83, 0.1) 30%, transparent 60%);
-  filter: blur(22px);
-  opacity: 0.82;
-  animation: vectra-nebula-drift 32s ease-in-out infinite alternate;
+    radial-gradient(ellipse at 20% 32%, rgba(46, 77, 174, 0.48) 0%, rgba(30, 48, 119, 0.25) 27%, transparent 57%),
+    radial-gradient(ellipse at 80% 24%, rgba(103, 62, 163, 0.34) 0%, rgba(57, 43, 120, 0.18) 30%, transparent 59%),
+    radial-gradient(ellipse at 58% 82%, rgba(23, 105, 151, 0.34) 0%, rgba(19, 59, 103, 0.16) 31%, transparent 60%);
+  background-size: 125% 125%, 120% 120%, 130% 130%;
+  background-position: 0% 0%, 100% 10%, 45% 100%;
+  filter: blur(20px);
+  opacity: 0.94;
+  animation: vectra-aurora-flow 22s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
 }
 
 .particles-container.vectra-particles-canvas::after {
   background-image:
-    radial-gradient(ellipse at 74% 62%, rgba(54, 105, 145, 0.15) 0%, transparent 43%),
-    radial-gradient(ellipse at 34% 76%, rgba(91, 65, 143, 0.13) 0%, transparent 44%),
-    radial-gradient(ellipse at 45% 18%, rgba(33, 79, 131, 0.12) 0%, transparent 42%);
-  filter: blur(34px);
-  opacity: 0.72;
-  animation: vectra-nebula-breathe 26s ease-in-out infinite alternate;
+    linear-gradient(118deg, transparent 18%, rgba(41, 105, 157, 0.14) 37%, rgba(89, 71, 164, 0.19) 51%, transparent 72%),
+    radial-gradient(ellipse at 72% 65%, rgba(59, 129, 166, 0.22) 0%, transparent 45%),
+    radial-gradient(ellipse at 30% 76%, rgba(107, 76, 164, 0.2) 0%, transparent 46%);
+  background-size: 150% 150%, 125% 125%, 125% 125%;
+  background-position: 0% 40%, 100% 80%, 0% 20%;
+  filter: blur(28px);
+  opacity: 0.82;
+  animation: vectra-aurora-wave 17s ease-in-out infinite alternate;
 }
 
-@keyframes vectra-nebula-drift {
-  from { transform: translate3d(-1.5%, -1%, 0) scale(1); }
-  to { transform: translate3d(1.5%, 1%, 0) scale(1.06); }
+@keyframes vectra-aurora-flow {
+  0% {
+    transform: translate3d(-1.2%, 0.4%, 0) scale(1);
+    background-position: 0% 0%, 100% 10%, 45% 100%;
+  }
+  50% {
+    transform: translate3d(0.6%, -0.8%, 0) scale(1.035);
+    background-position: 18% 18%, 78% 28%, 60% 72%;
+  }
+  100% {
+    transform: translate3d(1.1%, 0.5%, 0) scale(1.06);
+    background-position: 32% 8%, 60% 0%, 28% 84%;
+  }
 }
 
-@keyframes vectra-nebula-breathe {
-  from { transform: translate3d(1%, -1%, 0) scale(1.02); }
-  to { transform: translate3d(-1%, 1%, 0) scale(1.08); }
+@keyframes vectra-aurora-wave {
+  from {
+    transform: translate3d(1%, -1%, 0) scale(1.02) skewX(-1deg);
+    background-position: 0% 40%, 100% 80%, 0% 20%;
+  }
+  to {
+    transform: translate3d(-1%, 1%, 0) scale(1.07) skewX(1deg);
+    background-position: 100% 60%, 0% 15%, 100% 85%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
