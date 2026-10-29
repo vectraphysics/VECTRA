@@ -16,7 +16,7 @@ export function Simulations() {
   const { ref, isVisible } = useReveal();
 
   return (
-    <section id="simulations" className="relative py-20 sm:py-28 lg:py-32">
+    <section id="simulations" className="relative isolate vectra-section-flow py-20 sm:py-28 lg:py-32">
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div className="absolute left-1/2 top-0 h-[300px] w-full max-w-[600px] -translate-x-1/2 rounded-full opacity-10 blur-[120px] pulse-glow-soft" style={{ background: 'radial-gradient(ellipse, #2d4a7a 0%, transparent 70%)' }} />
       </div>
