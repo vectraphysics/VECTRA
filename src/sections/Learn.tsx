@@ -46,7 +46,7 @@ export function Learn() {
             return (
               <div key={lesson.id} className="reveal reveal-up" style={{ transitionDelay: `${index * 90}ms` }}>
                 {href ? (
-                  <Link to={href} className="glass-panel glass-panel-hover group flex h-full min-w-0 flex-col gap-5 p-6">{content}</Link>
+                  <Link to={href} className="glass-panel glass-panel-hover card-glow glare-card group relative flex h-full min-w-0 flex-col gap-5 p-6 sm:p-7">{content}</Link>
                 ) : (
                   <article className="glass-panel flex h-full min-w-0 flex-col gap-5 p-6">{content}</article>
                 )}
