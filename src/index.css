@@ -515,3 +515,55 @@
     will-change: auto;
   }
 }
+
+
+/* Landing card typography: soft, staggered focus-in as each card enters view. */
+@keyframes vectra-card-text-arrive {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 9px, 0);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .vectra-landing-flow .reveal.is-visible .glass-panel h3 {
+    animation: vectra-card-text-arrive 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: 100ms;
+  }
+
+  .vectra-landing-flow .reveal.is-visible .glass-panel p {
+    animation: vectra-card-text-arrive 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: 190ms;
+  }
+
+  .vectra-landing-flow .reveal.is-visible .glass-panel span {
+    animation: vectra-card-text-arrive 650ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: 250ms;
+  }
+
+  .vectra-landing-flow .glass-panel h3 {
+    transition: color 280ms ease, text-shadow 280ms ease;
+  }
+
+  .vectra-landing-flow .glass-panel-hover:hover h3,
+  .vectra-landing-flow a:focus-visible .glass-panel h3 {
+    color: #e8fbff;
+    text-shadow: 0 0 18px rgba(94, 200, 216, 0.22);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vectra-landing-flow .reveal.is-visible .glass-panel h3,
+  .vectra-landing-flow .reveal.is-visible .glass-panel p,
+  .vectra-landing-flow .reveal.is-visible .glass-panel span {
+    animation: none;
+    filter: none;
+    transform: none;
+  }
+}

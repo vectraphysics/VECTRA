@@ -19,24 +19,24 @@
 
 .particles-container.vectra-particles-canvas::before {
   background-image:
-    radial-gradient(ellipse at 20% 32%, rgba(46, 77, 174, 0.48) 0%, rgba(30, 48, 119, 0.25) 27%, transparent 57%),
-    radial-gradient(ellipse at 80% 24%, rgba(103, 62, 163, 0.34) 0%, rgba(57, 43, 120, 0.18) 30%, transparent 59%),
-    radial-gradient(ellipse at 58% 82%, rgba(23, 105, 151, 0.34) 0%, rgba(19, 59, 103, 0.16) 31%, transparent 60%);
+    radial-gradient(ellipse at 20% 32%, rgba(62, 104, 232, 0.66) 0%, rgba(35, 61, 155, 0.34) 27%, transparent 57%),
+    radial-gradient(ellipse at 80% 24%, rgba(155, 89, 224, 0.48) 0%, rgba(87, 54, 165, 0.27) 30%, transparent 59%),
+    radial-gradient(ellipse at 58% 82%, rgba(20, 155, 206, 0.48) 0%, rgba(20, 88, 145, 0.26) 31%, transparent 60%);
   background-size: 125% 125%, 120% 120%, 130% 130%;
   background-position: 0% 0%, 100% 10%, 45% 100%;
-  filter: blur(20px);
+  filter: blur(24px) saturate(1.25);
   opacity: 0.94;
   animation: vectra-aurora-flow 22s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
 }
 
 .particles-container.vectra-particles-canvas::after {
   background-image:
-    linear-gradient(118deg, transparent 18%, rgba(41, 105, 157, 0.14) 37%, rgba(89, 71, 164, 0.19) 51%, transparent 72%),
-    radial-gradient(ellipse at 72% 65%, rgba(59, 129, 166, 0.22) 0%, transparent 45%),
-    radial-gradient(ellipse at 30% 76%, rgba(107, 76, 164, 0.2) 0%, transparent 46%);
+    linear-gradient(118deg, transparent 18%, rgba(48, 153, 211, 0.24) 37%, rgba(145, 101, 220, 0.30) 51%, transparent 72%),
+    radial-gradient(ellipse at 72% 65%, rgba(54, 176, 218, 0.32) 0%, transparent 45%),
+    radial-gradient(ellipse at 30% 76%, rgba(157, 105, 224, 0.30) 0%, transparent 46%);
   background-size: 150% 150%, 125% 125%, 125% 125%;
   background-position: 0% 40%, 100% 80%, 0% 20%;
-  filter: blur(28px);
+  filter: blur(32px) saturate(1.2);
   opacity: 0.82;
   animation: vectra-aurora-wave 17s ease-in-out infinite alternate;
 }
