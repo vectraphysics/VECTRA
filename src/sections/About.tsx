@@ -26,7 +26,7 @@ export function About() {
   const { ref, isVisible } = useReveal();
 
   return (
-    <section id="about" className="relative py-20 sm:py-28 lg:py-32">
+    <section id="about" className="relative isolate vectra-section-flow py-20 sm:py-28 lg:py-32">
       <div className="container-vectra">
         <div
           ref={ref}
