@@ -39,7 +39,7 @@ export function HomePage() {
           speed={0.12}
           particleColors={['#8be9ff', '#8099cc', '#c4b5fd']}
           moveParticlesOnHover={false}
-          alphaParticles
+          alphaParticles={false}
           particleBaseSize={32}
           sizeRandomness={0.55}
           pixelRatio={0.8}
