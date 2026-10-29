@@ -32,7 +32,7 @@ export function Simulations() {
           {simulationItems.map((sim, index) => {
             const Icon = sim.icon;
             return (
-              <Link key={sim.id} to={sim.href} className="glass-panel glass-panel-hover card-glow group relative flex min-w-0 flex-col gap-5 p-6 sm:p-7 reveal reveal-up" style={{ transitionDelay: `${index * 90}ms` }}>
+              <Link key={sim.id} to={sim.href} className="glass-panel glass-panel-hover card-glow glare-card group relative flex min-w-0 flex-col gap-5 p-6 sm:p-7 reveal reveal-up" style={{ transitionDelay: `${index * 90}ms` }}>
                 <div className="flex items-start justify-between">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-surface-border bg-space-700/50 text-accent-cyan">
                     <Icon className="h-6 w-6" strokeWidth={1.5} />
