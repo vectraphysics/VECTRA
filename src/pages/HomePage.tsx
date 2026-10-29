@@ -1,5 +1,6 @@
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import Particles from '@/components/Particles';
 import { Hero } from '@/sections/Hero';
 import { Explore } from '@/sections/Explore';
 import { Simulations } from '@/sections/Simulations';
@@ -29,26 +30,53 @@ export function HomePage() {
   }, []);
 
   return (
-    <div className="relative bg-space-900 vectra-landing-flow">
-      <Navbar />
+    <div className="relative isolate bg-space-900 vectra-landing-flow">
+      {/* React Bits starfield: a quiet, continuous layer behind the existing iridescent hero. */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+        <Particles
+          particleCount={42}
+          particleSpread={10}
+          speed={0.12}
+          particleColors={['#8be9ff', '#8099cc', '#c4b5fd']}
+          moveParticlesOnHover={false}
+          alphaParticles
+          particleBaseSize={2}
+          sizeRandomness={0.65}
+          pixelRatio={0.55}
+          shape="circle"
+          glow={0.18}
+          twinkle={0.18}
+          depthOfField={0.12}
+          connections={false}
+          drift="none"
+          intro
+          opacity={0.55}
+          className="vectra-particles-canvas"
+          style={{ width: '100%', height: '100%' }}
+        />
+      </div>
 
-      <main>
-        <Hero />
-        <Explore />
-        <Simulations />
-        <Learn />
-        <About />
+      <div className="relative z-10">
+        <Navbar />
 
-        <div className="mt-8 text-center">
-          <div className="vectra-dev-team">
-            <span className="vectra-dev-name">Elihle</span>
-            <span className="vectra-dev-name">Minenhle</span>
-            <span className="vectra-dev-name">Kwanele</span>
+        <main>
+          <Hero />
+          <Explore />
+          <Simulations />
+          <Learn />
+          <About />
+
+          <div className="mt-8 text-center">
+            <div className="vectra-dev-team">
+              <span className="vectra-dev-name">Elihle</span>
+              <span className="vectra-dev-name">Minenhle</span>
+              <span className="vectra-dev-name">Kwanele</span>
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
 
-      <Footer />
+        <Footer />
+      </div>
     </div>
   );
 }
