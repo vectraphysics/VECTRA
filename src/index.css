@@ -427,3 +427,49 @@
     box-shadow: none;
   }
 }
+
+
+/* Silk-inspired section bridges: quiet atmospheric movement without another WebGL layer. */
+.vectra-section-flow::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  inset: -5rem 0 auto;
+  height: 19rem;
+  background:
+    radial-gradient(ellipse 70% 58% at 50% 0%, rgba(94, 200, 216, 0.055), transparent 72%),
+    radial-gradient(ellipse 52% 65% at 12% 18%, rgba(91, 117, 190, 0.035), transparent 76%),
+    linear-gradient(180deg, rgba(12, 22, 42, 0.18), transparent 88%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 36%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 36%, transparent 100%);
+}
+
+.vectra-section-flow > .container-vectra {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .vectra-section-flow::before {
+    animation: vectra-silk-drift 18s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes vectra-silk-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+    opacity: 0.78;
+  }
+  to {
+    transform: translate3d(0, 8px, 0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vectra-section-flow::before {
+    animation: none;
+    transform: none;
+  }
+}
