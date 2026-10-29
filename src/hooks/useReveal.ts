@@ -1,13 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function useReveal<T extends HTMLElement = HTMLDivElement>(
   options?: IntersectionObserverInit & { triggerOnce?: boolean }
 ) {
-  const ref = useRef<T>(null);
+  const elementRef = useRef<T | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
+  // Mark this node before effects run, allowing the page observer to skip it.
+  const ref = useCallback((element: T | null) => {
+    if (element) element.dataset.revealLocal = 'true';
+    else if (elementRef.current) delete elementRef.current.dataset.revealLocal;
+    elementRef.current = element;
+  }, []);
+
   useEffect(() => {
-    const element = ref.current;
+    const element = elementRef.current;
     if (!element) return;
 
     const {

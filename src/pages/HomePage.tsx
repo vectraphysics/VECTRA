@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import Particles from '@/components/Particles';
@@ -8,6 +9,32 @@ import { Learn } from '@/sections/Learn';
 import { About } from '@/sections/About';
 
 export function HomePage() {
+  useEffect(() => {
+    // One page-level observer animates layout wrappers. Elements managed by
+    // useReveal are excluded so two observers never fight over their classes.
+    const elements = document.querySelectorAll<HTMLElement>(
+      '.reveal:not([data-reveal-local]), .section-fade:not([data-reveal-local])'
+    );
+    const allRevealElements = document.querySelectorAll<HTMLElement>('.reveal, .section-fade');
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      allRevealElements.forEach((element) => element.classList.add('is-visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          entry.target.classList.toggle('is-visible', entry.isIntersecting);
+        });
+      },
+      { threshold: 0.01, rootMargin: '0px' }
+    );
+
+    elements.forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="relative isolate bg-space-900 vectra-landing-flow">
       {/* React Bits starfield: a quiet, continuous layer behind the existing iridescent hero. */}
