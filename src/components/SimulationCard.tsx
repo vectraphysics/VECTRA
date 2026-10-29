@@ -28,11 +28,6 @@ export function TopicCard({ topic, index }: TopicCardProps) {
         proximity={90}
         smoothing={0.24}
       >
-        <div
-          className={`pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br ${topic.accent} opacity-0 transition-opacity duration-500 group-hover:opacity-100`}
-          aria-hidden="true"
-        />
-
         <div className="relative flex items-start justify-between">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-surface-border bg-space-700/50 text-accent-cyan transition-colors duration-500 group-hover:border-accent-cyan/40 group-hover:text-accent-ice">
             <Icon className="h-6 w-6" strokeWidth={1.5} />

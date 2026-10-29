@@ -1,5 +1,6 @@
 'use client';
 
+/* React Bits SpotlightCard, adapted from https://reactbits.dev/components/spotlight-card */
 import React, { useEffect, useRef } from 'react';
 
 import './SpotlightCard.css';
@@ -39,12 +40,12 @@ type Settings = {
 
 const THEMES: Record<'dark' | 'light', Palette> = {
   dark: {
-    surface: 'rgba(16, 23, 43, 0.72)',
-    border: 'rgba(148, 171, 211, 0.14)',
-    shadow: '0 18px 44px -32px rgba(94, 200, 216, 0.18)',
-    light: '#5268ad',
-    fill: 0.34,
-    edge: 0.72
+    surface: 'rgba(7, 12, 27, 0.76)',
+    border: 'rgba(151, 177, 224, 0.18)',
+    shadow: '0 24px 56px -28px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.035)',
+    light: '#354b86',
+    fill: 0.52,
+    edge: 0.84
   },
   light: {
     surface: '#ffffff',

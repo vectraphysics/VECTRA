@@ -3,9 +3,28 @@
   isolation: isolate;
   overflow: hidden;
   padding: 0;
-  border-radius: 1.5rem;
+  border-radius: 1.35rem;
   background-color: var(--spotlight-card-surface);
+  background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.035), transparent 38%, rgba(115, 145, 210, 0.018));
   box-shadow: var(--spotlight-card-shadow);
+  -webkit-backdrop-filter: blur(22px) saturate(145%);
+  backdrop-filter: blur(22px) saturate(145%);
+  transition: border-color 280ms ease, box-shadow 320ms ease, transform 320ms ease, background-color 320ms ease;
+}
+
+.spotlight-card.glass-panel {
+  border-color: rgba(151, 177, 224, 0.15);
+  background-color: var(--spotlight-card-surface);
+  -webkit-backdrop-filter: blur(22px) saturate(145%);
+  backdrop-filter: blur(22px) saturate(145%);
+}
+
+.spotlight-card.glass-panel-hover:hover,
+.spotlight-card.glass-panel-hover:focus-within {
+  border-color: rgba(105, 145, 221, 0.34);
+  background-color: rgba(9, 15, 32, 0.84);
+  box-shadow: 0 22px 54px -32px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(220, 232, 255, 0.045);
+  transform: translateY(-2px);
 }
 
 .spotlight-card__light,
@@ -48,4 +67,16 @@
 
 .spotlight-card__edge {
   opacity: 0;
+}
+
+@media (hover: none) {
+  .spotlight-card.glass-panel-hover:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spotlight-card {
+    transition: none;
+  }
 }
