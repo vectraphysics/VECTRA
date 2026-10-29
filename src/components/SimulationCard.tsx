@@ -15,7 +15,7 @@ export function TopicCard({ topic, index }: TopicCardProps) {
   return (
     <article
       ref={ref}
-      className={`glass-panel glass-panel-hover card-glow group relative flex flex-col gap-5 p-6 sm:p-7 reveal reveal-up parallax-panel ${isVisible ? 'is-visible' : ''}`}
+      className={`glass-panel glass-panel-hover card-glow glare-card group relative flex flex-col gap-5 p-6 sm:p-7 reveal reveal-up parallax-panel ${isVisible ? 'is-visible' : ''}`}
       style={{ transitionDelay: `${(index % 3) * 80}ms` }}
     >
       <div
