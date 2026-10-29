@@ -21,10 +21,10 @@ export function TopicCard({ topic, index }: TopicCardProps) {
     >
       <SpotlightCard
         className="glass-panel glass-panel-hover group relative flex h-full flex-col gap-5 p-6 sm:p-7"
-        spotlightColor="rgba(139, 233, 255, 0.9)"
-        intensity={0.2}
+        spotlightColor="rgba(48, 68, 136, 0.92)"
+        intensity={0.14}
         spotlightSize={250}
-        borderGlow={0.55}
+        borderGlow={0.42}
         proximity={90}
         smoothing={0.24}
       >

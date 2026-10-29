@@ -48,10 +48,10 @@ export function About() {
               >
                 <SpotlightCard
                   className="glass-panel glass-panel-hover group relative flex h-full items-start gap-4 p-5"
-                  spotlightColor="rgba(139, 233, 255, 0.9)"
-                  intensity={0.16}
+                  spotlightColor="rgba(48, 68, 136, 0.92)"
+                  intensity={0.14}
                   spotlightSize={210}
-                  borderGlow={0.5}
+                  borderGlow={0.4}
                   proximity={80}
                   smoothing={0.24}
                 >
