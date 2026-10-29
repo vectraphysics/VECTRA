@@ -1,6 +1,6 @@
 import { ArrowRight, Sparkles } from 'lucide-react';
-import { Starfield } from '@/components/Starfield';
 import { OrbitalSystem } from '@/components/OrbitalSystem';
+import Iridescence from '@/components/Iridescence';
 
 export function Hero() {
   return (
@@ -8,28 +8,33 @@ export function Hero() {
       id="top"
       className="relative flex min-h-screen items-center overflow-hidden pt-16 sm:pt-20"
     >
-      {/* Background starfield */}
-      <Starfield density={1.2} />
-
-      {/* Nebula glow overlays */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        aria-hidden="true"
-      >
-        <div
-          className="absolute left-1/4 top-1/3 h-[400px] w-[400px] rounded-full opacity-20 blur-[120px]"
-          style={{ background: 'radial-gradient(circle, #2d4a7a 0%, transparent 70%)' }}
-        />
-        <div
-          className="absolute right-1/4 bottom-1/4 h-[350px] w-[350px] rounded-full opacity-15 blur-[100px]"
-          style={{ background: 'radial-gradient(circle, #1a4a55 0%, transparent 70%)' }}
+      {/* Single homepage background animation: soft, low-opacity Iridescence */}
+      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+        <Iridescence
+          color="#3b82f6"
+          speed={0.35}
+          amplitude={0.08}
+          scale={1.15}
+          detail={4}
+          brightness={1.15}
+          saturation={0.8}
+          contrast={0.9}
+          mouseReact={false}
+          stir={0.25}
+          sheen={0.15}
+          clickSwirl={false}
+          grain={0}
+          fade={0.2}
+          opacity={0.24}
+          resolution={0.5}
+          style={{ width: '100%', height: '100%' }}
         />
       </div>
 
       <div className="container-vectra relative z-10">
         <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-8">
           {/* Left: content */}
-          <div className="flex min-w-0 flex-col gap-6 animate-fade-up">
+          <div className="flex min-w-0 flex-col gap-6">
             <div className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 shrink-0 text-accent-cyan" strokeWidth={1.5} />
               <span className="eyebrow min-w-0">Interactive Physics & Space Science</span>
@@ -66,7 +71,7 @@ export function Hero() {
           </div>
 
           {/* Right: orbital system visual */}
-          <div className="flex min-w-0 items-center justify-center animate-fade-in">
+          <div className="flex min-w-0 items-center justify-center">
             <OrbitalSystem />
           </div>
         </div>
