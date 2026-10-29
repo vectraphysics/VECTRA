@@ -35,7 +35,8 @@ export function Navbar() {
           : 'border-b border-transparent bg-transparent'
       }`}
     >
-      <nav className="container-vectra flex h-16 items-center justify-between sm:h-20" aria-label="Main navigation">
+      <div className={`vectra-nav-iridescence ${scrolled ? 'is-scrolled' : ''}`} aria-hidden="true" />
+      <nav className="container-vectra relative z-10 flex h-16 items-center justify-between sm:h-20" aria-label="Main navigation">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5" onClick={closeMobile}>
           <Logo />
@@ -75,7 +76,7 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="border-t border-surface-border bg-space-900/95 backdrop-blur-xl md:hidden">
+        <div className="relative z-10 border-t border-surface-border bg-space-900/95 backdrop-blur-xl md:hidden">
           <div className="container-vectra flex flex-col gap-1 py-4">
             {navLinks.map((link) => (
               <a
