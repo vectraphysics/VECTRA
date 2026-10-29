@@ -1,88 +1,80 @@
 import { ArrowRight, Sparkles } from 'lucide-react';
-import { OrbitalSystem } from '@/components/OrbitalSystem';
 import Iridescence from '@/components/Iridescence';
 
 export function Hero() {
   return (
     <section
       id="top"
-      className="relative flex min-h-screen items-center overflow-hidden pt-16 sm:pt-20"
+      className="relative flex min-h-screen items-center overflow-hidden pt-20 pb-24 sm:pt-24"
     >
-      {/* Single homepage background animation: soft, low-opacity Iridescence */}
-      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+      {/* The sole animated hero visual: React Bits Iridescence */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        aria-hidden="true"
+      >
         <Iridescence
-          color="#3b82f6"
-          speed={0.35}
-          amplitude={0.08}
+          color="#8099cc"
+          speed={0.3}
+          amplitude={0.06}
           scale={1.15}
-          detail={4}
-          brightness={1.15}
-          saturation={0.8}
-          contrast={0.9}
+          detail={5}
+          brightness={1.25}
+          saturation={1.15}
+          contrast={1.05}
           mouseReact={false}
-          stir={0.25}
-          sheen={0.15}
+          stir={0.18}
+          sheen={0.18}
           clickSwirl={false}
           grain={0}
-          fade={0.2}
-          opacity={0.24}
+          fade={0.14}
+          opacity={0.4}
           resolution={0.5}
           style={{ width: '100%', height: '100%' }}
         />
       </div>
 
       <div className="container-vectra relative z-10">
-        <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-8">
-          {/* Left: content */}
-          <div className="flex min-w-0 flex-col gap-6">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 shrink-0 text-accent-cyan" strokeWidth={1.5} />
-              <span className="eyebrow min-w-0">Interactive Physics & Space Science</span>
-            </div>
-
-            <h1 className="font-display text-hero text-star-white">
-              <span className="text-gradient">VECTRA</span>
-            </h1>
-
-            <p className="max-w-xl font-body text-lg leading-relaxed text-star-white/60 sm:text-xl">
-              Explore the laws of the universe through interactive simulations,
-              visual explanations, and guided learning. Physics, made intuitive.
-            </p>
-
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <a href="#explore" className="btn-primary group">
-                Explore Physics
-                <ArrowRight
-                  className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
-                  strokeWidth={2}
-                />
-              </a>
-              <a href="#simulations" className="btn-ghost">
-                View Simulations
-              </a>
-            </div>
-
-            {/* Stats */}
-            <div className="mt-8 flex flex-wrap justify-between gap-2 border-t border-surface-border pt-6 sm:justify-start sm:gap-8">
-              <Stat value="7" label="Disciplines" />
-              <Stat value="6+" label="Simulations" />
-              <Stat value="∞" label="Curiosity" />
-            </div>
+        <div className="mx-auto flex max-w-5xl flex-col items-center gap-7 text-center sm:gap-8">
+          <div className="flex items-center justify-center gap-2">
+            <Sparkles className="h-4 w-4 shrink-0 text-accent-cyan" strokeWidth={1.5} />
+            <span className="eyebrow">Interactive Physics &amp; Space Science</span>
           </div>
 
-          {/* Right: orbital system visual */}
-          <div className="flex min-w-0 items-center justify-center">
-            <OrbitalSystem />
+          <h1 className="font-display text-hero text-star-white">
+            <span className="text-gradient">VECTRA</span>
+          </h1>
+
+          <p className="mx-auto max-w-2xl font-body text-lg leading-relaxed text-star-white/75 sm:text-xl">
+            Explore the laws of the universe through interactive simulations,
+            visual explanations, and guided learning. Physics, made intuitive.
+          </p>
+
+          <div className="flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
+            <a href="#explore" className="btn-primary group justify-center">
+              Explore Physics
+              <ArrowRight
+                className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                strokeWidth={2}
+              />
+            </a>
+            <a href="#simulations" className="btn-ghost justify-center">
+              View Simulations
+            </a>
+          </div>
+
+          <div className="mt-5 flex w-full max-w-xl flex-wrap justify-center gap-x-10 gap-y-5 border-t border-surface-border/80 pt-6 sm:mt-8 sm:gap-x-16">
+            <Stat value="7" label="Disciplines" />
+            <Stat value="6+" label="Simulations" />
+            <Stat value="∞" label="Curiosity" />
           </div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 lg:flex">
-        <span className="font-mono text-[0.65rem] uppercase tracking-widest-2 text-star-white/30">
-          Scroll
+      <div className="pointer-events-none absolute bottom-7 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 lg:flex">
+        <span className="font-mono text-[0.65rem] uppercase tracking-widest-2 text-star-white/45">
+          Scroll to explore
         </span>
-        <div className="h-10 w-px bg-gradient-to-b from-star-white/20 to-transparent" />
+        <div className="h-10 w-px bg-gradient-to-b from-star-white/30 to-transparent" />
       </div>
     </section>
   );
@@ -90,9 +82,9 @@ export function Hero() {
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <div className="flex flex-col gap-0.5">
+    <div className="flex min-w-[5rem] flex-col items-center gap-0.5">
       <span className="font-display text-2xl font-semibold text-star-white">{value}</span>
-      <span className="font-mono text-[0.7rem] uppercase tracking-widest-2 text-star-white/35">
+      <span className="font-mono text-[0.7rem] uppercase tracking-widest-2 text-star-white/45">
         {label}
       </span>
     </div>
