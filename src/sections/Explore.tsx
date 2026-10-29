@@ -7,8 +7,9 @@ export function Explore() {
   const { ref, isVisible } = useReveal();
 
   return (
-    <section id="explore" className="relative py-20 sm:py-28 lg:py-32">
-      <div className="container-vectra">
+    <section id="explore" className="relative isolate py-20 sm:py-28 lg:py-32">
+      <div className="vectra-section-bridge pointer-events-none absolute inset-x-0 -top-16 h-80" aria-hidden="true" />
+      <div className="container-vectra relative z-10">
         <div ref={ref} className={`reveal reveal-up ${isVisible ? 'is-visible' : ''}`}>
           <SectionHeading
             eyebrow="Explore"
