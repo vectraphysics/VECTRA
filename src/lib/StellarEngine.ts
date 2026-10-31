@@ -26,8 +26,9 @@ const ACCRETION_COLOR = 0xff8844;
  * protostar, stable main-sequence star, expanded giant, supernova flash,
  * compact remnant, or black hole with accretion disk.
  *
- * Transitions between stages interpolate the star's radius, color, and
- * emissive intensity smoothly over a transition duration.
+ * Stage-specific structures illustrate accretion, stellar outflows, envelope
+ * ejection, pulsar beams and compact remnants. The visuals are educational
+ * schematics, not hydrodynamic or relativistic numerical simulations.
  */
 export class StellarEngine {
   private renderer: THREE.WebGLRenderer;
@@ -392,9 +393,10 @@ export class StellarEngine {
     // A few dipole-like loops make the tilted magnetic structure legible.
     for (let loopIndex = 0; loopIndex < 3; loopIndex++) {
       const loopRadius = 2.6 + loopIndex * 1.25;
+      const footpointAngle = Math.asin(Math.sqrt(0.34 / loopRadius));
       const points: THREE.Vector3[] = [];
       for (let step = 0; step <= 80; step++) {
-        const theta = 0.12 + (Math.PI - 0.24) * (step / 80);
+        const theta = footpointAngle + (Math.PI - 2 * footpointAngle) * (step / 80);
         const radius = loopRadius * Math.sin(theta) ** 2;
         points.push(new THREE.Vector3(radius * Math.sin(theta), radius * Math.cos(theta), 0));
       }
