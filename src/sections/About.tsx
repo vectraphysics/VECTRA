@@ -32,7 +32,7 @@ export function About() {
   const { ref, isVisible } = useReveal();
 
   return (
-    <section id="about" className="relative isolate vectra-section-flow about-section py-20 sm:py-28 lg:py-32">
+    <section id="about" className="relative isolate vectra-section-flow about-section py-16 sm:py-24 lg:py-32">
       <div className="container-vectra">
         <div className="about-layout">
           <div className="about-intro">
