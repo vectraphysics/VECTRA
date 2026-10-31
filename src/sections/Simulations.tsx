@@ -25,6 +25,7 @@ export function Simulations() {
         <div ref={ref} className={`reveal reveal-up ${isVisible ? 'is-visible' : ''}`}>
           <SectionHeading
             eyebrow="Simulations"
+            sectionIndex="02 / 04"
             title="Learn by doing"
             description="Explore interactive physics experiences and see how changing a system's conditions changes what happens."
           />
