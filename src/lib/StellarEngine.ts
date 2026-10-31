@@ -264,9 +264,32 @@ export class StellarEngine {
     this.targetGlowIntensity = stage.glowIntensity;
 
     // Stage-specific visual elements
-    this.targetNebulaOpacity = stage.id === 'nebula' ? 0.7 : stage.id === 'protostar' ? 0.3 : 0;
-    this.targetSupernovaOpacity = stage.id === 'supernova' ? 0.9 : 0;
-    this.targetAccretionOpacity = stage.id === 'black-hole' ? 0.6 : 0;
+    // Nebula clouds remain visible during formation and are expelled again
+    // during the planetary-nebula phase.
+    this.targetNebulaOpacity =
+      stage.id === 'nebula' ? 0.7 :
+      stage.id === 'protostar' ? 0.3 :
+      stage.id === 'planetary-nebula' ? 0.58 : 0;
+
+    // The expanding shell distinguishes a supernova from the slower,
+    // luminous gas shell of a planetary nebula.
+    this.targetSupernovaOpacity =
+      stage.id === 'supernova' ? 0.9 :
+      stage.id === 'planetary-nebula' ? 0.32 : 0;
+
+    // A flattened accretion structure appears during protostellar formation
+    // and becomes hotter and brighter around a black hole.
+    this.targetAccretionOpacity =
+      stage.id === 'protostar' ? 0.38 :
+      stage.id === 'black-hole' ? 0.72 : 0;
+
+    this.accretionMaterial.color.setHex(
+      stage.id === 'protostar' ? 0xd9874b :
+      stage.id === 'black-hole' ? ACCRETION_COLOR : 0x66cde8
+    );
+    this.supernovaMaterial.color.setHex(
+      stage.id === 'planetary-nebula' ? 0x65c9ff : 0xffffff
+    );
 
     if (animate) {
       this.transitionProgress = 0;
