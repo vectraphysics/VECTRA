@@ -2,6 +2,7 @@ name: VECTRA CI
 
 on:
   pull_request:
+    branches-ignore: ["main"]
   workflow_dispatch:
 
 permissions:

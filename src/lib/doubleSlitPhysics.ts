@@ -44,7 +44,7 @@ export const DEFAULT_DS_PARAMS: DoubleSlitParameters = {
   emissionRate: 50,
 };
 
-export function deriveDSData(p: DoubleSlitParameters, mode: SlitMode): DoubleSlitDerivedData {
+export function deriveDSData(p: DoubleSlitParameters): DoubleSlitDerivedData {
   const fringeSpacing = p.slitSeparation > 0 ? (p.wavelength * p.screenDistance) / p.slitSeparation : 0;
   const firstMinimum = p.slitWidth > 0 ? (p.wavelength * p.screenDistance) / p.slitWidth : 0;
   const maxAngle = Math.atan(200 / p.screenDistance);
