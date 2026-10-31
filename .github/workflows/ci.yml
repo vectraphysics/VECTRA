@@ -2,16 +2,13 @@ name: VECTRA CI
 
 on:
   pull_request:
-    branches: ["main", "design/about-section-refinement"]
-  push:
-    branches: ["main", "feature/double-pendulum-simulation"]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: "ci-${{ github.workflow }}-${{ github.ref }}"
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -34,14 +31,8 @@ jobs:
       - name: TypeScript typecheck
         run: npm run typecheck
 
-      - name: ESLint (simulation and integration files)
-        run: >-
-          npx eslint
-          src/lib/doublePendulumPhysics.ts
-          src/hooks/useDoublePendulumCanvas.ts
-          src/pages/DoublePendulumPage.tsx
-          src/sections/Simulations.tsx
-          src/App.tsx
+      - name: ESLint
+        run: npm run lint
 
       - name: Production build
         run: npm run build
