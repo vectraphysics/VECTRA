@@ -184,8 +184,15 @@ export function computeProbeData(
   const field = dipoleField(pos, strength, orientationDeg);
   const magnitude = field.length();
   const distance = pos.length();
-  // Normalize relative to a reference field at distance 5
-  const refField = dipoleField(new THREE.Vector3(5, 0, 0), strength, 0).length();
+  // Normalize against the equatorial field at r = 5, rotated with the dipole.
+  // This keeps B/B₀ comparable when the magnet orientation changes.
+  const angle = THREE.MathUtils.degToRad(orientationDeg);
+  const referencePosition = new THREE.Vector3(
+    5 * Math.cos(angle),
+    0,
+    -5 * Math.sin(angle)
+  );
+  const refField = dipoleField(referencePosition, strength, orientationDeg).length();
   const normalizedStrength = refField > 0 ? magnitude / refField : 0;
 
   return {
