@@ -425,7 +425,10 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
 
-    const intersectionObserver = new IntersectionObserver(([entry]) => {
+    const intersectionObserver = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+
       isInViewport = entry.isIntersecting;
       if (isInViewport) startAnimationLoop();
       else stopAnimationLoop();
