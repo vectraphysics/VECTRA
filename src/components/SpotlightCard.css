@@ -155,3 +155,10 @@
     backdrop-filter: blur(10px) saturate(140%);
   }
 }
+
+@media (max-width: 640px) {
+  .spotlight-card {
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+    backdrop-filter: blur(10px) saturate(140%);
+  }
+}
