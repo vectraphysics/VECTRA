@@ -78,6 +78,10 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
     const context = canvas?.getContext('2d', { alpha: false });
 
     if (!canvas || !container || !context) return;
+    const drawingCanvas = canvas as HTMLCanvasElement;
+    const drawingContainer = container as HTMLElement;
+    const drawingContext = context as CanvasRenderingContext2D;
+
 
     let width = 0;
     let height = 0;
@@ -164,16 +168,16 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
     }
 
     function resize() {
-      const bounds = container.getBoundingClientRect();
+      const bounds = drawingContainer.getBoundingClientRect();
       width = Math.max(1, bounds.width);
       height = Math.max(1, bounds.height);
       pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
 
-      canvas.width = Math.round(width * pixelRatio);
-      canvas.height = Math.round(height * pixelRatio);
-      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      drawingCanvas.width = Math.round(width * pixelRatio);
+      drawingCanvas.height = Math.round(height * pixelRatio);
+      drawingContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 
-      background = context.createLinearGradient(0, 0, width, height);
+      background = drawingContext.createLinearGradient(0, 0, width, height);
       background.addColorStop(0, '#07101f');
       background.addColorStop(0.55, '#080d1b');
       background.addColorStop(1, '#050914');
@@ -190,21 +194,21 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
 
       const start = trailCount === TRAIL_CAPACITY ? trailCursor : 0;
 
-      context.beginPath();
+      drawingContext.beginPath();
       for (let i = 0; i < trailCount; i += 1) {
         const index = (start + i) % TRAIL_CAPACITY;
         const x = pivotX + trailX[index] * scale;
         const y = pivotY + trailY[index] * scale;
 
-        if (i === 0) context.moveTo(x, y);
-        else context.lineTo(x, y);
+        if (i === 0) drawingContext.moveTo(x, y);
+        else drawingContext.lineTo(x, y);
       }
 
-      context.strokeStyle = 'rgba(116, 224, 239, 0.14)';
-      context.lineWidth = 1.5;
-      context.lineCap = 'round';
-      context.lineJoin = 'round';
-      context.stroke();
+      drawingContext.strokeStyle = 'rgba(116, 224, 239, 0.14)';
+      drawingContext.lineWidth = 1.5;
+      drawingContext.lineCap = 'round';
+      drawingContext.lineJoin = 'round';
+      drawingContext.stroke();
     }
 
     function draw(current: DoublePendulumState) {
@@ -213,24 +217,24 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
       const totalLength = parameters.length1 + parameters.length2;
       if (width <= 1 || height <= 1 || totalLength <= 0) return;
 
-      context.clearRect(0, 0, width, height);
-      context.fillStyle = background ?? '#080d1b';
-      context.fillRect(0, 0, width, height);
+      drawingContext.clearRect(0, 0, width, height);
+      drawingContext.fillStyle = background ?? '#080d1b';
+      drawingContext.fillRect(0, 0, width, height);
 
       // Low-contrast instrument grid.
-      context.strokeStyle = 'rgba(145, 174, 218, 0.045)';
-      context.lineWidth = 1;
-      context.beginPath();
+      drawingContext.strokeStyle = 'rgba(145, 174, 218, 0.045)';
+      drawingContext.lineWidth = 1;
+      drawingContext.beginPath();
       const gridSpacing = 44;
       for (let x = gridSpacing; x < width; x += gridSpacing) {
-        context.moveTo(x, 0);
-        context.lineTo(x, height);
+        drawingContext.moveTo(x, 0);
+        drawingContext.lineTo(x, height);
       }
       for (let y = gridSpacing; y < height; y += gridSpacing) {
-        context.moveTo(0, y);
-        context.lineTo(width, y);
+        drawingContext.moveTo(0, y);
+        drawingContext.lineTo(width, y);
       }
-      context.stroke();
+      drawingContext.stroke();
 
       const pivotX = width * 0.5;
       const scale = Math.min(
@@ -241,15 +245,15 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
       const pivotY = height * 0.5;
 
       // Downward reference axis.
-      context.save();
-      context.setLineDash([4, 8]);
-      context.strokeStyle = 'rgba(168, 213, 232, 0.12)';
-      context.lineWidth = 1;
-      context.beginPath();
-      context.moveTo(pivotX, pivotY);
-      context.lineTo(pivotX, height - 16);
-      context.stroke();
-      context.restore();
+      drawingContext.save();
+      drawingContext.setLineDash([4, 8]);
+      drawingContext.strokeStyle = 'rgba(168, 213, 232, 0.12)';
+      drawingContext.lineWidth = 1;
+      drawingContext.beginPath();
+      drawingContext.moveTo(pivotX, pivotY);
+      drawingContext.lineTo(pivotX, height - 16);
+      drawingContext.stroke();
+      drawingContext.restore();
 
       const points = modelToCanvas(current.theta1, current.theta2, parameters);
       const jointX = pivotX + points.firstX * scale;
@@ -260,62 +264,62 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
       drawTrail(pivotX, pivotY, scale, config.showTrail);
 
       // Rods: a soft light edge and a crisp inner stroke.
-      context.lineCap = 'round';
-      context.shadowBlur = 15;
-      context.shadowColor = 'rgba(94, 200, 216, 0.26)';
-      context.strokeStyle = 'rgba(172, 222, 238, 0.58)';
-      context.lineWidth = 5;
-      context.beginPath();
-      context.moveTo(pivotX, pivotY);
-      context.lineTo(jointX, jointY);
-      context.lineTo(bobX, bobY);
-      context.stroke();
+      drawingContext.lineCap = 'round';
+      drawingContext.shadowBlur = 15;
+      drawingContext.shadowColor = 'rgba(94, 200, 216, 0.26)';
+      drawingContext.strokeStyle = 'rgba(172, 222, 238, 0.58)';
+      drawingContext.lineWidth = 5;
+      drawingContext.beginPath();
+      drawingContext.moveTo(pivotX, pivotY);
+      drawingContext.lineTo(jointX, jointY);
+      drawingContext.lineTo(bobX, bobY);
+      drawingContext.stroke();
 
-      context.shadowBlur = 0;
-      context.strokeStyle = 'rgba(233, 246, 255, 0.82)';
-      context.lineWidth = 1.35;
-      context.beginPath();
-      context.moveTo(pivotX, pivotY);
-      context.lineTo(jointX, jointY);
-      context.lineTo(bobX, bobY);
-      context.stroke();
+      drawingContext.shadowBlur = 0;
+      drawingContext.strokeStyle = 'rgba(233, 246, 255, 0.82)';
+      drawingContext.lineWidth = 1.35;
+      drawingContext.beginPath();
+      drawingContext.moveTo(pivotX, pivotY);
+      drawingContext.lineTo(jointX, jointY);
+      drawingContext.lineTo(bobX, bobY);
+      drawingContext.stroke();
 
       // Joint and masses.
       const radius1 = Math.max(6, Math.min(12, 5 + parameters.mass1 * 2.1));
       const radius2 = Math.max(7, Math.min(14, 5 + parameters.mass2 * 2.4));
 
-      context.shadowColor = '#62d6e7';
-      context.shadowBlur = 18;
-      context.fillStyle = '#70dbe9';
-      context.beginPath();
-      context.arc(jointX, jointY, radius1, 0, TAU);
-      context.fill();
+      drawingContext.shadowColor = '#62d6e7';
+      drawingContext.shadowBlur = 18;
+      drawingContext.fillStyle = '#70dbe9';
+      drawingContext.beginPath();
+      drawingContext.arc(jointX, jointY, radius1, 0, TAU);
+      drawingContext.fill();
 
-      context.shadowColor = '#a99cff';
-      context.shadowBlur = 21;
-      context.fillStyle = '#b8aaff';
-      context.beginPath();
-      context.arc(bobX, bobY, radius2, 0, TAU);
-      context.fill();
-      context.shadowBlur = 0;
+      drawingContext.shadowColor = '#a99cff';
+      drawingContext.shadowBlur = 21;
+      drawingContext.fillStyle = '#b8aaff';
+      drawingContext.beginPath();
+      drawingContext.arc(bobX, bobY, radius2, 0, TAU);
+      drawingContext.fill();
+      drawingContext.shadowBlur = 0;
 
-      context.fillStyle = 'rgba(255,255,255,0.75)';
-      context.beginPath();
-      context.arc(jointX - radius1 * 0.28, jointY - radius1 * 0.28, radius1 * 0.24, 0, TAU);
-      context.fill();
-      context.beginPath();
-      context.arc(bobX - radius2 * 0.28, bobY - radius2 * 0.28, radius2 * 0.24, 0, TAU);
-      context.fill();
+      drawingContext.fillStyle = 'rgba(255,255,255,0.75)';
+      drawingContext.beginPath();
+      drawingContext.arc(jointX - radius1 * 0.28, jointY - radius1 * 0.28, radius1 * 0.24, 0, TAU);
+      drawingContext.fill();
+      drawingContext.beginPath();
+      drawingContext.arc(bobX - radius2 * 0.28, bobY - radius2 * 0.28, radius2 * 0.24, 0, TAU);
+      drawingContext.fill();
 
-      context.strokeStyle = 'rgba(226, 240, 255, 0.7)';
-      context.lineWidth = 1;
-      context.beginPath();
-      context.arc(pivotX, pivotY, 8, 0, TAU);
-      context.stroke();
-      context.fillStyle = '#d8f3fa';
-      context.beginPath();
-      context.arc(pivotX, pivotY, 3, 0, TAU);
-      context.fill();
+      drawingContext.strokeStyle = 'rgba(226, 240, 255, 0.7)';
+      drawingContext.lineWidth = 1;
+      drawingContext.beginPath();
+      drawingContext.arc(pivotX, pivotY, 8, 0, TAU);
+      drawingContext.stroke();
+      drawingContext.fillStyle = '#d8f3fa';
+      drawingContext.beginPath();
+      drawingContext.arc(pivotX, pivotY, 3, 0, TAU);
+      drawingContext.fill();
     }
 
     function frame(timestamp: number) {
@@ -423,7 +427,7 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
     emitMetrics();
 
     const resizeObserver = new ResizeObserver(resize);
-    resizeObserver.observe(container);
+    resizeObserver.observe(drawingContainer);
 
     const intersectionObserver = new IntersectionObserver((entries) => {
       const entry = entries[0];
@@ -433,7 +437,7 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
       if (isInViewport) startAnimationLoop();
       else stopAnimationLoop();
     }, { threshold: 0 });
-    intersectionObserver.observe(container);
+    intersectionObserver.observe(drawingContainer);
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     startAnimationLoop();
