@@ -36,12 +36,18 @@ export function useWaveCanvas(
   configRef.current = config;
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const container = containerRef.current;
-    if (!canvas || !container) return;
+    const canvasNode = canvasRef.current;
+    const containerNode = containerRef.current;
+    if (!canvasNode || !containerNode) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const context = canvasNode.getContext('2d');
+    if (!context) return;
+
+    // Explicit non-null aliases are safe after the guards above and remain
+    // narrowed inside the nested renderer callbacks used by this effect.
+    const canvas: HTMLCanvasElement = canvasNode;
+    const container: HTMLDivElement = containerNode;
+    const ctx: CanvasRenderingContext2D = context;
 
     let width = 0;
     let height = 0;
