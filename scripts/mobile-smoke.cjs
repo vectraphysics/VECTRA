@@ -66,7 +66,7 @@ async function waitForServer(url, timeoutMs = 30000) {
             canvasWidth: rect?.width ?? 0,
             canvasHeight: rect?.height ?? 0,
             viewportHeight: viewport?.getBoundingClientRect().height ?? 0,
-            canvasTouchAction: canvas ? getComputedStyle(canvas).touchAction : 'missing',
+            canvasTouchAction: canvas ? getComputedStyle(canvas).touchAction : 'missing',\n            touchActionChain: canvas ? (() => { const values = []; let node = canvas; while (node && node !== document.documentElement) { values.push(getComputedStyle(node).touchAction); node = node.parentElement; } return values; })() : [],
             smallControls: buttons.filter((button) => button.getBoundingClientRect().height < 40).map((button) => ({
               text: button.innerText.trim(),
               height: Math.round(button.getBoundingClientRect().height),
@@ -78,7 +78,7 @@ async function waitForServer(url, timeoutMs = 30000) {
         if (layout.documentWidth > viewport.width) failures.push(`${route} horizontal overflow at ${viewport.width}px: ${layout.documentWidth}px`);
         if (layout.canvasWidth < viewport.width - 2 || layout.canvasHeight < 300) failures.push(`${route} canvas has unexpected dimensions: ${JSON.stringify(layout)}`);
         if (!layout.webgl) failures.push(`${route} did not create a WebGL context at ${viewport.width}px`);
-        if (layout.smallControls.length) failures.push(`${route} has undersized primary controls: ${JSON.stringify(layout.smallControls)}`);
+        if (!layout.touchActionChain.includes('none')) failures.push(`${route} canvas has no touch-action:none ancestor at ${viewport.width}px`);\n        if (layout.smallControls.length) failures.push(`${route} has undersized primary controls: ${JSON.stringify(layout.smallControls)}`);
 
         if (route.includes('stellar')) {
           const play = page.getByRole('button', { name: /Play Evolution/ });
@@ -94,11 +94,25 @@ async function waitForServer(url, timeoutMs = 30000) {
           await page.waitForTimeout(700);
           await page.screenshot({ path: path.join(artifacts, `stellar-${viewport.width}.png`), fullPage: true });
         } else {
-          const play = page.getByRole('button', { name: /Play/ }).first();
-          if (await play.count()) await play.click();
+          await page.getByRole('button', { name: '2×' }).click();
+          if (!(await page.getByRole('button', { name: '2×' }).getAttribute('class')).includes('active')) {
+            failures.push(`Orbital speed selection did not activate at ${viewport.width}px`);
+          }
+          await page.getByRole('button', { name: 'Play' }).click();
+          await page.getByRole('button', { name: 'Pause' }).waitFor();
+          await page.getByRole('button', { name: 'Pause' }).click();
           await page.waitForTimeout(700);
           await page.screenshot({ path: path.join(artifacts, `orbital-${viewport.width}.png`), fullPage: true });
         }
+
+        const scrollCheck = await page.evaluate(() => {
+          const before = window.scrollY;
+          window.scrollTo(0, document.body.scrollHeight);
+          const after = window.scrollY;
+          window.scrollTo(0, 0);
+          return { before, after };
+        });
+        if (scrollCheck.after <= 0) failures.push(`${route} page did not scroll to its lower controls at ${viewport.width}px`);
 
         if (pageErrors.length) failures.push(`${route} page errors at ${viewport.width}px: ${pageErrors.join(' | ')}`);
         console.log(JSON.stringify({ route, viewport, layout, pageErrors }));
