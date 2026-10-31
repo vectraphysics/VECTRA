@@ -45,13 +45,14 @@ export function WavePlayback({ controls }: WavePlaybackProps) {
 
         <div className="flex flex-col gap-1.5">
           <span className="font-mono text-[0.7rem] uppercase tracking-widest-2 text-star-white/30">
-            Speed
+            Animation rate
           </span>
           <div className="flex items-center gap-0.5 rounded-lg border border-surface-border bg-space-900/40 p-0.5">
             {SPEEDS.map((s) => (
               <button
                 key={s}
                 onClick={() => setSpeed(s)}
+                aria-pressed={speed === s}
                 className={`sim-speed-btn flex-1 ${speed === s ? 'active' : ''}`}
               >
                 {s}×
