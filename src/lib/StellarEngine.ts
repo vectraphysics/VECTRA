@@ -95,6 +95,16 @@ export class StellarEngine {
 
   // Animation
   private animationId = 0;
+
+  private onVisibilityChange = (): void => {
+    if (document.hidden) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = 0;
+      return;
+    }
+
+    if (this.animationId === 0) this.animate();
+  };
   private resizeObserver: ResizeObserver;
   private reducedMotion = false;
   private clock = new THREE.Clock();
@@ -229,6 +239,7 @@ export class StellarEngine {
     this.resizeObserver.observe(container);
 
     // Start
+    document.addEventListener('visibilitychange', this.onVisibilityChange);
     this.animate();
   }
 
@@ -470,6 +481,11 @@ export class StellarEngine {
   // ---- Animation loop ----
 
   private animate = (): void => {
+    if (document.hidden) {
+      this.animationId = 0;
+      return;
+    }
+
     this.animationId = requestAnimationFrame(this.animate);
     const dt = Math.min(0.05, this.clock.getDelta());
 
@@ -576,7 +592,9 @@ export class StellarEngine {
   // ---- Cleanup ----
 
   dispose(): void {
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
     cancelAnimationFrame(this.animationId);
+    this.animationId = 0;
     this.unbindEvents();
     this.resizeObserver.disconnect();
 
