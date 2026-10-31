@@ -51,7 +51,7 @@ export function MFVisualization({ controls }: MFVisualizationProps) {
 
         {/* Toggles */}
         <button onClick={toggleFieldDirection} className={`sim-toggle-btn ${showFieldDirection ? 'active' : ''}`}>
-          <span>Field Direction (Particles)</span>
+          <span>Direction Arrows</span>
           <span className={`h-3.5 w-6 rounded-full p-0.5 transition-colors ${showFieldDirection ? 'bg-accent-cyan/30' : 'bg-space-500'}`}>
             <span className={`block h-2.5 w-2.5 rounded-full bg-star-white transition-transform ${showFieldDirection ? 'translate-x-2.5' : ''}`} />
           </span>

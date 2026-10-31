@@ -10,16 +10,15 @@ import * as THREE from 'three';
  *
  * We work in normalized units where (μ₀/4π) = 1 and m = strength · û.
  *
- * Field lines are traced by integrating dB/dl ∝ B̂ — stepping along the field
- * direction from seed points near the north pole until reaching the south pole
- * or exceeding a max step count.
+ * Displayed paths are traced by integrating along B̂ from seed points near
+ * the north pole. This view shows the exterior dipole paths, not the return
+ * path through the inside of the magnet.
  */
 
 export interface MagnetParameters {
   strength: number;    // dipole moment magnitude (normalized)
-  orientation: number; // rotation about Z axis in degrees
-  lineDensity: number; // number of field lines per ring
-  particleSpeed: number; // flow animation speed
+  orientation: number; // rotation about Y axis in degrees
+  lineDensity: number; // number of displayed field lines per ring
   vizScale: number;    // visual scale multiplier
 }
 
@@ -27,7 +26,6 @@ export const DEFAULT_MAGNET_PARAMS: MagnetParameters = {
   strength: 100,
   orientation: 0,
   lineDensity: 12,
-  particleSpeed: 1,
   vizScale: 1,
 };
 
@@ -186,8 +184,15 @@ export function computeProbeData(
   const field = dipoleField(pos, strength, orientationDeg);
   const magnitude = field.length();
   const distance = pos.length();
-  // Normalize relative to a reference field at distance 5
-  const refField = dipoleField(new THREE.Vector3(5, 0, 0), strength, 0).length();
+  // Normalize against the equatorial field at r = 5, rotated with the dipole.
+  // This keeps B/B₀ comparable when the magnet orientation changes.
+  const angle = THREE.MathUtils.degToRad(orientationDeg);
+  const referencePosition = new THREE.Vector3(
+    5 * Math.cos(angle),
+    0,
+    -5 * Math.sin(angle)
+  );
+  const refField = dipoleField(referencePosition, strength, orientationDeg).length();
   const normalizedStrength = refField > 0 ? magnitude / refField : 0;
 
   return {

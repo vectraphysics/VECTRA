@@ -65,7 +65,7 @@ export function MagneticFieldPage() {
             {/* Bottom-left hint */}
             <div className="pointer-events-none absolute bottom-4 left-4 z-10 hidden sm:block">
               <p className="font-mono text-[0.7rem] leading-relaxed text-star-white/25">
-                Drag to rotate · Shift+drag to pan · Scroll to zoom · Drag probe to move
+                Drag to rotate · Shift+drag to pan · Scroll to zoom · Drag the gold compass to measure
               </p>
             </div>
           </div>
