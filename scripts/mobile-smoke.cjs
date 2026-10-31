@@ -72,6 +72,7 @@ async function waitForServer(url, timeoutMs = 30000) {
               text: button.innerText.trim(),
               height: Math.round(button.getBoundingClientRect().height),
             })),
+            sliderHeights: [...document.querySelectorAll('input[type="range"]')].map((input) => Math.round(input.getBoundingClientRect().height)),
             webgl: Boolean(canvas && (canvas.getContext('webgl2') || canvas.getContext('webgl'))),
           };
         });
@@ -81,6 +82,7 @@ async function waitForServer(url, timeoutMs = 30000) {
         if (!layout.webgl) failures.push(`${route} did not create a WebGL context at ${viewport.width}px`);
         if (!layout.touchActionChain.includes('none')) failures.push(`${route} canvas has no touch-action:none ancestor at ${viewport.width}px`);
         if (layout.smallControls.length) failures.push(`${route} has undersized primary controls: ${JSON.stringify(layout.smallControls)}`);
+        if (layout.sliderHeights.some((height) => height < 44)) failures.push(`${route} has undersized range-slider touch areas: ${JSON.stringify(layout.sliderHeights)}`);
 
         if (route.includes('stellar')) {
           const play = page.getByRole('button', { name: /Play Evolution/ });
