@@ -21,7 +21,7 @@ export function PlaybackControls({ controls }: PlaybackControlsProps) {
           {playState === 'playing' ? (
             <button
               onClick={pause}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-accent-cyan/30 bg-accent-cyan/10 px-4 py-2.5 font-display text-sm font-medium text-accent-cyan transition-all hover:bg-accent-cyan/20"
+              className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-accent-cyan/30 bg-accent-cyan/10 px-4 py-2.5 font-display text-sm font-medium text-accent-cyan transition-all hover:bg-accent-cyan/20"
             >
               <Pause className="h-4 w-4" strokeWidth={2} />
               Pause
@@ -30,7 +30,7 @@ export function PlaybackControls({ controls }: PlaybackControlsProps) {
             <button
               onClick={play}
               disabled={playState === 'impact'}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-accent-cyan/30 bg-accent-cyan/10 px-4 py-2.5 font-display text-sm font-medium text-accent-cyan transition-all hover:bg-accent-cyan/20 disabled:cursor-not-allowed disabled:opacity-30"
+              className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-accent-cyan/30 bg-accent-cyan/10 px-4 py-2.5 font-display text-sm font-medium text-accent-cyan transition-all hover:bg-accent-cyan/20 disabled:cursor-not-allowed disabled:opacity-30"
             >
               <Play className="h-4 w-4" strokeWidth={2} />
               {playState === 'impact' ? 'Impact' : 'Play'}
@@ -38,7 +38,7 @@ export function PlaybackControls({ controls }: PlaybackControlsProps) {
           )}
           <button
             onClick={reset}
-            className="flex items-center justify-center gap-2 rounded-lg border border-surface-border bg-space-700/30 px-4 py-2.5 font-display text-sm font-medium text-star-white/60 transition-all hover:border-surface-border-hover hover:text-star-white"
+            className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-surface-border bg-space-700/30 px-4 py-2.5 font-display text-sm font-medium text-star-white/60 transition-all hover:border-surface-border-hover hover:text-star-white"
           >
             <RotateCcw className="h-4 w-4" strokeWidth={1.5} />
             Reset
@@ -55,7 +55,7 @@ export function PlaybackControls({ controls }: PlaybackControlsProps) {
               <button
                 key={s}
                 onClick={() => setSpeed(s)}
-                className={`sim-speed-btn flex-1 ${speed === s ? 'active' : ''}`}
+                className={`sim-speed-btn min-h-11 flex-1 ${speed === s ? 'active' : ''}`}
               >
                 {s}×
               </button>
