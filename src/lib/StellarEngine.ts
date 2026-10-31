@@ -120,6 +120,7 @@ export class StellarEngine {
   private camDamping = 0.12;
   private currentCamPos = new THREE.Vector3();
   private currentCamTarget = new THREE.Vector3();
+  private desiredCamPos = new THREE.Vector3();
 
   // Pointer
   private isPointerDown = false;
@@ -231,7 +232,7 @@ export class StellarEngine {
       color: 0xffffff,
       transparent: true,
       opacity: 0,
-      side: THREE.BackSide,
+      side: THREE.DoubleSide,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
@@ -465,13 +466,10 @@ export class StellarEngine {
     this.targetNebulaOpacity =
       stage.id === 'nebula' ? 0.7 :
       stage.id === 'protostar' ? 0.3 :
-      stage.id === 'planetary-nebula' ? 0.58 : 0;
+      stage.id === 'asymptotic-giant' ? 0.24 : 0;
 
-    // The expanding shell distinguishes a supernova from the slower,
-    // luminous gas shell of a planetary nebula.
-    this.targetSupernovaOpacity =
-      stage.id === 'supernova' ? 0.9 :
-      stage.id === 'planetary-nebula' ? 0.32 : 0;
+    // Core-collapse ejecta are separate from the slower planetary-nebula shell.
+    this.targetSupernovaOpacity = stage.id === 'supernova' ? 0.9 : 0;
 
     // A flattened accretion structure appears during protostellar formation
     // and becomes hotter and brighter around a black hole.
@@ -493,6 +491,16 @@ export class StellarEngine {
     this.planetaryNebulaShellMaterial.color.setHex(0x63c7f2);
     this.eventHorizon.visible = stage.id === 'black-hole';
     this.photonRing.visible = stage.id === 'black-hole';
+    if (stage.id === 'planetary-nebula') {
+      this.planetaryNebulaPoints.scale.setScalar(1);
+      this.planetaryNebulaShell.scale.set(8, 10, 8);
+    }
+    if (stage.id === 'supernova') {
+      this.supernovaShell.scale.setScalar(5);
+    }
+    if (stage.id === 'neutron-star') {
+      this.neutronStarGroup.rotation.set(0, 0, 0);
+    }
 
     if (animate) {
       this.transitionProgress = 0;
@@ -593,12 +601,12 @@ export class StellarEngine {
 
   private smoothCamera(): void {
     const { radius, theta, phi } = this.camSpherical;
-    const desiredPos = new THREE.Vector3(
+    this.desiredCamPos.set(
       radius * Math.sin(phi) * Math.cos(theta),
       radius * Math.cos(phi),
       radius * Math.sin(phi) * Math.sin(theta)
     ).add(this.cameraTarget);
-    this.currentCamPos.lerp(desiredPos, this.camDamping);
+    this.currentCamPos.lerp(this.desiredCamPos, this.camDamping);
     this.currentCamTarget.lerp(this.cameraTarget, this.camDamping);
     this.camera.position.copy(this.currentCamPos);
     this.camera.lookAt(this.currentCamTarget);
@@ -745,20 +753,22 @@ export class StellarEngine {
     if (this.currentSupernovaOpacity > 0.01) {
       const expansion = 5 + Math.min(this.stageTimer, this.stageDuration) * 2.8;
       this.supernovaShell.scale.setScalar(expansion);
-      this.supernovaShell.rotation.y += dt * 0.08;
+      if (!this.reducedMotion) this.supernovaShell.rotation.y += dt * 0.08;
     }
 
     // Nebula dynamics remain deliberately subtle.
     if (this.currentNebulaOpacity > 0.01) {
-      this.nebulaPoints.rotation.y += dt * 0.025;
+      if (!this.reducedMotion) this.nebulaPoints.rotation.y += dt * 0.025;
     }
 
     if (this.currentPlanetaryOpacity > 0.01) {
       const expansion = 1 + Math.min(this.stageTimer, this.stageDuration) * 0.018;
       this.planetaryNebulaPoints.scale.setScalar(expansion);
       this.planetaryNebulaShell.scale.set(8 * expansion, 10 * expansion, 8 * expansion);
-      this.planetaryNebulaPoints.rotation.y += dt * 0.018;
-      this.planetaryNebulaShell.rotation.y += dt * 0.018;
+      if (!this.reducedMotion) {
+        this.planetaryNebulaPoints.rotation.y += dt * 0.018;
+        this.planetaryNebulaShell.rotation.y += dt * 0.018;
+      }
     }
 
     // Disk material moves around the protostar or black hole.
