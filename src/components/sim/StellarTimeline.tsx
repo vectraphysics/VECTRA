@@ -24,7 +24,7 @@ export function StellarTimeline({ controls }: StellarTimelineProps) {
               <button
                 key={stage.id}
                 onClick={() => goToStage(idx)}
-                className={`group flex items-center gap-3 rounded-lg border px-3 py-2 text-left transition-all ${
+                className={`group flex min-h-11 items-center gap-3 rounded-lg border px-3 py-2 text-left transition-all ${
                   isActive
                     ? 'border-accent-cyan/40 bg-accent-cyan/10'
                     : isPast
