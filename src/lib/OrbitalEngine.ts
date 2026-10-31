@@ -383,6 +383,11 @@ export class OrbitalEngine {
         nextState.position = { x: impact.x, y: impact.y, z: impact.z };
       }
       this.state = nextState;
+      this.testBody.group.position.set(
+        this.state.position.x,
+        this.state.position.y,
+        this.state.position.z
+      );
       this.finishCollision();
       return;
     }
