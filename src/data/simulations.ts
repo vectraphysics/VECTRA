@@ -37,6 +37,15 @@ export const lessonModules: LessonModule[] = [
     level: 'Introductory',
   },
   {
+    id: 'momentum-impulse',
+    title: 'Momentum and Impulse',
+    discipline: 'Mechanics',
+    equation: 'p = mv · J = Δp',
+    description: 'Study signed momentum, impulse, force-time graphs, conservation, and collisions with interactive experiments and guided practice.',
+    duration: '35–45 min',
+    level: 'Intermediate',
+  },
+  {
     id: 'maxwell-equations',
     title: "Maxwell's Equations",
     discipline: 'Electromagnetism',
