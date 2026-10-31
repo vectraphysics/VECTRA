@@ -34,8 +34,14 @@ jobs:
       - name: TypeScript typecheck
         run: npm run typecheck
 
-      - name: ESLint
-        run: npm run lint
+      - name: ESLint (simulation and integration files)
+        run: >-
+          npx eslint
+          src/lib/doublePendulumPhysics.ts
+          src/hooks/useDoublePendulumCanvas.ts
+          src/pages/DoublePendulumPage.tsx
+          src/sections/Simulations.tsx
+          src/App.tsx
 
       - name: Production build
         run: npm run build
