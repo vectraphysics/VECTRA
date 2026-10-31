@@ -43,6 +43,7 @@ export function Explore() {
         <div ref={ref} className={`reveal reveal-up ${isVisible ? 'is-visible' : ''}`}>
           <SectionHeading
             eyebrow="Explore the field"
+            sectionIndex="01 / 04"
             title="A map of modern physics"
             description="Move between the major disciplines, find a topic, and follow the connections that make physics one coherent picture of nature."
           />
