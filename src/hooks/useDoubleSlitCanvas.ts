@@ -40,7 +40,6 @@ const MAX_PARTICLES = 80;
 const MAX_IMPACTS = 5000;
 const PARTICLE_COLOR_PHOTON = '#5ec8d8';
 const PARTICLE_COLOR_ELECTRON = '#a8d5e8';
-const IMPACT_COLOR = '#e8c87a';
 const BARRIER_COLOR = '#2a3450';
 const SOURCE_COLOR = '#5ec8d8';
 const SCREEN_COLOR = '#1a2138';
@@ -280,7 +279,6 @@ export function useDoubleSlitCanvas(
       const dist = distCacheRef.current;
       if (!dist || dist.length < 2) return;
 
-      const maxScreenY = height * 0.45;
       const overlayWidth = 60;
       const overlayX = screenX + 10;
 
@@ -358,7 +356,6 @@ export function useDoubleSlitCanvas(
       const cfg = configRef.current;
       if (!cfg.isPlaying) return;
 
-      const maxScreenY = height * 0.45;
       const remaining: Particle[] = [];
 
       for (const p of particlesRef.current) {

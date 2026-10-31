@@ -1,5 +1,5 @@
 import { Play, Pause, RotateCcw } from 'lucide-react';
-import type { SimulationControls, PlayState } from '@/hooks/useOrbitalSimulation';
+import type { SimulationControls } from '@/hooks/useOrbitalSimulation';
 
 interface PlaybackControlsProps {
   controls: SimulationControls;
