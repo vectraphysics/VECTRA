@@ -81,6 +81,10 @@ export class MagneticFieldEngine {
   private camDamping = 0.12;
   private currentCamPos = new THREE.Vector3();
   private currentCamTarget = new THREE.Vector3();
+  private probeDirectionScratch = new THREE.Vector3();
+  private probeUpDirection = new THREE.Vector3(0, 1, 0);
+  private probeQuaternionScratch = new THREE.Quaternion();
+  private particlePositionScratch = new THREE.Vector3();
 
   // Pointer interaction
   private isPointerDown = false;
@@ -631,11 +635,10 @@ export class MagneticFieldEngine {
     // Orient needle along field direction
     const data = computeProbeData(this.probePosition, this.params.strength, this.params.orientation);
     if (data.magnitude > 1e-6) {
-      const dir = data.field.clone().normalize();
+      const dir = this.probeDirectionScratch.copy(data.field).normalize();
       // Align cone (default points +Y) to field direction
-      const up = new THREE.Vector3(0, 1, 0);
-      const quat = new THREE.Quaternion().setFromUnitVectors(up, dir);
-      this.probeNeedle.quaternion.slerp(quat, 0.1);
+      this.probeQuaternionScratch.setFromUnitVectors(this.probeUpDirection, dir);
+      this.probeNeedle.quaternion.slerp(this.probeQuaternionScratch, 0.1);
     }
 
     // Rotate ring to face camera
@@ -659,8 +662,8 @@ export class MagneticFieldEngine {
       const nextIdx = Math.min(idx + 1, fl.points.length - 1);
       const t = fl.particleProgress * (fl.points.length - 1) - idx;
 
-      const p = fl.points[idx].clone().lerp(fl.points[nextIdx], t);
-      fl.particle.position.copy(p);
+      this.particlePositionScratch.copy(fl.points[idx]).lerp(fl.points[nextIdx], t);
+      fl.particle.position.copy(this.particlePositionScratch);
     }
   }
 
