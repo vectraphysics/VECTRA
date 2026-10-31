@@ -254,28 +254,3 @@
     min-height: 2.75rem;
   }
 }
-
-/* Mobile ergonomics: clear horizontal filter navigation and comfortable controls. */
-@media (max-width: 640px) {
-  .explore-filter-list {
-    scroll-snap-type: x proximity;
-    scroll-padding-inline: 0.8rem;
-    touch-action: pan-x;
-    padding-block: 0.2rem 0.4rem;
-  }
-
-  .explore-filter {
-    min-height: 2.75rem;
-    padding-inline: 0.9rem;
-    scroll-snap-align: start;
-  }
-
-  .explore-search__clear {
-    width: 2.5rem;
-    height: 2.5rem;
-  }
-
-  .explore-reset {
-    min-height: 2.75rem;
-  }
-}
