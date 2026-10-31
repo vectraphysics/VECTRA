@@ -14,7 +14,8 @@ export function MomentumActivities() {
   const [speedB, setSpeedB] = useState(2);
   const pA = momentum(massA, speedA);
   const pB = momentum(massB, speedB);
-  const comparisonDeltaMomentum = 2;\n  const force = comparisonDeltaMomentum / time;
+  const comparisonDeltaMomentum = 2;
+  const force = comparisonDeltaMomentum / time;
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
