@@ -1,4 +1,4 @@
-import { ArrowUpRight, Orbit, Waves, SlidersHorizontal, Magnet, Star, Thermometer } from 'lucide-react';
+import { Activity, ArrowUpRight, Orbit, Waves, SlidersHorizontal, Magnet, Star, Thermometer } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SpotlightCard from '@/components/SpotlightCard';
 import { SectionHeading } from '@/components/SectionHeading';
@@ -6,6 +6,7 @@ import { useReveal } from '@/hooks/useReveal';
 
 const simulationItems = [
   { id: 'orbital-mechanics', title: 'Orbital Mechanics', description: 'Explore gravity, orbital paths, and how changing velocity reshapes an orbit.', label: 'Mechanics', icon: Orbit, href: '/simulations/orbital-mechanics' },
+  { id: 'double-pendulum', title: 'Double Pendulum', description: 'Explore coupled motion, nonlinear dynamics, and sensitivity to initial conditions.', label: 'Mechanics', icon: Activity, href: '/simulations/double-pendulum' },
   { id: 'waves', title: 'Wave Interference', description: 'Observe wave motion, superposition, and interference patterns.', label: 'Waves', icon: Waves, href: '/simulations/waves' },
   { id: 'double-slit', title: 'Double-Slit Experiment', description: 'Investigate how wave behaviour produces an interference pattern.', label: 'Modern Physics', icon: SlidersHorizontal, href: '/simulations/double-slit' },
   { id: 'magnetic-fields', title: 'Magnetic Fields', description: 'Visualize magnetic field patterns and explore their behaviour.', label: 'Electromagnetism', icon: Magnet, href: '/simulations/magnetic-fields' },
@@ -17,7 +18,7 @@ export function Simulations() {
   const { ref, isVisible } = useReveal();
 
   return (
-    <section id="simulations" className="relative isolate vectra-section-flow py-20 sm:py-28 lg:py-32">
+    <section id="simulations" className="relative isolate vectra-section-flow py-16 sm:py-24 lg:py-32">
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div className="absolute left-1/2 top-0 h-[300px] w-full max-w-[600px] -translate-x-1/2 rounded-full opacity-10 blur-[120px] pulse-glow-soft" style={{ background: 'radial-gradient(ellipse, #2d4a7a 0%, transparent 70%)' }} />
       </div>
@@ -25,35 +26,64 @@ export function Simulations() {
         <div ref={ref} className={`reveal reveal-up ${isVisible ? 'is-visible' : ''}`}>
           <SectionHeading
             eyebrow="Simulations"
+            sectionIndex="02 / 04"
             title="Learn by doing"
             description="Explore interactive physics experiences and see how changing a system's conditions changes what happens."
           />
         </div>
-        <div className="mt-12 grid gap-5 sm:mt-14 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3">
+
+        <div className="mt-9 grid gap-3.5 sm:mt-14 sm:gap-4 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3">
           {simulationItems.map((sim, index) => {
             const Icon = sim.icon;
+
             return (
-              <Link key={sim.id} to={sim.href} className="group relative block min-w-0 reveal reveal-up focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-space-900" style={{ transitionDelay: `${index * 90}ms` }}>
+              <Link
+                key={sim.id}
+                to={sim.href}
+                aria-label={`Open the ${sim.title} simulation`}
+                className="group block min-w-0 rounded-2xl reveal reveal-up focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-space-900"
+                style={{ transitionDelay: `${index * 75}ms` }}
+              >
                 <SpotlightCard
-                  className="glass-panel glass-panel-hover relative flex h-full min-w-0 flex-col gap-5 p-6 sm:p-7"
-                  spotlightColor="rgba(48, 68, 136, 0.92)"
-                  intensity={0.14}
-                  spotlightSize={250}
-                  borderGlow={0.42}
+                  className="simulation-card flex h-full min-h-[224px] min-w-0 flex-col gap-4 p-5 sm:min-h-[248px] sm:gap-5 sm:p-6"
+                  spotlightColor="rgba(48, 68, 136, 0.72)"
+                  intensity={0.12}
+                  spotlightSize={230}
+                  borderGlow={0.34}
                   proximity={90}
                   smoothing={0.24}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-surface-border bg-space-700/50 text-accent-cyan">
-                      <Icon className="h-6 w-6" strokeWidth={1.5} />
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-mono text-[0.62rem] uppercase tracking-[0.2em] text-star-white/35">
+                      Model {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span className="rounded-full border border-accent-cyan/20 bg-accent-cyan/[0.06] px-2.5 py-1 font-mono text-[0.62rem] tracking-wide text-accent-ice/80">
+                      {sim.label}
+                    </span>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-accent-cyan/20 bg-accent-cyan/[0.07] text-accent-cyan transition-colors duration-300 group-hover:border-accent-cyan/40 group-hover:bg-accent-cyan/[0.11] group-hover:text-accent-ice">
+                      <Icon className="h-[1.35rem] w-[1.35rem]" strokeWidth={1.55} />
                     </div>
-                    <ArrowUpRight className="h-5 w-5 text-star-white/30 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent-cyan" strokeWidth={1.5} />
+                    <div className="min-w-0 pt-0.5">
+                      <h3 className="font-display text-lg font-medium leading-snug text-star-white transition-colors duration-300 group-hover:text-accent-ice sm:text-xl">
+                        {sim.title}
+                      </h3>
+                      <p className="mt-2 font-body text-sm leading-relaxed text-star-white/55">
+                        {sim.description}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-3">
-                    <h3 className="font-display text-xl font-medium text-star-white">{sim.title}</h3>
-                    <p className="font-body text-sm leading-relaxed text-star-white/50">{sim.description}</p>
+
+                  <div className="mt-auto flex items-center justify-between border-t border-white/[0.07] pt-4">
+                    <span className="font-mono text-[0.66rem] uppercase tracking-[0.16em] text-star-white/40 transition-colors duration-300 group-hover:text-star-white/70">
+                      Open simulation
+                    </span>
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.09] text-star-white/55 transition-all duration-300 group-hover:border-accent-cyan/35 group-hover:bg-accent-cyan/10 group-hover:text-accent-cyan">
+                      <ArrowUpRight className="h-4 w-4" strokeWidth={1.6} />
+                    </span>
                   </div>
-                  <span className="mt-auto self-start rounded-md border border-accent-cyan/25 bg-accent-cyan/5 px-2.5 py-1 font-mono text-[0.7rem] text-accent-ice">{sim.label}</span>
                 </SpotlightCard>
               </Link>
             );
