@@ -420,7 +420,7 @@ const Iridescence = ({
 
     const frame = (now: number) => {
       raf = 0;
-      if (!alive || !visible) return;
+      if (!alive || !visible || document.hidden) return;
       const s = settingsRef.current;
       const dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60;
       last = now;
@@ -444,7 +444,7 @@ const Iridescence = ({
     };
 
     const wake = () => {
-      if (raf || !alive || !visible) return;
+      if (raf || !alive || !visible || document.hidden) return;
       raf = requestAnimationFrame(frame);
     };
 
@@ -506,6 +506,16 @@ const Iridescence = ({
       wake();
     };
 
+    const onDocumentVisibilityChange = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+        last = 0;
+      } else {
+        wake();
+      }
+    };
+
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(root);
     const visibility = new IntersectionObserver(entries => {
@@ -519,6 +529,7 @@ const Iridescence = ({
     window.addEventListener('pointermove', onPointerMove, { passive: true });
     window.addEventListener('pointerdown', onPointerDown, { passive: true });
     document.documentElement.addEventListener('pointerleave', onPointerLeave);
+    document.addEventListener('visibilitychange', onDocumentVisibilityChange);
     resize();
 
     return () => {
@@ -530,6 +541,7 @@ const Iridescence = ({
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerdown', onPointerDown);
       document.documentElement.removeEventListener('pointerleave', onPointerLeave);
+      document.removeEventListener('visibilitychange', onDocumentVisibilityChange);
       gl.deleteTexture(fieldTexture);
       gl.deleteBuffer(buffer);
       gl.deleteProgram(program);
