@@ -34,8 +34,27 @@
 
 /* Custom range slider */
 .sim-slider {
-  @apply h-1 w-full cursor-pointer appearance-none rounded-full bg-space-500;
+  @apply w-full cursor-pointer appearance-none rounded-full bg-transparent;
   -webkit-appearance: none;
+  height: 44px;
+  touch-action: pan-y;
+}
+
+.sim-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 9999px;
+  background: #1a2138;
+}
+
+.sim-slider::-moz-range-track {
+  height: 4px;
+  border-radius: 9999px;
+  background: #1a2138;
+}
+
+.sim-slider:focus-visible {
+  outline: 2px solid rgba(94, 200, 216, 0.75);
+  outline-offset: 2px;
 }
 
 .sim-slider::-webkit-slider-thumb {
