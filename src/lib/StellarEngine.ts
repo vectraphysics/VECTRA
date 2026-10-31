@@ -135,6 +135,9 @@ export class StellarEngine {
   // Animation
   private animationId = 0;
   private resizeObserver: ResizeObserver;
+  private intersectionObserver: IntersectionObserver | null = null;
+  private containerVisible = true;
+  private documentVisible = !document.hidden;
   private reducedMotion = false;
   private clock = new THREE.Clock();
 
@@ -148,7 +151,8 @@ export class StellarEngine {
 
     // Renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const pixelRatioLimit = window.innerWidth < 768 ? 1.5 : 2;
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, pixelRatioLimit));
     const initW = container.clientWidth || container.parentElement?.clientWidth || window.innerWidth;
     const initH = container.clientHeight || container.parentElement?.clientHeight || 400;
     this.renderer.setSize(initW, initH);
@@ -436,12 +440,23 @@ export class StellarEngine {
     // Events
     this.bindEvents();
 
-    // Resize
+    // Resize and visibility lifecycle
     this.resizeObserver = new ResizeObserver(() => this.handleResize());
     this.resizeObserver.observe(container);
+    if (typeof IntersectionObserver !== 'undefined') {
+      this.intersectionObserver = new IntersectionObserver(
+        ([entry]) => {
+          this.containerVisible = entry.isIntersecting;
+          this.syncAnimationState();
+        },
+        { threshold: 0.01 }
+      );
+      this.intersectionObserver.observe(container);
+    }
+    document.addEventListener('visibilitychange', this.onDocumentVisibilityChange);
 
-    // Start
-    this.animate();
+    // Start only while the simulation viewport is visible.
+    this.syncAnimationState();
   }
 
   // ---- Procedural stellar surface and glow textures ----
@@ -461,10 +476,15 @@ export class StellarEngine {
       throw new Error('Unable to create the stellar surface texture.');
     }
 
+    let seed = 0x51a7e;
+    const nextRandom = (): number => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 0x100000000;
+    };
     const layers = [8, 16, 32, 64].map((size, index) => ({
       size,
       weight: [0.48, 0.28, 0.16, 0.08][index],
-      values: Float32Array.from({ length: size * size }, () => Math.random()),
+      values: Float32Array.from({ length: size * size }, nextRandom),
     }));
     const image = context.createImageData(width, height);
 
@@ -821,7 +841,33 @@ export class StellarEngine {
 
   // ---- Animation loop ----
 
+  private onDocumentVisibilityChange = (): void => {
+    this.documentVisible = !document.hidden;
+    this.syncAnimationState();
+  };
+
+  private syncAnimationState(): void {
+    if (this.containerVisible && this.documentVisible) {
+      if (this.animationId === 0) {
+        this.clock.start();
+        this.animationId = requestAnimationFrame(this.animate);
+      }
+      return;
+    }
+
+    if (this.animationId !== 0) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = 0;
+      this.clock.stop();
+    }
+  }
+
   private animate = (): void => {
+    if (!this.containerVisible || !this.documentVisible) {
+      this.animationId = 0;
+      this.clock.stop();
+      return;
+    }
     this.animationId = requestAnimationFrame(this.animate);
     const dt = Math.min(0.05, this.clock.getDelta());
     this.elapsedTime += dt;
@@ -962,9 +1008,12 @@ export class StellarEngine {
   // ---- Cleanup ----
 
   dispose(): void {
-    cancelAnimationFrame(this.animationId);
-    this.unbindEvents();
+    if (this.animationId !== 0) cancelAnimationFrame(this.animationId);
+    this.animationId = 0;
+    document.removeEventListener('visibilitychange', this.onDocumentVisibilityChange);
+    this.intersectionObserver?.disconnect();
     this.resizeObserver.disconnect();
+    this.unbindEvents();
 
     // Several visual pairs intentionally share geometry, materials or maps.
     // Dispose each GPU resource once to keep mount/unmount cycles predictable.
