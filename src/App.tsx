@@ -14,6 +14,10 @@ const EnergyWorkPowerPage = lazy(() =>
   import('@/pages/EnergyWorkPowerPage').then((m) => ({ default: m.EnergyWorkPowerPage }))
 );
 
+const MomentumImpulsePage = lazy(() =>
+  import('@/pages/MomentumImpulsePage').then((m) => ({ default: m.MomentumImpulsePage }))
+);
+
 const OrbitalMechanicsPage = lazy(() =>
   import('@/pages/OrbitalMechanicsPage').then((m) => ({ default: m.OrbitalMechanicsPage }))
 );
@@ -80,6 +84,18 @@ function App() {
               </div>
             }>
               <EnergyWorkPowerPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/lessons/mechanics/momentum-impulse"
+          element={
+            <Suspense fallback={
+              <div className="flex min-h-screen items-center justify-center bg-space-900">
+                <span className="font-mono text-sm text-star-white/40">Loading lesson…</span>
+              </div>
+            }>
+              <MomentumImpulsePage />
             </Suspense>
           }
         />

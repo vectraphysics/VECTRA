@@ -58,12 +58,8 @@ export function solveCollision(
     finalVelocityAMps = commonVelocity / totalMass;
     finalVelocityBMps = finalVelocityAMps;
   } else {
-    const relativeApproachSpeed = initialVelocityAMps - initialVelocityBMps;
-    if (relativeApproachSpeed <= 0) {
-      throw new RangeError('For this layout, object A must approach object B, so its initial velocity must be greater.');
-    }
-    finalVelocityAMps = (massAKg * initialVelocityAMps + massBKg * initialVelocityBMps - massBKg * relativeApproachSpeed) / totalMass;
-    finalVelocityBMps = (massAKg * initialVelocityAMps + massBKg * initialVelocityBMps + massAKg * relativeApproachSpeed) / totalMass;
+    finalVelocityAMps = ((massAKg - massBKg) * initialVelocityAMps + 2 * massBKg * initialVelocityBMps) / totalMass;
+    finalVelocityBMps = (2 * massAKg * initialVelocityAMps + (massBKg - massAKg) * initialVelocityBMps) / totalMass;
   }
 
   const initialMomentumKgMps = mode === 'explosion' ? 0 : momentum(massAKg, initialVelocityAMps) + momentum(massBKg, initialVelocityBMps);

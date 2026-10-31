@@ -148,7 +148,7 @@ export function EnergyWorkPowerPage() {
           <section id="activities" className="scroll-mt-24 py-12 sm:py-16"><ChapterHeading number="Lab" title="Explore the energy system" subtitle="Move a control and predict the result before reading it"/><div className="mt-6"><EnergyActivities /></div></section>
           <section id="practice" className="scroll-mt-24 border-t border-surface-border py-12 sm:py-16"><EnergyPractice /></section>
 
-          <section className="mb-12 flex flex-col gap-5 rounded-2xl border border-surface-border bg-space-800/35 p-6 sm:mb-16 sm:flex-row sm:items-center sm:justify-between sm:p-8"><div><p className="eyebrow">Continue · Mechanics</p><h2 className="mt-3 font-display text-xl font-semibold sm:text-2xl">Next, explore momentum</h2><p className="mt-2 text-sm leading-6 text-star-white/50">Return to the learning pathway to continue through mechanics.</p></div><Link to="/" className="btn-primary min-h-12 shrink-0 justify-center">Back to VECTRA <ArrowUpRight className="h-4 w-4" /></Link></section>
+          <section className="mb-12 flex flex-col gap-5 rounded-2xl border border-surface-border bg-space-800/35 p-6 sm:mb-16 sm:flex-row sm:items-center sm:justify-between sm:p-8"><div><p className="eyebrow">Continue · Mechanics</p><h2 className="mt-3 font-display text-xl font-semibold sm:text-2xl">Next, explore momentum</h2><p className="mt-2 text-sm leading-6 text-star-white/50">Connect motion and forces to momentum, impulse, and collisions.</p></div><Link to="/lessons/mechanics/momentum-impulse" className="btn-primary min-h-12 shrink-0 justify-center">Open Momentum &amp; Impulse <ArrowUpRight className="h-4 w-4" /></Link></section>
         </div>
       </main>
     </div>
