@@ -111,19 +111,21 @@ async function waitForServer(url, timeoutMs = 30000) {
 
         const scrollCheck = await page.evaluate(() => {
           const scrollingElement = document.scrollingElement;
-          const before = scrollingElement?.scrollTop ?? 0;
+          const initialScroll = scrollingElement?.scrollTop ?? 0;
           const scrollHeight = scrollingElement?.scrollHeight ?? 0;
           const clientHeight = scrollingElement?.clientHeight ?? 0;
           if (scrollingElement) {
             scrollingElement.style.scrollBehavior = 'auto';
+            scrollingElement.scrollTop = 0;
             scrollingElement.scrollTop = scrollHeight;
           }
+          const before = 0;
           const after = scrollingElement?.scrollTop ?? 0;
           if (scrollingElement) {
             scrollingElement.scrollTop = 0;
             scrollingElement.style.removeProperty('scroll-behavior');
           }
-          return { before, after, scrollHeight, clientHeight, hasOverflow: scrollHeight > clientHeight + 1 };
+          return { initialScroll, before, after, scrollHeight, clientHeight, hasOverflow: scrollHeight > clientHeight + 1 };
         });
         if (scrollCheck.hasOverflow && scrollCheck.after <= scrollCheck.before) failures.push(`${route} page could not scroll despite overflow at ${viewport.width}px: ${JSON.stringify(scrollCheck)}`);
         console.log(JSON.stringify({ route, viewport, scrollCheck }));
