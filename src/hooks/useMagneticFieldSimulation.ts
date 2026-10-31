@@ -6,9 +6,6 @@ import { DEFAULT_MAGNET_PARAMS } from '@/lib/magneticFieldPhysics';
 export interface MagneticFieldControls {
   // Parameters
   params: MagnetParameters;
-  // Playback
-  isPlaying: boolean;
-  speed: number;
   // Visualization
   vizMode: VizMode;
   showFieldDirection: boolean;
@@ -16,13 +13,10 @@ export interface MagneticFieldControls {
   // Probe
   probeData: ProbeData | null;
   // Actions
-  togglePlay: () => void;
   reset: () => void;
-  setSpeed: (s: number) => void;
   setStrength: (v: number) => void;
   setOrientation: (v: number) => void;
   setLineDensity: (v: number) => void;
-  setParticleSpeed: (v: number) => void;
   setVizScale: (v: number) => void;
   setVizMode: (m: VizMode) => void;
   toggleFieldDirection: () => void;
@@ -34,8 +28,6 @@ export function useMagneticFieldSimulation(
   containerRef: React.RefObject<HTMLDivElement | null>
 ): MagneticFieldControls {
   const engineRef = useRef<MagneticFieldEngine | null>(null);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [speed, setSpeedState] = useState(1);
   const [params, setParams] = useState<MagnetParameters>({ ...DEFAULT_MAGNET_PARAMS });
   const [vizMode, setVizModeState] = useState<VizMode>('lines');
   const [showFieldDirection, setShowFieldDirection] = useState(true);
@@ -58,28 +50,12 @@ export function useMagneticFieldSimulation(
     };
   }, [containerRef]);
 
-  const togglePlay = useCallback(() => {
-    setIsPlaying((v) => {
-      const next = !v;
-      if (next) engineRef.current?.play();
-      else engineRef.current?.pause();
-      return next;
-    });
-  }, []);
-
   const reset = useCallback(() => {
     engineRef.current?.reset();
     setParams({ ...DEFAULT_MAGNET_PARAMS });
-    setIsPlaying(true);
-    setSpeedState(1);
     setVizModeState('lines');
     setShowFieldDirection(true);
     setShowFieldStrength(false);
-  }, []);
-
-  const setSpeed = useCallback((s: number) => {
-    engineRef.current?.setSpeed(s);
-    setSpeedState(s);
   }, []);
 
   const setStrength = useCallback((v: number) => {
@@ -95,11 +71,6 @@ export function useMagneticFieldSimulation(
   const setLineDensity = useCallback((v: number) => {
     setParams((p) => ({ ...p, lineDensity: v }));
     engineRef.current?.setLineDensity(v);
-  }, []);
-
-  const setParticleSpeed = useCallback((v: number) => {
-    setParams((p) => ({ ...p, particleSpeed: v }));
-    engineRef.current?.setParticleSpeed(v);
   }, []);
 
   const setVizScale = useCallback((v: number) => {
@@ -134,19 +105,14 @@ export function useMagneticFieldSimulation(
 
   return {
     params,
-    isPlaying,
-    speed,
     vizMode,
     showFieldDirection,
     showFieldStrength,
     probeData,
-    togglePlay,
     reset,
-    setSpeed,
     setStrength,
     setOrientation,
     setLineDensity,
-    setParticleSpeed,
     setVizScale,
     setVizMode,
     toggleFieldDirection,
