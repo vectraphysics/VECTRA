@@ -26,10 +26,10 @@ export function MFDataPanel({ params, probeData }: MFDataPanelProps) {
       </div>
       <div className="sim-panel-body">
         <div className="sim-data-row">
-          <span className="sim-data-label">Field Strength</span>
+          <span className="sim-data-label">Dipole Moment</span>
           <div className="flex items-baseline gap-1">
             <span className="sim-data-value">{formatNum(params.strength, 0)}</span>
-            <span className="sim-data-unit">m</span>
+            <span className="sim-data-unit">a.u.</span>
           </div>
         </div>
         <div className="sim-data-row">
@@ -43,17 +43,17 @@ export function MFDataPanel({ params, probeData }: MFDataPanelProps) {
         <div className="h-px bg-surface-border" />
 
         <div className="sim-data-row">
-          <span className="sim-data-label">Probe Distance</span>
+          <span className="sim-data-label">Distance from Centre</span>
           <div className="flex items-baseline gap-1">
             <span className="sim-data-value">{probeData ? formatNum(probeData.distance, 1) : '—'}</span>
-            <span className="sim-data-unit">r</span>
+            <span className="sim-data-unit">sim units</span>
           </div>
         </div>
         <div className="sim-data-row">
           <span className="sim-data-label">|B| at Probe</span>
           <div className="flex items-baseline gap-1">
             <span className="sim-data-value">{probeData ? formatNum(probeData.magnitude, 3) : '—'}</span>
-            <span className="sim-data-unit">B</span>
+            <span className="sim-data-unit">a.u.</span>
           </div>
         </div>
         <div className="sim-data-row">
@@ -64,9 +64,12 @@ export function MFDataPanel({ params, probeData }: MFDataPanelProps) {
           </div>
         </div>
         <div className="sim-data-row">
-          <span className="sim-data-label">Field Direction</span>
+          <span className="sim-data-label">Field Vector (Bx, By, Bz)</span>
           <span className="sim-data-value text-xs">{fieldDir}</span>
         </div>
+        <p className="font-body text-[0.65rem] leading-relaxed text-star-white/35">
+          Normalized dipole model. Field values are relative, not measured in tesla.
+        </p>
       </div>
     </div>
   );
