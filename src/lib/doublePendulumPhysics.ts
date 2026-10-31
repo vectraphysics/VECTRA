@@ -7,8 +7,9 @@
  * - Angles are measured from the downward vertical, positive to the right.
  * - SI units: kg, m, s and m/s².
  *
- * The equations are obtained from the Euler–Lagrange equations. The coupled
- * angular accelerations are found by solving the 2×2 mass-matrix system.
+ * The closed-form angular accelerations are derived from the Euler–Lagrange
+ * equations. They are algebraically equivalent to solving the coupled 2×2
+ * mass-matrix system and are adapted from PhysicsHub's MIT-licensed model.
  */
 
 export interface DoublePendulumParameters {
@@ -162,6 +163,9 @@ export function rk4DoublePendulumStep(
     throw new RangeError('The integration timestep must be finite and positive.');
   }
 
+  // Classical RK4 stage sequence, adapted to a fixed-size typed state vector.
+  // PhysicsHub reference: app/(core)/engine/integrators.js (MIT licensed).
+  // https://github.com/physicshub/physicshub.github.io/blob/bf7637238edf40e7b34021c43dc2abf45248f4db/app/(core)/engine/integrators.js
   const current: StateVector = [state.theta1, state.theta2, state.omega1, state.omega2];
   const halfStep = dt * 0.5;
 
