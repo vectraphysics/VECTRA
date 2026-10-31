@@ -18,6 +18,10 @@ const OrbitalMechanicsPage = lazy(() =>
   import('@/pages/OrbitalMechanicsPage').then((m) => ({ default: m.OrbitalMechanicsPage }))
 );
 
+const DoublePendulumPage = lazy(() =>
+  import('@/pages/DoublePendulumPage').then((m) => ({ default: m.DoublePendulumPage }))
+);
+
 const WavesPage = lazy(() =>
   import('@/pages/WavesPage').then((m) => ({ default: m.WavesPage }))
 );
@@ -76,6 +80,18 @@ function App() {
               </div>
             }>
               <EnergyWorkPowerPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/simulations/double-pendulum"
+          element={
+            <Suspense fallback={
+              <div className="flex min-h-screen items-center justify-center bg-space-900">
+                <span className="font-mono text-sm text-star-white/40">Loading simulation…</span>
+              </div>
+            }>
+              <DoublePendulumPage />
             </Suspense>
           }
         />

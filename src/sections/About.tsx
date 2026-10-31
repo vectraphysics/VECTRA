@@ -1,25 +1,30 @@
 import { BookOpen, FunctionSquare, Lightbulb } from 'lucide-react';
 import SpotlightCard from '@/components/SpotlightCard';
 import { SectionHeading } from '@/components/SectionHeading';
-import { LessonCard } from '@/components/LessonCard';
-import { lessonModules } from '@/data/simulations';
 import { useReveal } from '@/hooks/useReveal';
+import './About.css';
 
-const features = [
+const principles = [
   {
+    number: '01',
     icon: FunctionSquare,
-    title: 'Equations explained',
-    description: 'Every formula is broken down: what it means, where it comes from, and when to use it.',
+    title: 'Mathematics with meaning',
+    description: 'Understand what an equation describes, what each variable represents, and how the relationship applies to a physical system.',
+    tag: 'Build the foundation',
   },
   {
+    number: '02',
     icon: Lightbulb,
-    title: 'Visual demonstrations',
-    description: 'Diagrams and animations that make abstract concepts concrete and memorable.',
+    title: 'Ideas made visible',
+    description: 'Use diagrams, models, and interactive simulations to connect abstract principles with observable behaviour.',
+    tag: 'Explore the model',
   },
   {
+    number: '03',
     icon: BookOpen,
-    title: 'Guided lessons',
-    description: 'Structured learning paths that build understanding step by step, at your own pace.',
+    title: 'Learning with structure',
+    description: 'Move through guided explanations and worked examples in a sequence that makes each new idea easier to place.',
+    tag: 'Develop understanding',
   },
 ];
 
@@ -27,53 +32,71 @@ export function About() {
   const { ref, isVisible } = useReveal();
 
   return (
-    <section id="about" className="relative isolate vectra-section-flow py-20 sm:py-28 lg:py-32">
+    <section id="about" className="relative isolate vectra-section-flow about-section py-16 sm:py-24 lg:py-32">
       <div className="container-vectra">
-        <div ref={ref} className={`reveal reveal-up ${isVisible ? 'is-visible' : ''}`}>
-          <SectionHeading
-            eyebrow="About VECTRA"
-            title="Understand the why, not just the what"
-            description="Guided lessons combine clear explanations, mathematical foundations, and visual demonstrations to build genuine intuition."
-          />
-        </div>
-
-        <div className="mt-10 grid gap-4 sm:grid-cols-3">
-          {features.map((feature, i) => {
-            const Icon = feature.icon;
-            return (
-              <div
-                key={feature.title}
-                className="reveal reveal-up"
-                style={{ transitionDelay: `${i * 140}ms` }}
-              >
-                <SpotlightCard
-                  className="glass-panel glass-panel-hover group relative flex h-full items-start gap-4 p-5"
-                  spotlightColor="rgba(48, 68, 136, 0.92)"
-                  intensity={0.14}
-                  spotlightSize={210}
-                  borderGlow={0.4}
-                  proximity={80}
-                  smoothing={0.24}
-                >
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-surface-border bg-space-700/40 text-accent-cyan">
-                    <Icon className="h-5 w-5" strokeWidth={1.5} />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <h3 className="font-display text-sm font-medium text-star-white">{feature.title}</h3>
-                    <p className="font-body text-sm leading-relaxed text-star-white/45">{feature.description}</p>
-                  </div>
-                </SpotlightCard>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="mt-8 grid gap-5 sm:grid-cols-2">
-          {lessonModules.map((lesson, index) => (
-            <div key={lesson.id} className="reveal reveal-up" style={{ transitionDelay: `${index * 100}ms` }}>
-              <LessonCard lesson={lesson} index={index} />
+        <div className="about-layout">
+          <div className="about-intro">
+            <div ref={ref} className={`reveal reveal-up ${isVisible ? 'is-visible' : ''}`}>
+              <SectionHeading
+                eyebrow="The VECTRA approach"
+                sectionIndex="04 / 04"
+                title="Understand the physics behind the formula"
+                description="VECTRA brings mathematical reasoning, visual explanations, and interactive models into one learning environment."
+              />
             </div>
-          ))}
+
+            <div className="about-manifesto mt-8">
+              <span className="about-manifesto__label">A different way to learn</span>
+              <p>
+                A formula is more than a line of symbols. It describes a relationship in the physical world. VECTRA is designed to help you connect the mathematics to the phenomenon.
+              </p>
+              <div className="about-manifesto__footer">
+                <span>Question</span>
+                <span className="about-manifesto__line" aria-hidden="true" />
+                <span>Model</span>
+                <span className="about-manifesto__line" aria-hidden="true" />
+                <span>Insight</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="about-principles" aria-label="How VECTRA supports learning">
+            {principles.map((principle, index) => {
+              const Icon = principle.icon;
+
+              return (
+                <div
+                  key={principle.number}
+                  className="about-principle-wrap reveal reveal-up"
+                  style={{ transitionDelay: `${index * 100}ms` }}
+                >
+                  <SpotlightCard
+                    className="about-principle glass-panel glass-panel-hover group"
+                    spotlightColor="rgba(48, 68, 136, 0.72)"
+                    intensity={0.12}
+                    spotlightSize={220}
+                    borderGlow={0.32}
+                    proximity={80}
+                    smoothing={0.24}
+                  >
+                    <div className="about-principle__top">
+                      <span className="about-principle__number">{principle.number}</span>
+                      <span className="about-principle__tag">{principle.tag}</span>
+                    </div>
+                    <div className="about-principle__body">
+                      <span className="about-principle__icon">
+                        <Icon className="h-5 w-5" strokeWidth={1.5} />
+                      </span>
+                      <div>
+                        <h3>{principle.title}</h3>
+                        <p>{principle.description}</p>
+                      </div>
+                    </div>
+                  </SpotlightCard>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>

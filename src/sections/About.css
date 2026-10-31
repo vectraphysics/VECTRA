@@ -1,0 +1,177 @@
+.about-section {
+  overflow: clip;
+}
+
+.about-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: start;
+  gap: clamp(2.5rem, 6vw, 5.5rem);
+}
+
+.about-intro {
+  min-width: 0;
+}
+
+.about-manifesto {
+  position: relative;
+  overflow: hidden;
+  padding: 1.35rem 1.4rem 1.2rem;
+  border: 1px solid rgba(148, 171, 211, 0.12);
+  border-radius: 1rem;
+  background:
+    radial-gradient(ellipse at 0% 0%, rgba(94, 200, 216, 0.08), transparent 62%),
+    rgba(12, 19, 36, 0.48);
+}
+
+.about-manifesto::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 1.5rem;
+  width: 5rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(139, 233, 255, 0.55), transparent);
+}
+
+.about-manifesto__label,
+.about-principle__number,
+.about-principle__tag {
+  color: rgba(139, 233, 255, 0.66);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.about-manifesto p {
+  margin-top: 0.8rem;
+  color: rgba(232, 237, 245, 0.76);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.02rem, 1.5vw, 1.22rem);
+  line-height: 1.65;
+  letter-spacing: -0.018em;
+}
+
+.about-manifesto__footer {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 1.3rem;
+  color: rgba(232, 237, 245, 0.38);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.about-manifesto__line {
+  width: clamp(0.8rem, 2vw, 2rem);
+  height: 1px;
+  background: rgba(139, 233, 255, 0.22);
+}
+
+.about-principles {
+  display: grid;
+  gap: 0.85rem;
+  min-width: 0;
+  padding-top: 0.25rem;
+}
+
+.about-principle-wrap {
+  min-width: 0;
+}
+
+.about-principle {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 9.5rem;
+  padding: 1.15rem 1.25rem;
+  border-radius: 1rem;
+}
+
+.about-principle__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.about-principle__tag {
+  color: rgba(232, 237, 245, 0.32);
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+}
+
+.about-principle__body {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.9rem;
+}
+
+.about-principle__icon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border: 1px solid rgba(94, 200, 216, 0.18);
+  border-radius: 0.75rem;
+  background: rgba(94, 200, 216, 0.055);
+  color: #9de8f3;
+}
+
+.about-principle__body h3 {
+  color: rgba(232, 237, 245, 0.94);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.98rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.about-principle__body p {
+  max-width: 34rem;
+  margin-top: 0.35rem;
+  color: rgba(232, 237, 245, 0.46);
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+
+@media (max-width: 900px) {
+  .about-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+
+  .about-manifesto {
+    max-width: 42rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .about-principle {
+    min-height: 0;
+    padding: 1rem;
+  }
+
+  .about-principle__body {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+
+  .about-principle__icon {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .about-manifesto {
+    padding: 1.1rem;
+  }
+
+  .about-manifesto__footer {
+    gap: 0.45rem;
+    font-size: 0.52rem;
+  }
+}
+

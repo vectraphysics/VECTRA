@@ -15,22 +15,23 @@ export function Learn() {
   const { ref, isVisible } = useReveal();
 
   return (
-    <section id="learn" className="relative isolate vectra-section-flow py-20 sm:py-28 lg:py-32">
+    <section id="learn" className="relative isolate vectra-section-flow py-16 sm:py-24 lg:py-32">
       <div className="container-vectra">
         <div ref={ref} className={`reveal reveal-up ${isVisible ? 'is-visible' : ''}`}>
           <SectionHeading
             eyebrow="Guided learning"
+            sectionIndex="03 / 04"
             title="Build understanding, one idea at a time"
             description="Follow structured learning modules that connect core equations with physical intuition and practice."
           />
         </div>
 
-        <div className="mt-12 grid gap-4 sm:mt-14 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3">
+        <div className="mt-9 grid gap-3.5 sm:mt-14 sm:gap-4 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3">
           {lessonModules.map((lesson, index) => {
             const href = lessonLinks[lesson.id];
             const card = (
               <SpotlightCard
-                className="lesson-card group flex h-full min-h-[292px] min-w-0 flex-col gap-5 p-5 sm:p-6"
+                className="lesson-card group flex h-full min-h-[260px] min-w-0 flex-col gap-4 p-5 sm:min-h-[292px] sm:gap-5 sm:p-6"
                 spotlightColor="rgba(48, 68, 136, 0.72)"
               >
                 <div className="flex items-center justify-between gap-3">

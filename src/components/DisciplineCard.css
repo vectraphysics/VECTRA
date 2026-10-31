@@ -1,0 +1,281 @@
+/* Discipline-specific visual identity, built from lightweight SVG and CSS. */
+.discipline-card {
+  --discipline-accent: 94, 200, 216;
+  border-color: rgba(178, 201, 245, 0.16);
+}
+
+.discipline-card[data-discipline='mechanics'] {
+  --discipline-accent: 219, 166, 91;
+}
+
+.discipline-card[data-discipline='waves'] {
+  --discipline-accent: 89, 194, 218;
+}
+
+.discipline-card[data-discipline='electricity'] {
+  --discipline-accent: 218, 190, 91;
+}
+
+.discipline-card[data-discipline='electromagnetism'] {
+  --discipline-accent: 157, 128, 226;
+}
+
+.discipline-card[data-discipline='thermodynamics'] {
+  --discipline-accent: 222, 117, 102;
+}
+
+.discipline-card[data-discipline='modern-physics'] {
+  --discipline-accent: 89, 190, 164;
+}
+
+.discipline-card[data-discipline='astrophysics'] {
+  --discipline-accent: 105, 146, 228;
+}
+
+.discipline-card__visual {
+  position: relative;
+  display: flex;
+  min-height: 8.2rem;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  margin: -1.5rem -1.5rem 0;
+  padding: 0.9rem 1.15rem 0.45rem;
+  border: 1px solid rgba(var(--discipline-accent), 0.16);
+  border-radius: 0.9rem;
+  background:
+    radial-gradient(ellipse 72% 90% at 78% 55%, rgba(var(--discipline-accent), 0.17), transparent 72%),
+    linear-gradient(125deg, rgba(var(--discipline-accent), 0.055), rgba(7, 13, 27, 0.28) 64%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
+}
+
+.discipline-card__visual::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  background-image:
+    linear-gradient(rgba(195, 214, 245, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(195, 214, 245, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(110deg, transparent 8%, #000 100%);
+}
+
+.discipline-card__visual-meta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  color: rgba(var(--discipline-accent), 0.9);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.discipline-card__visual-meta span:last-child {
+  overflow: hidden;
+  color: rgba(225, 234, 248, 0.44);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.discipline-glyph {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 4.7rem;
+  overflow: visible;
+  color: rgb(var(--discipline-accent));
+}
+
+.discipline-glyph__primary,
+.discipline-glyph__guide,
+.discipline-glyph__axis,
+.discipline-glyph__divider,
+.discipline-glyph__rays {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.discipline-glyph__primary {
+  stroke-width: 2;
+}
+
+.discipline-glyph__guide {
+  stroke-width: 1.15;
+  opacity: 0.34;
+  stroke-dasharray: 3 6;
+}
+
+.discipline-glyph__axis {
+  stroke-width: 1.1;
+  opacity: 0.42;
+}
+
+.discipline-glyph__divider {
+  stroke-width: 1.3;
+  opacity: 0.74;
+}
+
+.discipline-glyph__point {
+  fill: rgb(var(--discipline-accent));
+  stroke: rgba(7, 13, 27, 0.8);
+  stroke-width: 1.5;
+}
+
+.discipline-glyph__block {
+  fill: rgba(var(--discipline-accent), 0.12);
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.discipline-glyph__star {
+  fill: rgb(var(--discipline-accent));
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 1;
+}
+
+.discipline-card__icon {
+  display: flex;
+  width: 3rem;
+  height: 3rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(var(--discipline-accent), 0.28);
+  border-radius: 0.85rem;
+  background: rgba(var(--discipline-accent), 0.075);
+  color: rgb(var(--discipline-accent));
+  transition: background-color 220ms ease, border-color 220ms ease;
+}
+
+.discipline-card:hover .discipline-card__icon,
+.discipline-card:focus-within .discipline-card__icon {
+  border-color: rgba(var(--discipline-accent), 0.52);
+  background: rgba(var(--discipline-accent), 0.13);
+}
+
+.discipline-card__arrow {
+  color: rgba(var(--discipline-accent), 0.62);
+}
+
+.discipline-card__title {
+  width: fit-content;
+  max-width: 100%;
+  text-wrap: balance;
+}
+
+.discipline-card__title::after {
+  content: '';
+  display: block;
+  width: 2.1rem;
+  height: 1px;
+  margin-top: 0.7rem;
+  background: linear-gradient(90deg, rgba(var(--discipline-accent), 0.68), transparent);
+  transition: width 220ms ease;
+}
+
+.discipline-card:hover .discipline-card__title::after,
+.discipline-card:focus-within .discipline-card__title::after {
+  width: 3.6rem;
+}
+
+.discipline-card__topic {
+  display: inline-flex;
+  min-height: 1.75rem;
+  align-items: center;
+  border: 1px solid rgba(159, 185, 229, 0.1);
+  border-radius: 0.42rem;
+  background: rgba(255, 255, 255, 0.018);
+  padding: 0.3rem 0.55rem;
+  color: rgba(232, 237, 245, 0.48);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  line-height: 1.25;
+  transition: border-color 180ms ease, color 180ms ease, background-color 180ms ease;
+}
+
+.discipline-card__topic--linked {
+  border-color: rgba(var(--discipline-accent), 0.28);
+  background: rgba(var(--discipline-accent), 0.06);
+  color: rgba(224, 245, 249, 0.82);
+}
+
+.discipline-card__topic--linked:hover {
+  border-color: rgba(var(--discipline-accent), 0.55);
+  background: rgba(var(--discipline-accent), 0.12);
+}
+
+.discipline-card__more {
+  display: inline-flex;
+  min-height: 1.75rem;
+  align-items: center;
+  padding-inline: 0.45rem;
+  color: rgba(232, 237, 245, 0.3);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+}
+
+@media (min-width: 640px) {
+  .discipline-card__visual {
+    margin-inline: -1.75rem;
+    margin-top: -1.75rem;
+    padding-inline: 1.4rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .discipline-card__visual-meta {
+    font-size: 0.5rem;
+    letter-spacing: 0.085em;
+  }
+
+  .discipline-glyph {
+    height: 4.4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .discipline-card__icon,
+  .discipline-card__title::after,
+  .discipline-card__topic {
+    transition: none;
+  }
+}
+
+
+/* Narrow-screen card proportions: preserve the artwork without wasting vertical space. */
+@media (max-width: 639px) {
+  .discipline-card {
+    gap: 1.05rem;
+    padding: 1.15rem;
+  }
+
+  .discipline-card__visual {
+    min-height: 7.25rem;
+    margin: -1.15rem -1.15rem 0;
+    padding: 0.8rem 0.95rem 0.35rem;
+  }
+
+  .discipline-glyph {
+    height: 4rem;
+  }
+
+  .discipline-card__icon {
+    width: 2.7rem;
+    height: 2.7rem;
+  }
+
+  .discipline-card__topic--linked {
+    min-height: 2.5rem;
+    padding-inline: 0.7rem;
+  }
+}
