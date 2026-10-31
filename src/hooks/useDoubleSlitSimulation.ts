@@ -55,7 +55,7 @@ export function useDoubleSlitSimulation(
 
   const detectorCountRef = useRef(0);
 
-  const derived = useMemo(() => deriveDSData(params, mode), [params, mode]);
+  const derived = useMemo(() => deriveDSData(params), [params]);
 
   const { canvasRef, clearDetector: canvasClearDetector, resetAll: canvasResetAll } =
     useDoubleSlitCanvas(
