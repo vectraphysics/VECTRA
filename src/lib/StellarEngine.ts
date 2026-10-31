@@ -64,6 +64,8 @@ export class StellarEngine {
   private planetaryNebulaMaterial: THREE.PointsMaterial;
   private planetaryNebulaShell: THREE.Mesh;
   private planetaryNebulaShellMaterial: THREE.MeshBasicMaterial;
+  private planetaryEquatorialRing: THREE.Mesh;
+  private planetaryEquatorialRingMaterial: THREE.MeshBasicMaterial;
   private neutronStarGroup: THREE.Group;
   private neutronStarMaterial: THREE.MeshStandardMaterial;
   private neutronBeamMaterial: THREE.MeshBasicMaterial;
@@ -308,11 +310,24 @@ export class StellarEngine {
       side: THREE.DoubleSide,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
-      wireframe: true,
     });
     this.planetaryNebulaShell = new THREE.Mesh(planetaryShellGeometry, this.planetaryNebulaShellMaterial);
     this.planetaryNebulaShell.scale.set(8, 10, 8);
     this.scene.add(this.planetaryNebulaShell);
+
+    // Dense equatorial waist between the bipolar lobes.
+    const planetaryRingGeometry = new THREE.TorusGeometry(5.2, 0.28, 8, 80);
+    this.planetaryEquatorialRingMaterial = new THREE.MeshBasicMaterial({
+      color: 0xd78e72,
+      transparent: true,
+      opacity: 0,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    this.planetaryEquatorialRing = new THREE.Mesh(planetaryRingGeometry, this.planetaryEquatorialRingMaterial);
+    this.planetaryEquatorialRing.rotation.x = Math.PI / 2;
+    this.scene.add(this.planetaryEquatorialRing);
 
     // Neutron star and pulsar structure. The magnetic axis is tilted relative
     // to the spin axis, so the two radiation beams sweep around as it rotates.
@@ -324,7 +339,7 @@ export class StellarEngine {
       roughness: 0.28,
       metalness: 0.05,
     });
-    const neutronGeometry = new THREE.SphereGeometry(0.78, 40, 32);
+    const neutronGeometry = new THREE.SphereGeometry(0.34, 40, 32);
     const neutronSphere = new THREE.Mesh(neutronGeometry, this.neutronStarMaterial);
     this.neutronStarGroup.add(neutronSphere);
 
@@ -337,7 +352,7 @@ export class StellarEngine {
       depthWrite: false,
     });
     const neutronGlow = new THREE.Sprite(neutronGlowMaterial);
-    neutronGlow.scale.setScalar(4.2);
+    neutronGlow.scale.setScalar(2.6);
     this.neutronStarGroup.add(neutronGlow);
 
     const magneticAxis = new THREE.Group();
@@ -357,6 +372,14 @@ export class StellarEngine {
     southBeam.position.y = -6;
     southBeam.rotation.x = Math.PI;
     magneticAxis.add(northBeam, southBeam);
+
+    const polarHotspotGeometry = new THREE.SphereGeometry(0.075, 16, 12);
+    const polarHotspotMaterial = new THREE.MeshBasicMaterial({ color: 0xf2fbff });
+    const northHotspot = new THREE.Mesh(polarHotspotGeometry, polarHotspotMaterial);
+    northHotspot.position.y = 0.31;
+    const southHotspot = new THREE.Mesh(polarHotspotGeometry, polarHotspotMaterial);
+    southHotspot.position.y = -0.31;
+    magneticAxis.add(northHotspot, southHotspot);
 
     // A few dipole-like loops make the tilted magnetic structure legible.
     for (let loopIndex = 0; loopIndex < 3; loopIndex++) {
@@ -486,6 +509,7 @@ export class StellarEngine {
       stage.id === 'black-hole' ? ACCRETION_COLOR : 0x66cde8
     );
     this.accretionDisk.scale.setScalar(stage.id === 'protostar' ? 2.15 : 1.25);
+    this.accretionDisk.rotation.x = stage.id === 'protostar' ? Math.PI / 2 : Math.PI / 2.5;
     this.supernovaMaterial.color.setHex(0xffe1c5);
     this.planetaryNebulaMaterial.color.setHex(0x72cfff);
     this.planetaryNebulaShellMaterial.color.setHex(0x63c7f2);
@@ -494,6 +518,7 @@ export class StellarEngine {
     if (stage.id === 'planetary-nebula') {
       this.planetaryNebulaPoints.scale.setScalar(1);
       this.planetaryNebulaShell.scale.set(8, 10, 8);
+      this.planetaryEquatorialRing.scale.setScalar(1);
     }
     if (stage.id === 'supernova') {
       this.supernovaShell.scale.setScalar(5);
@@ -547,9 +572,11 @@ export class StellarEngine {
     this.protostellarJets.visible = this.currentProtostellarJetOpacity > 0.01;
 
     this.planetaryNebulaMaterial.opacity = this.currentPlanetaryOpacity;
-    this.planetaryNebulaShellMaterial.opacity = this.currentPlanetaryOpacity * 0.14;
+    this.planetaryNebulaShellMaterial.opacity = this.currentPlanetaryOpacity * 0.12;
+    this.planetaryEquatorialRingMaterial.opacity = this.currentPlanetaryOpacity * 0.28;
     this.planetaryNebulaPoints.visible = this.currentPlanetaryOpacity > 0.01;
     this.planetaryNebulaShell.visible = this.currentPlanetaryOpacity > 0.01;
+    this.planetaryEquatorialRing.visible = this.currentPlanetaryOpacity > 0.01;
 
     this.neutronBeamMaterial.opacity = this.currentPulsarOpacity * 0.38;
     for (const material of this.neutronFieldMaterials) {
@@ -765,6 +792,7 @@ export class StellarEngine {
       const expansion = 1 + Math.min(this.stageTimer, this.stageDuration) * 0.018;
       this.planetaryNebulaPoints.scale.setScalar(expansion);
       this.planetaryNebulaShell.scale.set(8 * expansion, 10 * expansion, 8 * expansion);
+      this.planetaryEquatorialRing.scale.setScalar(expansion);
       if (!this.reducedMotion) {
         this.planetaryNebulaPoints.rotation.y += dt * 0.018;
         this.planetaryNebulaShell.rotation.y += dt * 0.018;
