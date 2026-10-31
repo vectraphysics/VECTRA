@@ -115,31 +115,33 @@ export function CollisionLab() {
   const finalVelocityB = data?.finalVelocityBMps ?? 0;
   const hasCollision = mode === 'explosion' || approaching;
   const phase = progress < 0.5 ? 'Before impact' : 'After impact';
+  const contactSeparation = (widthA + widthB) / 4;
+  const aStartsLeft = relativeVelocity > 0;
+  const contactA = TRACK_CENTER + (aStartsLeft ? -contactSeparation : contactSeparation);
+  const contactB = TRACK_CENTER + (aStartsLeft ? contactSeparation : -contactSeparation);
   let xA = 220;
   let xB = 500;
 
   if (mode === 'explosion' && data) {
-    xA = TRACK_CENTER - 18 + finalVelocityA * displacementScale * progress;
-    xB = TRACK_CENTER + 18 + finalVelocityB * displacementScale * progress;
+    xA = TRACK_CENTER - contactSeparation + finalVelocityA * displacementScale * progress;
+    xB = TRACK_CENTER + contactSeparation + finalVelocityB * displacementScale * progress;
   } else if (!approaching) {
     xA = 220;
     xB = 500;
   } else if (progress < 0.5) {
     const approachProgress = progress * 2;
-    const aStartsLeft = relativeVelocity > 0;
     const startA = aStartsLeft ? 220 : 500;
     const startB = aStartsLeft ? 500 : 220;
-    xA = startA + (TRACK_CENTER - startA) * approachProgress;
-    xB = startB + (TRACK_CENTER - startB) * approachProgress;
+    xA = startA + (contactA - startA) * approachProgress;
+    xB = startB + (contactB - startB) * approachProgress;
   } else if (mode === 'stick' && data) {
-    const separation = 19;
-    const travelA = finalVelocityA * displacementScale * ((progress - 0.5) * 2);
-    xA = TRACK_CENTER - separation + travelA;
-    xB = TRACK_CENTER + separation + travelA;
+    const travel = finalVelocityA * displacementScale * ((progress - 0.5) * 2);
+    xA = TRACK_CENTER - contactSeparation + travel;
+    xB = TRACK_CENTER + contactSeparation + travel;
   } else if (data) {
     const afterProgress = (progress - 0.5) * 2;
-    xA = TRACK_CENTER + finalVelocityA * displacementScale * afterProgress;
-    xB = TRACK_CENTER + finalVelocityB * displacementScale * afterProgress;
+    xA = contactA + finalVelocityA * displacementScale * afterProgress;
+    xB = contactB + finalVelocityB * displacementScale * afterProgress;
   }
 
   const displayedVelocityA = mode === 'explosion' ? finalVelocityA : progress < 0.5 ? velocityA : finalVelocityA;
