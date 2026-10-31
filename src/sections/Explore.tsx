@@ -41,7 +41,7 @@ export function Explore() {
   };
 
   return (
-    <section id="explore" className="relative isolate py-20 sm:py-28 lg:py-32">
+    <section id="explore" className="relative isolate py-16 sm:py-24 lg:py-32">
       <div className="vectra-section-bridge pointer-events-none absolute inset-x-0 -top-16 h-80" aria-hidden="true" />
       <div className="container-vectra relative z-10">
         <div ref={ref} className={`reveal reveal-up ${isVisible ? 'is-visible' : ''}`}>
@@ -120,7 +120,7 @@ export function Explore() {
         <p className="sr-only" aria-live="polite">
           Showing {visibleTopics.length} of {physicsTopics.length} physics disciplines.
         </p>
-        <div className="mt-7 grid gap-5 sm:mt-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid gap-4 sm:mt-8 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {visibleTopics.map((topic, index) => (
             <div key={topic.id} className="min-w-0">
               <TopicCard topic={topic} index={index} />
