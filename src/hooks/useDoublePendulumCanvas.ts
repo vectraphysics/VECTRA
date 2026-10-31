@@ -91,6 +91,7 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
     let trailSampleCounter = 0;
     let lastMetricsTimestamp = 0;
     let lastResetToken = configurationRef.current.resetToken;
+    let isInViewport = true;
 
     let state = createDoublePendulumState(
       configurationRef.current.initialAngles.theta1,
@@ -382,15 +383,22 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
       animationId = requestAnimationFrame(frame);
     }
 
-    function handleVisibilityChange() {
-      if (document.hidden) {
-        if (animationId) cancelAnimationFrame(animationId);
-        animationId = 0;
-        lastTimestamp = 0;
-      } else if (!animationId) {
+    function stopAnimationLoop() {
+      if (animationId) cancelAnimationFrame(animationId);
+      animationId = 0;
+      lastTimestamp = 0;
+    }
+
+    function startAnimationLoop() {
+      if (!document.hidden && isInViewport && !animationId) {
         lastTimestamp = 0;
         animationId = requestAnimationFrame(frame);
       }
+    }
+
+    function handleVisibilityChange() {
+      if (document.hidden) stopAnimationLoop();
+      else startAnimationLoop();
     }
 
     resize();
@@ -398,12 +406,21 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
 
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
+
+    const intersectionObserver = new IntersectionObserver(([entry]) => {
+      isInViewport = entry.isIntersecting;
+      if (isInViewport) startAnimationLoop();
+      else stopAnimationLoop();
+    }, { threshold: 0 });
+    intersectionObserver.observe(container);
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    animationId = requestAnimationFrame(frame);
+    startAnimationLoop();
 
     return () => {
-      if (animationId) cancelAnimationFrame(animationId);
+      stopAnimationLoop();
       resizeObserver.disconnect();
+      intersectionObserver.disconnect();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
