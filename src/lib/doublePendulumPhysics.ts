@@ -83,6 +83,13 @@ export function createDoublePendulumState(
   };
 }
 
+/**
+ * Closed-form Euler–Lagrange accelerations, adapted from PhysicsHub's
+ * DoublePendulum.jsx (MIT licensed). The source includes optional damping;
+ * this implementation uses its conservative case (damping = 0).
+ *
+ * Source: https://github.com/physicshub/physicshub.github.io/blob/bf7637238edf40e7b34021c43dc2abf45248f4db/simulations/DoublePendulum.jsx
+ */
 function acceleration(
   theta1: number,
   theta2: number,
@@ -94,29 +101,24 @@ function acceleration(
   const delta = theta1 - theta2;
   const sinDelta = Math.sin(delta);
   const cosDelta = Math.cos(delta);
+  const denominator = 2 * m1 + m2 - m2 * Math.cos(2 * delta);
 
-  // M(q) · [alpha1, alpha2]ᵀ = force(q, q̇)
-  const matrix11 = (m1 + m2) * l1 * l1;
-  const matrix12 = m2 * l1 * l2 * cosDelta;
-  const matrix22 = m2 * l2 * l2;
+  // The positive input constraints guarantee denominator >= 2m1 > 0.
+  const alpha1 = (
+    -g * (2 * m1 + m2) * Math.sin(theta1)
+    - m2 * g * Math.sin(theta1 - 2 * theta2)
+    - 2 * sinDelta * m2 * (
+      omega2 * omega2 * l2 + omega1 * omega1 * l1 * cosDelta
+    )
+  ) / (l1 * denominator);
 
-  const force1 =
-    -m2 * l1 * l2 * sinDelta * omega2 * omega2
-    - (m1 + m2) * g * l1 * Math.sin(theta1);
-
-  const force2 =
-    m2 * l1 * l2 * sinDelta * omega1 * omega1
-    - m2 * g * l2 * Math.sin(theta2);
-
-  const determinant = matrix11 * matrix22 - matrix12 * matrix12;
-
-  // Positive masses and lengths make this matrix positive definite.
-  if (!(determinant > 0) || !Number.isFinite(determinant)) {
-    throw new RangeError('Double-pendulum parameters must be finite and strictly positive.');
-  }
-
-  const alpha1 = (force1 * matrix22 - matrix12 * force2) / determinant;
-  const alpha2 = (matrix11 * force2 - matrix12 * force1) / determinant;
+  const alpha2 = (
+    2 * sinDelta * (
+      omega1 * omega1 * l1 * (m1 + m2)
+      + g * (m1 + m2) * Math.cos(theta1)
+      + omega2 * omega2 * l2 * m2 * cosDelta
+    )
+  ) / (l2 * denominator);
 
   return [alpha1, alpha2];
 }
