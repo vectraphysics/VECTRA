@@ -17,11 +17,8 @@ export interface MagneticFieldCallbacks {
 export type VizMode = 'lines' | 'vectors' | 'map';
 
 interface FieldLine {
-  points: THREE.Vector3[];
   line: THREE.Line;
-  particle: THREE.Mesh | null;
-  particleProgress: number;
-  particleOffset: number;
+  directionMarkers: THREE.LineSegments | null;
 }
 
 interface CameraSpherical {
@@ -33,7 +30,6 @@ interface CameraSpherical {
 const NORTH_COLOR = 0xe85d5d;
 const SOUTH_COLOR = 0x5e8ae8;
 const FIELD_LINE_COLOR = 0x5ec8d8;
-const PARTICLE_COLOR = 0xa8d5e8;
 const PROBE_COLOR = 0xe8c87a;
 
 export class MagneticFieldEngine {
@@ -44,9 +40,6 @@ export class MagneticFieldEngine {
   private callbacks: MagneticFieldCallbacks;
 
   private params: MagnetParameters;
-  private isPlaying = true;
-  private speedMultiplier = 1;
-
   // 3D objects
   private starfield: THREE.Points;
   private magnetGroup: THREE.Group;
@@ -94,7 +87,7 @@ export class MagneticFieldEngine {
   private animationId = 0;
   private resizeObserver: ResizeObserver;
   private reducedMotion = false;
-  private simTime = 0;
+  private lastProbeSignature = '';
 
   constructor(container: HTMLElement, params: MagnetParameters, callbacks: MagneticFieldCallbacks) {
     this.container = container;
@@ -106,7 +99,7 @@ export class MagneticFieldEngine {
 
     // Renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     const initW = container.clientWidth || container.parentElement?.clientWidth || window.innerWidth;
     const initH = container.clientHeight || container.parentElement?.clientHeight || 400;
     this.renderer.setSize(initW, initH);
@@ -136,7 +129,7 @@ export class MagneticFieldEngine {
     this.scene.add(this.fillLight);
 
     // Starfield
-    this.starfield = createStarfield(2000, 400);
+    this.starfield = createStarfield(900, 400);
     this.scene.add(this.starfield);
 
     // Magnet
@@ -268,13 +261,13 @@ export class MagneticFieldEngine {
   // ---- Field lines ----
 
   private rebuildFieldLines(): void {
-    // Dispose old
-    for (const fl of this.fieldLines) {
-      fl.line.geometry.dispose();
-      (fl.line.material as THREE.Material).dispose();
-      if (fl.particle) {
-        fl.particle.geometry.dispose();
-        (fl.particle.material as THREE.Material).dispose();
+    // Release old GPU buffers before replacing the field paths.
+    for (const fieldLine of this.fieldLines) {
+      fieldLine.line.geometry.dispose();
+      (fieldLine.line.material as THREE.Material).dispose();
+      if (fieldLine.directionMarkers) {
+        fieldLine.directionMarkers.geometry.dispose();
+        (fieldLine.directionMarkers.material as THREE.Material).dispose();
       }
     }
     this.fieldLines = [];
@@ -284,50 +277,102 @@ export class MagneticFieldEngine {
 
     const seeds = generateSeedPoints(this.params.lineDensity, this.params.orientation);
     const scale = this.params.vizScale;
+    const weakColor = new THREE.Color(0x4d8792);
+    const strongColor = new THREE.Color(0xe8c87a);
+    const referenceMagnitude = Math.max(this.params.strength / Math.pow(2.5, 3), 1e-9);
 
     for (const seed of seeds) {
       const scaledSeed = seed.clone().multiplyScalar(scale);
-      const points = traceFieldLine(scaledSeed, this.params.strength, this.params.orientation, 500, 0.5 * scale);
+      const forward = traceFieldLine(
+        scaledSeed, this.params.strength, this.params.orientation, 500, 0.5 * scale
+      );
+      if (forward.length < 2) continue;
 
+      // Keep the visible exterior path ordered from north toward south.
+      const inner = traceFieldLine(
+        scaledSeed, this.params.strength, this.params.orientation, 250, -0.5 * scale
+      );
+      const points = [...inner.reverse(), ...forward];
       if (points.length < 2) continue;
 
-      // Also trace backward from the seed to get the other half of the line
-      const backPoints = traceFieldLine(scaledSeed, this.params.strength, this.params.orientation, 250, -0.5 * scale);
-      const allPoints = [...backPoints.reverse(), ...points];
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      const colors = new Float32Array(points.length * 3);
+      points.forEach((point, index) => {
+        const magnitude = dipoleField(point, this.params.strength, this.params.orientation).length();
+        const strengthRatio = THREE.MathUtils.clamp(
+          Math.pow(magnitude / referenceMagnitude, 0.4), 0, 1
+        );
+        const color = weakColor.clone().lerp(strongColor, strengthRatio);
+        colors[index * 3] = color.r;
+        colors[index * 3 + 1] = color.g;
+        colors[index * 3 + 2] = color.b;
+      });
+      geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
 
-      if (allPoints.length < 2) continue;
-
-      const geometry = new THREE.BufferGeometry().setFromPoints(allPoints);
       const material = new THREE.LineBasicMaterial({
-        color: FIELD_LINE_COLOR,
+        color: this.showFieldStrength ? 0xffffff : FIELD_LINE_COLOR,
+        vertexColors: this.showFieldStrength,
         transparent: true,
-        opacity: 0.45,
+        opacity: this.showFieldStrength ? 0.9 : 0.72,
         linewidth: 1,
       });
       const line = new THREE.Line(geometry, material);
       this.fieldLinesGroup.add(line);
 
-      // Particle on the line
-      let particle: THREE.Mesh | null = null;
-      if (this.showFieldDirection) {
-        const pGeom = new THREE.SphereGeometry(0.15, 8, 8);
-        const pMat = new THREE.MeshBasicMaterial({
-          color: PARTICLE_COLOR,
-          transparent: true,
-          opacity: 0.9,
-        });
-        particle = new THREE.Mesh(pGeom, pMat);
-        this.fieldLinesGroup.add(particle);
-      }
-
-      this.fieldLines.push({
-        points: allPoints,
-        line,
-        particle,
-        particleProgress: Math.random(),
-        particleOffset: Math.random() * 100,
-      });
+      const directionMarkers = this.showFieldDirection
+        ? this.createDirectionMarkers(points, scale)
+        : null;
+      if (directionMarkers) this.fieldLinesGroup.add(directionMarkers);
+      this.fieldLines.push({ line, directionMarkers });
     }
+  }
+
+  /**
+   * Static chevrons sit tangent to the field path. Their tips point along B,
+   * replacing the old animated spheres with a precise direction cue.
+   */
+  private createDirectionMarkers(
+    points: THREE.Vector3[],
+    scale: number
+  ): THREE.LineSegments | null {
+    if (points.length < 8) return null;
+
+    const vertices: number[] = [];
+    const fractions = [0.34, 0.58, 0.82];
+    const up = new THREE.Vector3(0, 1, 0);
+    const right = new THREE.Vector3(1, 0, 0);
+
+    for (const fraction of fractions) {
+      const index = Math.max(1, Math.min(
+        points.length - 2, Math.round(fraction * (points.length - 1))
+      ));
+      const tip = points[index];
+      const tangent = points[index + 1].clone().sub(points[index - 1]).normalize();
+      if (tangent.lengthSq() < 1e-8) continue;
+
+      const reference = Math.abs(tangent.dot(up)) > 0.92 ? right : up;
+      const side = new THREE.Vector3().crossVectors(tangent, reference).normalize();
+      const base = tip.clone().addScaledVector(tangent, -0.52 * scale);
+      const halfWidth = 0.22 * scale;
+      const left = base.clone().addScaledVector(side, halfWidth);
+      const rightPoint = base.clone().addScaledVector(side, -halfWidth);
+
+      vertices.push(
+        tip.x, tip.y, tip.z, left.x, left.y, left.z,
+        tip.x, tip.y, tip.z, rightPoint.x, rightPoint.y, rightPoint.z
+      );
+    }
+
+    if (vertices.length === 0) return null;
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    const material = new THREE.LineBasicMaterial({
+      color: 0xe8c87a,
+      transparent: true,
+      opacity: 0.9,
+      depthWrite: false,
+    });
+    return new THREE.LineSegments(geometry, material);
   }
 
   // ---- Field vectors ----
@@ -400,12 +445,15 @@ export class MagneticFieldEngine {
       const pos = new THREE.Vector3(x, 0, z);
       const field = dipoleField(pos, this.params.strength, this.params.orientation);
       const mag = field.length();
-      const intensity = Math.min(1, mag * 0.3);
+      const referenceMagnitude = Math.max(this.params.strength / 27, 1e-9);
+      const intensity = THREE.MathUtils.clamp(
+        Math.pow(mag / referenceMagnitude, 0.5), 0, 1
+      );
 
-      // Cyan gradient based on strength
-      colors[i * 3] = 0.04;
-      colors[i * 3 + 1] = 0.04 + intensity * 0.35;
-      colors[i * 3 + 2] = 0.06 + intensity * 0.5;
+      // Keep field-map contrast comparable as dipole moment changes.
+      colors[i * 3] = 0.025 + intensity * 0.42;
+      colors[i * 3 + 1] = 0.045 + intensity * 0.34;
+      colors[i * 3 + 2] = 0.055 + intensity * 0.18;
     }
 
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
@@ -616,78 +664,53 @@ export class MagneticFieldEngine {
     // Rotate ring to face camera
     this.probeRing.lookAt(this.camera.position);
 
-    this.callbacks.onProbeUpdate(data);
-  }
+    const signature = [
+      this.probePosition.x,
+      this.probePosition.y,
+      this.probePosition.z,
+      this.params.strength,
+      this.params.orientation,
+    ].map((value) => value.toFixed(4)).join('|');
 
-  // ---- Animate particles ----
-
-  private animateParticles(dt: number): void {
-    if (!this.isPlaying) return;
-
-    for (const fl of this.fieldLines) {
-      if (!fl.particle || fl.points.length < 2) continue;
-
-      fl.particleProgress += dt * 0.15 * this.params.particleSpeed * this.speedMultiplier;
-      if (fl.particleProgress >= 1) fl.particleProgress -= 1;
-
-      const idx = Math.floor(fl.particleProgress * (fl.points.length - 1));
-      const nextIdx = Math.min(idx + 1, fl.points.length - 1);
-      const t = fl.particleProgress * (fl.points.length - 1) - idx;
-
-      const p = fl.points[idx].clone().lerp(fl.points[nextIdx], t);
-      fl.particle.position.copy(p);
+    // Avoid pushing identical probe values into React on every animation frame.
+    if (signature !== this.lastProbeSignature) {
+      this.lastProbeSignature = signature;
+      this.callbacks.onProbeUpdate(data);
     }
   }
 
-  // ---- Animation loop ----
+  // ---- Render loop ----
 
   private animate = (): void => {
     this.animationId = requestAnimationFrame(this.animate);
 
-    const dt = 1 / 60; // Approximate — could use clock for exact dt
-    if (this.isPlaying) {
-      this.simTime += dt * this.speedMultiplier;
-    }
-
-    // Rotate magnet to match orientation
+    // A fixed dipole has a static field. Only scene interaction needs rendering.
     this.magnetGroup.rotation.y = THREE.MathUtils.degToRad(this.params.orientation);
-
-    // Animate particles
-    this.animateParticles(dt * this.speedMultiplier);
-
-    // Update probe
     this.updateProbe();
-
-    // Smooth camera
     this.smoothCamera();
 
-    // Starfield parallax
     if (!this.reducedMotion) {
       this.starfield.rotation.y += 0.00003;
     }
-
     this.renderer.render(this.scene, this.camera);
   };
 
   // ---- Public API ----
 
-  play(): void { this.isPlaying = true; }
-  pause(): void { this.isPlaying = false; }
-
   reset(): void {
     this.params = { ...DEFAULT_MAGNET_PARAMS };
-    this.rebuildFieldLines();
-    this.rebuildVectors();
-    this.rebuildFieldMap();
+    this.showFieldDirection = true;
+    this.showFieldStrength = false;
     this.probePosition.set(8, 0, 0);
+    this.lastProbeSignature = '';
     this.vizMode = 'lines';
     this.fieldLinesGroup.visible = true;
     this.vectorsGroup.visible = false;
     this.fieldMapGroup.visible = false;
-    this.isPlaying = true;
+    this.rebuildFieldLines();
+    this.rebuildVectors();
+    this.rebuildFieldMap();
   }
-
-  setSpeed(s: number): void { this.speedMultiplier = s; }
 
   setStrength(v: number): void {
     this.params.strength = v;
@@ -706,10 +729,6 @@ export class MagneticFieldEngine {
   setLineDensity(v: number): void {
     this.params.lineDensity = v;
     this.rebuildFieldLines();
-  }
-
-  setParticleSpeed(v: number): void {
-    this.params.particleSpeed = v;
   }
 
   setVizScale(v: number): void {
@@ -733,10 +752,7 @@ export class MagneticFieldEngine {
 
   setShowFieldStrength(show: boolean): void {
     this.showFieldStrength = show;
-    // Adjust line opacity based on strength
-    for (const fl of this.fieldLines) {
-      (fl.line.material as THREE.LineBasicMaterial).opacity = show ? 0.7 : 0.45;
-    }
+    this.rebuildFieldLines();
   }
 
   getProbePosition(): THREE.Vector3 {
@@ -753,15 +769,6 @@ export class MagneticFieldEngine {
     cancelAnimationFrame(this.animationId);
     this.unbindEvents();
     this.resizeObserver.disconnect();
-
-    for (const fl of this.fieldLines) {
-      fl.line.geometry.dispose();
-      (fl.line.material as THREE.Material).dispose();
-      if (fl.particle) {
-        fl.particle.geometry.dispose();
-        (fl.particle.material as THREE.Material).dispose();
-      }
-    }
 
     this.scene.traverse((obj) => {
       if (obj instanceof THREE.Mesh) {
