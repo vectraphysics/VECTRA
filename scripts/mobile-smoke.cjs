@@ -66,8 +66,9 @@ async function waitForServer(url, timeoutMs = 30000) {
             canvasWidth: rect?.width ?? 0,
             canvasHeight: rect?.height ?? 0,
             viewportHeight: viewport?.getBoundingClientRect().height ?? 0,
-            canvasTouchAction: canvas ? getComputedStyle(canvas).touchAction : 'missing',\n            touchActionChain: canvas ? (() => { const values = []; let node = canvas; while (node && node !== document.documentElement) { values.push(getComputedStyle(node).touchAction); node = node.parentElement; } return values; })() : [],
-            smallControls: buttons.filter((button) => button.getBoundingClientRect().height < 40).map((button) => ({
+            canvasTouchAction: canvas ? getComputedStyle(canvas).touchAction : 'missing',
+            touchActionChain: canvas ? (() => { const values = []; let node = canvas; while (node && node !== document.documentElement) { values.push(getComputedStyle(node).touchAction); node = node.parentElement; } return values; })() : [],
+            smallControls: buttons.filter((button) => button.getBoundingClientRect().height < 44).map((button) => ({
               text: button.innerText.trim(),
               height: Math.round(button.getBoundingClientRect().height),
             })),
@@ -78,7 +79,8 @@ async function waitForServer(url, timeoutMs = 30000) {
         if (layout.documentWidth > viewport.width) failures.push(`${route} horizontal overflow at ${viewport.width}px: ${layout.documentWidth}px`);
         if (layout.canvasWidth < viewport.width - 2 || layout.canvasHeight < 300) failures.push(`${route} canvas has unexpected dimensions: ${JSON.stringify(layout)}`);
         if (!layout.webgl) failures.push(`${route} did not create a WebGL context at ${viewport.width}px`);
-        if (!layout.touchActionChain.includes('none')) failures.push(`${route} canvas has no touch-action:none ancestor at ${viewport.width}px`);\n        if (layout.smallControls.length) failures.push(`${route} has undersized primary controls: ${JSON.stringify(layout.smallControls)}`);
+        if (!layout.touchActionChain.includes('none')) failures.push(`${route} canvas has no touch-action:none ancestor at ${viewport.width}px`);
+        if (layout.smallControls.length) failures.push(`${route} has undersized primary controls: ${JSON.stringify(layout.smallControls)}`);
 
         if (route.includes('stellar')) {
           const play = page.getByRole('button', { name: /Play Evolution/ });
