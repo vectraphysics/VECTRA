@@ -52,6 +52,7 @@ export class StellarEngine {
   private starMaterial: THREE.MeshStandardMaterial;
   private starGlow: THREE.Sprite;
   private starGlowMaterial: THREE.SpriteMaterial;
+  private starSurfaceTexture: THREE.CanvasTexture;
   private nebulaPoints: THREE.Points;
   private nebulaMaterial: THREE.PointsMaterial;
   private supernovaShell: THREE.Mesh;
@@ -176,12 +177,15 @@ export class StellarEngine {
     this.scene.add(this.starfield);
 
     // Star mesh
-    const starGeom = new THREE.SphereGeometry(1, 48, 48);
+    const starGeom = new THREE.SphereGeometry(1, 64, 48);
+    this.starSurfaceTexture = this.createGranulationTexture();
     this.starMaterial = new THREE.MeshStandardMaterial({
       color: 0xfff5e0,
+      map: this.starSurfaceTexture,
       emissive: 0xffddaa,
+      emissiveMap: this.starSurfaceTexture,
       emissiveIntensity: 1.0,
-      roughness: 0.4,
+      roughness: 0.72,
       metalness: 0.0,
     });
     this.starMesh = new THREE.Mesh(starGeom, this.starMaterial);
@@ -440,7 +444,70 @@ export class StellarEngine {
     this.animate();
   }
 
-  // ---- Glow texture ----
+  // ---- Procedural stellar surface and glow textures ----
+
+  /**
+   * A subtle, deterministic granulation-like surface map. It adds broad,
+   * overlapping cells without claiming to solve stellar convection.
+   */
+  private createGranulationTexture(): THREE.CanvasTexture {
+    const width = 256;
+    const height = 128;
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d');
+    if (!context) {
+      throw new Error('Unable to create the stellar surface texture.');
+    }
+
+    const layers = [8, 16, 32, 64].map((size, index) => ({
+      size,
+      weight: [0.48, 0.28, 0.16, 0.08][index],
+      values: Float32Array.from({ length: size * size }, () => Math.random()),
+    }));
+    const image = context.createImageData(width, height);
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        let noise = 0;
+        for (const layer of layers) {
+          const gx = (x / width) * layer.size;
+          const gy = (y / height) * layer.size;
+          const x0 = Math.floor(gx) % layer.size;
+          const y0 = Math.floor(gy) % layer.size;
+          const x1 = (x0 + 1) % layer.size;
+          const y1 = (y0 + 1) % layer.size;
+          const fx = gx - Math.floor(gx);
+          const fy = gy - Math.floor(gy);
+          const sx = fx * fx * (3 - 2 * fx);
+          const sy = fy * fy * (3 - 2 * fy);
+          const a = layer.values[y0 * layer.size + x0];
+          const b = layer.values[y0 * layer.size + x1];
+          const c = layer.values[y1 * layer.size + x0];
+          const d = layer.values[y1 * layer.size + x1];
+          const top = THREE.MathUtils.lerp(a, b, sx);
+          const bottom = THREE.MathUtils.lerp(c, d, sx);
+          noise += THREE.MathUtils.lerp(top, bottom, sy) * layer.weight;
+        }
+
+        const value = Math.round(188 + noise * 67);
+        const offset = (y * width + x) * 4;
+        image.data[offset] = value;
+        image.data[offset + 1] = value;
+        image.data[offset + 2] = value;
+        image.data[offset + 3] = 255;
+      }
+    }
+
+    context.putImageData(image, 0, 0);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.ClampToEdgeWrapping;
+    texture.anisotropy = 1;
+    return texture;
+  }
 
   private createGlowTexture(): THREE.Texture {
     const size = 128;
@@ -899,26 +966,34 @@ export class StellarEngine {
     this.unbindEvents();
     this.resizeObserver.disconnect();
 
+    // Several visual pairs intentionally share geometry, materials or maps.
+    // Dispose each GPU resource once to keep mount/unmount cycles predictable.
+    const geometries = new Set<THREE.BufferGeometry>();
+    const materials = new Set<THREE.Material>();
+    const textures = new Set<THREE.Texture>();
+
     this.scene.traverse((obj) => {
-      if (obj instanceof THREE.Mesh) {
-        obj.geometry?.dispose();
-        if (Array.isArray(obj.material)) {
-          obj.material.forEach((m) => m.dispose());
-        } else {
-          obj.material?.dispose();
+      if (obj instanceof THREE.Mesh || obj instanceof THREE.Line || obj instanceof THREE.Points) {
+        geometries.add(obj.geometry);
+        const objectMaterials = Array.isArray(obj.material) ? obj.material : [obj.material];
+        for (const material of objectMaterials) {
+          materials.add(material);
+          for (const value of Object.values(material)) {
+            if (value instanceof THREE.Texture) textures.add(value);
+          }
         }
-      }
-      if (obj instanceof THREE.Points) {
-        obj.geometry?.dispose();
-        (obj.material as THREE.Material)?.dispose();
-      }
-      if (obj instanceof THREE.Sprite) {
-        (obj.material as THREE.Material)?.dispose();
+      } else if (obj instanceof THREE.Sprite) {
+        const material = obj.material;
+        materials.add(material);
+        for (const value of Object.values(material)) {
+          if (value instanceof THREE.Texture) textures.add(value);
+        }
       }
     });
 
-    // Sprite materials do not dispose their shared texture maps automatically.
-    this.starGlowMaterial.map?.dispose();
+    for (const geometry of geometries) geometry.dispose();
+    for (const material of materials) material.dispose();
+    for (const texture of textures) texture.dispose();
 
     this.renderer.dispose();
     if (this.renderer.domElement.parentNode) {
