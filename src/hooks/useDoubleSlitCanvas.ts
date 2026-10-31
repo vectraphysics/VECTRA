@@ -398,7 +398,7 @@ export function useDoubleSlitCanvas(
 
     const schedule = () => {
       if (isVisible && !document.hidden && animRef.current === 0) {
-        schedule();
+        animRef.current = requestAnimationFrame(render);
       }
     };
 
@@ -437,7 +437,7 @@ export function useDoubleSlitCanvas(
       drawProbabilityOverlay();
       drawParticles();
 
-      animRef.current = requestAnimationFrame(render);
+      schedule();
     }
 
     resize();
