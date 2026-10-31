@@ -79,7 +79,7 @@ export function getStagesForMass(mass: number): StellarStage[] {
 
   return initialMass >= CORE_COLLAPSE_HEURISTIC_MASS
     ? [...commonStages, ...getHighMassStages(initialMass)]
-    : [...commonStages, ...getIntermediateMassStages(initialMass)];
+    : [...commonStages, ...getIntermediateMassStages()];
 }
 
 function getCommonStages(mass: number): StellarStage[] {
@@ -139,7 +139,7 @@ function getCommonStages(mass: number): StellarStage[] {
   ];
 }
 
-function getIntermediateMassStages(mass: number): StellarStage[] {
+function getIntermediateMassStages(): StellarStage[] {
   const remnantMass = 'Typically about 0.5–1.3 M☉; depends on the progenitor';
   return [
     {
