@@ -68,7 +68,7 @@ function validateState(state: DoublePendulumState): void {
 export function createDoublePendulumState(
   theta1Degrees: number,
   theta2Degrees: number
- ): DoublePendulumState {
+): DoublePendulumState {
   if (!Number.isFinite(theta1Degrees) || !Number.isFinite(theta2Degrees)) {
     throw new RangeError('Initial angles must be finite numbers.');
   }
