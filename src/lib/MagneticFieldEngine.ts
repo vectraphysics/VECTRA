@@ -92,6 +92,16 @@ export class MagneticFieldEngine {
 
   // Animation
   private animationId = 0;
+
+  private onVisibilityChange = (): void => {
+    if (document.hidden) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = 0;
+      return;
+    }
+
+    if (this.animationId === 0) this.animate();
+  };
   private resizeObserver: ResizeObserver;
   private reducedMotion = false;
   private simTime = 0;
@@ -172,6 +182,7 @@ export class MagneticFieldEngine {
     this.resizeObserver.observe(container);
 
     // Start
+    document.addEventListener('visibilitychange', this.onVisibilityChange);
     this.animate();
   }
 
@@ -642,6 +653,11 @@ export class MagneticFieldEngine {
   // ---- Animation loop ----
 
   private animate = (): void => {
+    if (document.hidden) {
+      this.animationId = 0;
+      return;
+    }
+
     this.animationId = requestAnimationFrame(this.animate);
 
     const dt = 1 / 60; // Approximate — could use clock for exact dt
@@ -750,7 +766,9 @@ export class MagneticFieldEngine {
   // ---- Cleanup ----
 
   dispose(): void {
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
     cancelAnimationFrame(this.animationId);
+    this.animationId = 0;
     this.unbindEvents();
     this.resizeObserver.disconnect();
 
