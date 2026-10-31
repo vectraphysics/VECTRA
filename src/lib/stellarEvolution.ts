@@ -241,8 +241,9 @@ export function getPathForMass(mass: number): StellarPath {
  * The 8 and 25 M☉ boundaries are deliberately treated as illustrative:
  * real remnant type depends on the evolved core and mass-loss history.
  */
-export function getRemnantType(mass: number): 'white-dwarf' | 'neutron-star' | 'black-hole' {
+export function getRemnantType(mass: number): 'white-dwarf' | 'neutron-star' | 'black-hole' | 'uncertain-compact-remnant' {
   if (!Number.isFinite(mass) || mass < 8) return 'white-dwarf';
   if (mass >= 25) return 'black-hole';
+  if (mass < 10) return 'uncertain-compact-remnant';
   return 'neutron-star';
 }
