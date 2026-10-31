@@ -19,9 +19,8 @@ export type SpotlightCardProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 /**
- * SpotlightCard interaction follows the official React Bits implementation:
- * https://github.com/DavidHDev/react-bits/blob/main/src/content/Components/SpotlightCard/SpotlightCard.jsx
- * The extra optional props are retained for compatibility with existing VECTRA cards.
+ * Pointer-driven spotlight and restrained 3D response.
+ * Touch input and reduced-motion preferences keep the surface static.
  */
 const SpotlightCard = ({
   children,
@@ -33,27 +32,50 @@ const SpotlightCard = ({
   const divRef = useRef<HTMLDivElement>(null);
 
   const handlePointerMove: React.PointerEventHandler<HTMLDivElement> = (event) => {
-    if (event.pointerType === 'touch' || !divRef.current) return;
-    const rect = divRef.current.getBoundingClientRect();
-    divRef.current.style.setProperty('--mouse-x', `${event.clientX - rect.left}px`);
-    divRef.current.style.setProperty('--mouse-y', `${event.clientY - rect.top}px`);
-    divRef.current.style.setProperty('--spotlight-color', spotlightColor);
+    const element = divRef.current;
+    if (event.pointerType === 'touch' || !element) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const rect = element.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const tiltX = ((x / rect.width) - 0.5) * 3;
+    const tiltY = ((y / rect.height) - 0.5) * -3;
+
+    element.style.setProperty('--mouse-x', `${x}px`);
+    element.style.setProperty('--mouse-y', `${y}px`);
+    element.style.setProperty('--spotlight-color', spotlightColor);
+    element.style.setProperty('--pointer-tilt-x', `${tiltX.toFixed(2)}deg`);
+    element.style.setProperty('--pointer-tilt-y', `${tiltY.toFixed(2)}deg`);
   };
 
   const handlePointerEnter: React.PointerEventHandler<HTMLDivElement> = (event) => {
     if (event.pointerType === 'touch' || !divRef.current) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     divRef.current.style.setProperty('--spotlight-opacity', '1');
   };
 
   const handlePointerLeave: React.PointerEventHandler<HTMLDivElement> = () => {
-    divRef.current?.style.setProperty('--spotlight-opacity', '0');
+    const element = divRef.current;
+    if (!element) return;
+    element.style.setProperty('--spotlight-opacity', '0');
+    element.style.setProperty('--pointer-tilt-x', '0deg');
+    element.style.setProperty('--pointer-tilt-y', '0deg');
   };
 
   return (
     <div
       ref={divRef}
       className={`spotlight-card glass-panel glass-panel-hover ${className}`}
-      style={{ '--spotlight-color': spotlightColor, '--spotlight-opacity': 0, ...style } as React.CSSProperties}
+      style={{
+        '--spotlight-color': spotlightColor,
+        '--spotlight-opacity': 0,
+        '--pointer-tilt-x': '0deg',
+        '--pointer-tilt-y': '0deg',
+        ...style,
+      } as React.CSSProperties}
       onPointerMove={handlePointerMove}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
