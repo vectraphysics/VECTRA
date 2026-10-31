@@ -383,7 +383,7 @@ export function DoublePendulumPage() {
                   />
                 </div>
                 <p className="dp-control-hint">
-                  Both angles are measured from the downward vertical. The system is released from rest.
+                  Both angles are measured from the downward vertical, with positive angles to the right. The system is released from rest.
                 </p>
               </div>
             </section>
