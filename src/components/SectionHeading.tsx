@@ -1,4 +1,5 @@
 import BlurText from '@/components/BlurText';
+import './SectionHeading.css';
 
 interface SectionHeadingProps {
   eyebrow: string;
