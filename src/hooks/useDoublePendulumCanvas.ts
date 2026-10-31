@@ -69,6 +69,7 @@ function interpolateState(
 export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const configurationRef = useRef(configuration);
+  const startAnimationRef = useRef<(() => void) | null>(null);
   configurationRef.current = configuration;
 
   useEffect(() => {
@@ -91,6 +92,7 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
     let trailSampleCounter = 0;
     let lastMetricsTimestamp = 0;
     let lastResetToken = configurationRef.current.resetToken;
+    let lastShowTrail = configurationRef.current.showTrail;
     let isInViewport = true;
 
     let state = createDoublePendulumState(
@@ -231,11 +233,12 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
       context.stroke();
 
       const pivotX = width * 0.5;
-      const pivotY = height * 0.17;
       const scale = Math.min(
         (width * 0.42) / totalLength,
-        ((height - pivotY - 30) * 0.82) / totalLength
+        Math.max(1, height - 90) / (2 * totalLength)
       );
+      // Keep the complete circular reach above and below the pivot in view.
+      const pivotY = height * 0.5;
 
       // Downward reference axis.
       context.save();
@@ -328,6 +331,14 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
         resetSimulation();
       }
 
+      if (config.showTrail !== lastShowTrail) {
+        lastShowTrail = config.showTrail;
+        trailCursor = 0;
+        trailCount = 0;
+        trailSampleCounter = 0;
+        if (config.showTrail) recordTrail(state);
+      }
+
       if (lastTimestamp > 0 && config.isPlaying) {
         const elapsedFrame = Math.min(
           Math.max((timestamp - lastTimestamp) / 1000, 0),
@@ -379,8 +390,13 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
         lastMetricsTimestamp = timestamp;
       }
 
-      lastTimestamp = timestamp;
-      animationId = requestAnimationFrame(frame);
+      if (config.isPlaying) {
+        lastTimestamp = timestamp;
+        animationId = requestAnimationFrame(frame);
+      } else {
+        lastTimestamp = 0;
+        animationId = 0;
+      }
     }
 
     function stopAnimationLoop() {
@@ -395,6 +411,8 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
         animationId = requestAnimationFrame(frame);
       }
     }
+
+    startAnimationRef.current = startAnimationLoop;
 
     function handleVisibilityChange() {
       if (document.hidden) stopAnimationLoop();
@@ -418,12 +436,26 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
     startAnimationLoop();
 
     return () => {
+      startAnimationRef.current = null;
       stopAnimationLoop();
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
+
+  // Wake the renderer for a single redraw when paused controls or inputs change.
+  // While playing, this is a no-op because the animation frame is already active.
+  useEffect(() => {
+    startAnimationRef.current?.();
+  }, [
+    configuration.isPlaying,
+    configuration.speedMultiplier,
+    configuration.showTrail,
+    configuration.resetToken,
+    configuration.parameters,
+    configuration.initialAngles,
+  ]);
 
   return canvasRef;
 }
