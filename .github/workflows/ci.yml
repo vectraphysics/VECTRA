@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: ["main", "design/about-section-refinement"]
   push:
-    branches: ["main"]
+    branches: ["main", "feature/double-pendulum-simulation"]
   workflow_dispatch:
 
 permissions:
