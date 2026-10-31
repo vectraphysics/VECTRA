@@ -1,4 +1,4 @@
-import { ArrowUpRight, Orbit, Waves, SlidersHorizontal, Magnet, Star, Thermometer } from 'lucide-react';
+import { Activity, ArrowUpRight, Orbit, Waves, SlidersHorizontal, Magnet, Star, Thermometer } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SpotlightCard from '@/components/SpotlightCard';
 import { SectionHeading } from '@/components/SectionHeading';
@@ -6,6 +6,7 @@ import { useReveal } from '@/hooks/useReveal';
 
 const simulationItems = [
   { id: 'orbital-mechanics', title: 'Orbital Mechanics', description: 'Explore gravity, orbital paths, and how changing velocity reshapes an orbit.', label: 'Mechanics', icon: Orbit, href: '/simulations/orbital-mechanics' },
+  { id: 'double-pendulum', title: 'Double Pendulum', description: 'Explore coupled motion, nonlinear dynamics, and sensitivity to initial conditions.', label: 'Mechanics', icon: Activity, href: '/simulations/double-pendulum' },
   { id: 'waves', title: 'Wave Interference', description: 'Observe wave motion, superposition, and interference patterns.', label: 'Waves', icon: Waves, href: '/simulations/waves' },
   { id: 'double-slit', title: 'Double-Slit Experiment', description: 'Investigate how wave behaviour produces an interference pattern.', label: 'Modern Physics', icon: SlidersHorizontal, href: '/simulations/double-slit' },
   { id: 'magnetic-fields', title: 'Magnetic Fields', description: 'Visualize magnetic field patterns and explore their behaviour.', label: 'Electromagnetism', icon: Magnet, href: '/simulations/magnetic-fields' },
