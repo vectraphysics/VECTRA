@@ -110,11 +110,12 @@ async function waitForServer(url, timeoutMs = 30000) {
         }
 
         const scrollCheck = await page.evaluate(() => {
-          const before = window.scrollY;
-          window.scrollTo(0, document.documentElement.scrollHeight);
-          const after = window.scrollY;
-          window.scrollTo(0, 0);
-          return { before, after };
+          const scrollingElement = document.scrollingElement;
+          const before = scrollingElement?.scrollTop ?? 0;
+          if (scrollingElement) scrollingElement.scrollTop = scrollingElement.scrollHeight;
+          const after = scrollingElement?.scrollTop ?? 0;
+          if (scrollingElement) scrollingElement.scrollTop = 0;
+          return { before, after, scrollHeight: scrollingElement?.scrollHeight ?? 0, clientHeight: scrollingElement?.clientHeight ?? 0 };
         });
         if (scrollCheck.after <= 0) failures.push(`${route} page did not scroll to its lower controls at ${viewport.width}px`);
 
