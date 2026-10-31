@@ -44,7 +44,14 @@ export class StellarEngine {
   private stageTimer = 0;
   private stageDuration = 4; // seconds per stage at 1x speed
   private transitionProgress = 1; // 0 = start of transition, 1 = complete
-  private transitionSpeed = 0.5;
+  private transitionSpeed = 0.8;
+  private transitionStartRadius = 2.5;
+  private transitionStartColor = new THREE.Color(0xfff5e0);
+  private transitionStartEmissive = new THREE.Color(0xffddaa);
+  private transitionStartGlow = 1;
+  private transitionStartNebulaOpacity = 0;
+  private transitionStartSupernovaOpacity = 0;
+  private transitionStartAccretionOpacity = 0;
 
   // 3D objects
   private starfield: THREE.Points;
@@ -58,6 +65,7 @@ export class StellarEngine {
   private supernovaMaterial: THREE.MeshBasicMaterial;
   private accretionDisk: THREE.Mesh;
   private accretionMaterial: THREE.MeshBasicMaterial;
+  private pulsarBeams: THREE.Group;
   private ambientLight: THREE.AmbientLight;
   private pointLight: THREE.PointLight;
 
@@ -109,7 +117,7 @@ export class StellarEngine {
 
     // Renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     const initW = container.clientWidth || container.parentElement?.clientWidth || window.innerWidth;
     const initH = container.clientHeight || container.parentElement?.clientHeight || 400;
     this.renderer.setSize(initW, initH);
@@ -134,7 +142,7 @@ export class StellarEngine {
     this.scene.add(this.pointLight);
 
     // Starfield
-    this.starfield = createStarfield(2000, 400);
+    this.starfield = createStarfield(1400, 400);
     this.scene.add(this.starfield);
 
     // Star mesh
@@ -175,7 +183,7 @@ export class StellarEngine {
       sizeAttenuation: true,
     });
     const nebulaGeom = new THREE.BufferGeometry();
-    const nebulaCount = 500;
+    const nebulaCount = 350;
     const nebulaPos = new Float32Array(nebulaCount * 3);
     for (let i = 0; i < nebulaCount; i++) {
       // Distribute in a roughly spherical cloud
@@ -217,6 +225,28 @@ export class StellarEngine {
     this.accretionDisk = new THREE.Mesh(diskGeom, this.accretionMaterial);
     this.accretionDisk.rotation.x = Math.PI / 2.5;
     this.scene.add(this.accretionDisk);
+
+    // Pulsar radiation beams: a paired, tilted beam model for neutron-star stages.
+    // These are schematic emission cones, not a literal rendering of the magnetic field.
+    this.pulsarBeams = new THREE.Group();
+    const beamGeometry = new THREE.ConeGeometry(1.15, 15, 24, 1, true);
+    const beamMaterial = new THREE.MeshBasicMaterial({
+      color: 0x78cfff,
+      transparent: true,
+      opacity: 0.24,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const northBeam = new THREE.Mesh(beamGeometry, beamMaterial);
+    northBeam.position.y = 8;
+    const southBeam = new THREE.Mesh(beamGeometry, beamMaterial);
+    southBeam.position.y = -8;
+    southBeam.rotation.z = Math.PI;
+    this.pulsarBeams.add(northBeam, southBeam);
+    this.pulsarBeams.rotation.z = 0.42;
+    this.pulsarBeams.visible = false;
+    this.scene.add(this.pulsarBeams);
 
     // Set initial stage
     this.applyStage(0, false);
@@ -267,8 +297,16 @@ export class StellarEngine {
     this.targetNebulaOpacity = stage.id === 'nebula' ? 0.7 : stage.id === 'protostar' ? 0.3 : 0;
     this.targetSupernovaOpacity = stage.id === 'supernova' ? 0.9 : 0;
     this.targetAccretionOpacity = stage.id === 'black-hole' ? 0.6 : 0;
+    this.pulsarBeams.visible = stage.id === 'neutron-star';
 
     if (animate) {
+      this.transitionStartRadius = this.currentRadius;
+      this.transitionStartColor.copy(this.currentColor);
+      this.transitionStartEmissive.copy(this.currentEmissive);
+      this.transitionStartGlow = this.currentGlowIntensity;
+      this.transitionStartNebulaOpacity = this.currentNebulaOpacity;
+      this.transitionStartSupernovaOpacity = this.currentSupernovaOpacity;
+      this.transitionStartAccretionOpacity = this.currentAccretionOpacity;
       this.transitionProgress = 0;
     } else {
       this.transitionProgress = 1;
@@ -294,6 +332,7 @@ export class StellarEngine {
     this.starGlow.scale.setScalar(this.currentRadius * 4 * Math.max(0.5, this.currentGlowIntensity));
     this.starGlowMaterial.color.copy(this.currentColor);
     this.starGlowMaterial.opacity = 0.4 * this.currentGlowIntensity;
+    this.pulsarBeams.visible = this.stages[this.currentStageIndex]?.id === 'neutron-star';
 
     this.pointLight.color.copy(this.currentColor);
     this.pointLight.intensity = 2 * this.currentGlowIntensity;
@@ -317,13 +356,13 @@ export class StellarEngine {
     this.transitionProgress = Math.min(1, this.transitionProgress + dt * this.transitionSpeed);
     const t = this.easeInOutCubic(this.transitionProgress);
 
-    this.currentRadius = THREE.MathUtils.lerp(this.currentRadius, this.targetRadius, t * 0.1);
-    this.currentColor.lerp(this.targetColor, t * 0.1);
-    this.currentEmissive.lerp(this.targetEmissive, t * 0.1);
-    this.currentGlowIntensity = THREE.MathUtils.lerp(this.currentGlowIntensity, this.targetGlowIntensity, t * 0.1);
-    this.currentNebulaOpacity = THREE.MathUtils.lerp(this.currentNebulaOpacity, this.targetNebulaOpacity, t * 0.1);
-    this.currentSupernovaOpacity = THREE.MathUtils.lerp(this.currentSupernovaOpacity, this.targetSupernovaOpacity, t * 0.1);
-    this.currentAccretionOpacity = THREE.MathUtils.lerp(this.currentAccretionOpacity, this.targetAccretionOpacity, t * 0.1);
+    this.currentRadius = THREE.MathUtils.lerp(this.transitionStartRadius, this.targetRadius, t);
+    this.currentColor.copy(this.transitionStartColor).lerp(this.targetColor, t);
+    this.currentEmissive.copy(this.transitionStartEmissive).lerp(this.targetEmissive, t);
+    this.currentGlowIntensity = THREE.MathUtils.lerp(this.transitionStartGlow, this.targetGlowIntensity, t);
+    this.currentNebulaOpacity = THREE.MathUtils.lerp(this.transitionStartNebulaOpacity, this.targetNebulaOpacity, t);
+    this.currentSupernovaOpacity = THREE.MathUtils.lerp(this.transitionStartSupernovaOpacity, this.targetSupernovaOpacity, t);
+    this.currentAccretionOpacity = THREE.MathUtils.lerp(this.transitionStartAccretionOpacity, this.targetAccretionOpacity, t);
   }
 
   private easeInOutCubic(t: number): number {
@@ -506,6 +545,10 @@ export class StellarEngine {
       this.accretionDisk.rotation.z += dt * 0.5;
     }
 
+    if (this.pulsarBeams.visible && !this.reducedMotion) {
+      this.pulsarBeams.rotation.y += dt * 1.8;
+    }
+
     // Star slow rotation
     if (this.starMesh.visible) {
       this.starMesh.rotation.y += dt * 0.1;
@@ -598,6 +641,8 @@ export class StellarEngine {
       }
     });
 
+    // The beam geometry/material are included in scene traversal and disposed above.
+    this.starGlowMaterial.map?.dispose();
     this.renderer.dispose();
     if (this.renderer.domElement.parentNode) {
       this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
