@@ -107,16 +107,14 @@ export function Explore() {
           </div>
         </div>
 
-        <div
-          className="mt-7 grid gap-5 sm:mt-8 sm:grid-cols-2 lg:grid-cols-3"
-          aria-live="polite"
-          aria-relevant="additions removals"
-        >
+        <p className="sr-only" aria-live="polite">
+          Showing {visibleTopics.length} of {physicsTopics.length} physics disciplines.
+        </p>
+        <div className="mt-7 grid gap-5 sm:mt-8 sm:grid-cols-2 lg:grid-cols-3">
           {visibleTopics.map((topic, index) => (
             <div
               key={topic.id}
-              className="reveal reveal-up min-w-0"
-              style={{ transitionDelay: `${(index % 3) * 85}ms` }}
+              className="min-w-0"
             >
               <TopicCard topic={topic} index={index} />
             </div>
