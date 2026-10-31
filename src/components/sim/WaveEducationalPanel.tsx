@@ -19,16 +19,17 @@ export function WaveEducationalPanel() {
       </button>
       {expanded && (
         <div className="space-y-4 p-4">
-          <Section title="The Travelling Wave" equation="y(x, t) = A sin(kx − ωt)">
+          <Section title="The Travelling Wave" equation="y(x, t) = A sin(kx − ωt + φ)">
             A wave is a disturbance that travels through space. At any position x and time t,
             the displacement y is given by a sinusoidal function. The wave moves because the
             phase (kx − ωt) shifts as time advances, carrying the pattern forward.
           </Section>
 
           <Section title="Amplitude" equation="A">
-            The amplitude is the maximum displacement from equilibrium — how tall the crests
-            and how deep the troughs. A larger amplitude means more energy in the wave. Adjust
-            the amplitude slider to see the wave grow and shrink.
+            Amplitude is the maximum displacement from equilibrium. It is measured from the
+            centre line to a crest or trough, not from crest to trough. For a sinusoidal wave
+            on the same string, average power is proportional to amplitude squared when the
+            frequency and string properties are held fixed.
           </Section>
 
           <Section title="Wavelength" equation="λ — k = 2π/λ">
@@ -44,10 +45,10 @@ export function WaveEducationalPanel() {
           </Section>
 
           <Section title="Wave Speed" equation="v = fλ">
-            The wave speed — how fast the disturbance propagates — is determined by frequency
-            times wavelength. This is not an independent parameter: if you double the
-            wavelength while keeping frequency constant, the wave moves twice as fast. Try it
-            and watch the wave race across the screen.
+            The model uses v = fλ, so its calculated speed changes when either frequency or
+            wavelength changes. In a real fixed medium, the medium sets the propagation speed.
+            A change in frequency then produces a corresponding change in wavelength. The
+            playback-rate control changes only how quickly the animation is shown.
           </Section>
 
           <Section title="Direction">
