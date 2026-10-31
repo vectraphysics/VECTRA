@@ -1,0 +1,189 @@
+.explore-console {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(159, 185, 229, 0.14);
+  border-radius: 1.15rem;
+  background:
+    linear-gradient(115deg, rgba(26, 42, 70, 0.48), rgba(9, 15, 31, 0.78) 54%, rgba(12, 20, 39, 0.7)),
+    rgba(8, 13, 27, 0.78);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055), 0 20px 48px -40px rgba(0, 0, 0, 0.9);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.explore-console::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 7%;
+  width: 38%;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(120, 208, 229, 0.5), transparent);
+}
+
+.explore-console__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 2.8rem;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid rgba(159, 185, 229, 0.09);
+}
+
+.explore-console__controls {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+}
+
+.explore-search {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+  min-height: 2.9rem;
+  padding: 0 0.85rem;
+  border: 1px solid rgba(159, 185, 229, 0.12);
+  border-radius: 0.7rem;
+  background: rgba(3, 8, 20, 0.42);
+  transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.explore-search:focus-within {
+  border-color: rgba(94, 200, 216, 0.48);
+  background: rgba(5, 12, 27, 0.72);
+  box-shadow: 0 0 0 3px rgba(94, 200, 216, 0.07);
+}
+
+.explore-search input {
+  width: 100%;
+  min-height: 2.8rem;
+  appearance: none;
+}
+
+.explore-search input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.explore-search__clear {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 0.45rem;
+  color: rgba(232, 237, 245, 0.5);
+  transition: color 160ms ease, background-color 160ms ease;
+}
+
+.explore-search__clear:hover {
+  color: #dffaff;
+  background: rgba(94, 200, 216, 0.1);
+}
+
+.explore-filter-list {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 0.1rem 0 0.3rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(135, 163, 205, 0.22) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.explore-filter {
+  display: inline-flex;
+  min-height: 2.2rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 0.48rem 0.78rem;
+  border: 1px solid rgba(159, 185, 229, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.018);
+  color: rgba(232, 237, 245, 0.52);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.64rem;
+  letter-spacing: 0.015em;
+  white-space: nowrap;
+  transition: color 170ms ease, border-color 170ms ease, background-color 170ms ease, box-shadow 170ms ease;
+}
+
+.explore-filter:hover {
+  border-color: rgba(94, 200, 216, 0.3);
+  color: rgba(232, 237, 245, 0.88);
+}
+
+.explore-filter.is-active {
+  border-color: rgba(94, 200, 216, 0.4);
+  background: rgba(94, 200, 216, 0.095);
+  color: #b9f2fa;
+  box-shadow: inset 0 0 18px rgba(94, 200, 216, 0.045);
+}
+
+.explore-filter:focus-visible,
+.explore-search__clear:focus-visible,
+.explore-reset:focus-visible {
+  outline: 2px solid rgba(94, 200, 216, 0.8);
+  outline-offset: 3px;
+}
+
+.explore-empty {
+  display: flex;
+  min-height: 14rem;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem;
+  border: 1px dashed rgba(159, 185, 229, 0.2);
+  border-radius: 1rem;
+  background: rgba(9, 15, 30, 0.42);
+}
+
+.explore-reset {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid rgba(94, 200, 216, 0.28);
+  border-radius: 999px;
+  color: #b9f2fa;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.explore-reset:hover {
+  border-color: rgba(94, 200, 216, 0.5);
+  background: rgba(94, 200, 216, 0.08);
+}
+
+@media (max-width: 640px) {
+  .explore-console {
+    border-radius: 0.95rem;
+  }
+
+  .explore-console__topline {
+    padding-inline: 0.8rem;
+  }
+
+  .explore-console__controls {
+    gap: 0.75rem;
+    padding: 0.8rem;
+  }
+
+  .explore-filter-list {
+    margin-right: -0.8rem;
+    padding-right: 0.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explore-search,
+  .explore-search__clear,
+  .explore-filter,
+  .explore-reset {
+    transition: none;
+  }
+}
