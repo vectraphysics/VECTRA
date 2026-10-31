@@ -86,7 +86,6 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
     let lastTimestamp = 0;
     let accumulator = 0;
     let simulationTime = 0;
-    let frameCounter = 0;
     let trailCursor = 0;
     let trailCount = 0;
     let trailSampleCounter = 0;
@@ -186,7 +185,6 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
     ) {
       if (!showTrail || trailCount < 2) return;
 
-      const parameters = configurationRef.current.parameters;
       const start = trailCount === TRAIL_CAPACITY ? trailCursor : 0;
 
       context.beginPath();
@@ -200,7 +198,7 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
       }
 
       context.strokeStyle = 'rgba(116, 224, 239, 0.14)';
-      context.lineWidth = Math.max(1, Math.min(2, parameters.mass2));
+      context.lineWidth = 1.5;
       context.lineCap = 'round';
       context.lineJoin = 'round';
       context.stroke();
@@ -375,7 +373,6 @@ export function useDoublePendulumCanvas(configuration: CanvasConfiguration) {
       );
       draw(interpolateState(previousState, state, alpha));
 
-      frameCounter += 1;
       if (timestamp - lastMetricsTimestamp >= 140) {
         emitMetrics();
         lastMetricsTimestamp = timestamp;
