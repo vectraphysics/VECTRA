@@ -96,7 +96,7 @@ export function useWaveCanvas(
       }
     }
 
-    function drawGrid(cy: number) {
+    function drawGrid() {
       if (!ctx) return;
       ctx.strokeStyle = GRID_COLOR;
       ctx.lineWidth = 1;
@@ -128,7 +128,7 @@ export function useWaveCanvas(
     function drawWave(cy: number) {
       if (!ctx) return;
       const cfg = configRef.current;
-      const { params, derived, speedMultiplier } = cfg;
+      const { params, derived } = cfg;
       const t = timeRef.current;
 
       // Glow layer — thick, low-opacity stroke
@@ -334,7 +334,7 @@ export function useWaveCanvas(
       const cy = height / 2;
 
       // Grid
-      if (cfg.showGrid) drawGrid(cy);
+      if (cfg.showGrid) drawGrid();
 
       // Equilibrium
       if (cfg.showEquilibrium) drawEquilibrium(cy);

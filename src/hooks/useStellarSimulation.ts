@@ -44,7 +44,7 @@ export function useStellarSimulation(
     if (!containerRef.current) return;
 
     const engine = new StellarEngine(containerRef.current, DEFAULT_MASS, {
-      onStageChange: (idx, stage) => {
+      onStageChange: (idx) => {
         setCurrentStageIndex(idx);
       },
     });
