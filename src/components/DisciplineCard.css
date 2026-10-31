@@ -279,31 +279,3 @@
     padding-inline: 0.7rem;
   }
 }
-
-/* Narrow-screen card proportions: preserve the artwork without wasting vertical space. */
-@media (max-width: 639px) {
-  .discipline-card {
-    gap: 1.05rem;
-    padding: 1.15rem;
-  }
-
-  .discipline-card__visual {
-    min-height: 7.25rem;
-    margin: -1.15rem -1.15rem 0;
-    padding: 0.8rem 0.95rem 0.35rem;
-  }
-
-  .discipline-glyph {
-    height: 4rem;
-  }
-
-  .discipline-card__icon {
-    width: 2.7rem;
-    height: 2.7rem;
-  }
-
-  .discipline-card__topic--linked {
-    min-height: 2.5rem;
-    padding-inline: 0.7rem;
-  }
-}
