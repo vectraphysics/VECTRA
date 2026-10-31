@@ -14,7 +14,7 @@ export function CameraControls({ controls }: CameraControlsProps) {
       <div className="sim-panel-body">
         <button
           onClick={controls.resetCamera}
-          className="flex items-center justify-center gap-2 rounded-lg border border-surface-border bg-space-700/30 px-4 py-2.5 font-display text-sm font-medium text-star-white/60 transition-all hover:border-surface-border-hover hover:text-star-white"
+          className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-surface-border bg-space-700/30 px-4 py-2.5 font-display text-sm font-medium text-star-white/60 transition-all hover:border-surface-border-hover hover:text-star-white"
         >
           <Camera className="h-4 w-4" strokeWidth={1.5} />
           Reset Camera

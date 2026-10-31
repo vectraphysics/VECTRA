@@ -3,6 +3,7 @@ import * as THREE from 'three';
 export interface TrailObjects {
   mesh: THREE.Line;
   positions: Float32Array;
+  indices: Uint32Array;
   geometry: THREE.BufferGeometry;
   count: number;
   head: number;
@@ -17,6 +18,8 @@ export function createTrail(maxPoints = 2000): TrailObjects {
   const positions = new Float32Array(maxPoints * 3);
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const indices = new Uint32Array(maxPoints);
+  geometry.setIndex(new THREE.BufferAttribute(indices, 1));
   geometry.setDrawRange(0, 0);
 
   const material = new THREE.LineBasicMaterial({
@@ -33,6 +36,7 @@ export function createTrail(maxPoints = 2000): TrailObjects {
   return {
     mesh,
     positions,
+    indices,
     geometry,
     count: maxPoints,
     head: 0,
@@ -52,17 +56,17 @@ export function addTrailPoint(trail: TrailObjects, x: number, y: number, z: numb
   trail.head = (trail.head + 1) % trail.count;
   trail.filled = Math.min(trail.filled + 1, trail.count);
 
-  // Rebuild the draw range as a contiguous segment from oldest to newest.
-  // When the buffer wraps, we draw all points (the ring is full).
-  if (trail.filled < trail.count) {
-    // Not yet wrapped — draw from 0 to head
-    trail.geometry.setDrawRange(0, trail.filled);
-  } else {
-    // Full ring — draw everything
-    trail.geometry.setDrawRange(0, trail.count);
+  // Index the points from oldest to newest. Once the ring buffer wraps,
+  // this prevents a false straight chord between the newest and oldest points.
+  const start = trail.filled === trail.count ? trail.head : 0;
+  for (let i = 0; i < trail.filled; i++) {
+    trail.indices[i] = (start + i) % trail.count;
   }
 
+  trail.geometry.setDrawRange(0, trail.filled);
   trail.geometry.attributes.position.needsUpdate = true;
+  const indexAttribute = trail.geometry.index;
+  if (indexAttribute) indexAttribute.needsUpdate = true;
 }
 
 /**
@@ -82,6 +86,8 @@ export function clearTrail(trail: TrailObjects): void {
 export function resizeTrail(trail: TrailObjects, newMax: number): void {
   trail.count = newMax;
   trail.positions = new Float32Array(newMax * 3);
+  trail.indices = new Uint32Array(newMax);
   trail.geometry.setAttribute('position', new THREE.BufferAttribute(trail.positions, 3));
+  trail.geometry.setIndex(new THREE.BufferAttribute(trail.indices, 1));
   clearTrail(trail);
 }

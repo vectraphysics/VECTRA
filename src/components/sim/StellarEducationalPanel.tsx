@@ -9,8 +9,9 @@ export function StellarEducationalPanel() {
       <button
         onClick={() => setExpanded((v) => !v)}
         className="sim-panel-header w-full transition-colors hover:bg-surface-hover"
+        aria-expanded={expanded}
       >
-        <span className="sim-panel-title">Stellar Evolution</span>
+        <span className="sim-panel-title">Stellar Evolution Notes</span>
         {expanded ? (
           <ChevronUp className="ml-auto h-4 w-4 text-star-white/40" strokeWidth={1.5} />
         ) : (
@@ -19,46 +20,36 @@ export function StellarEducationalPanel() {
       </button>
       {expanded && (
         <div className="space-y-4 p-4">
-          <Section title="A Star Is Born">
-            Stars begin their lives in nebulae — vast clouds of hydrogen and helium gas.
-            Gravity slowly pulls the gas together, compressing it until the core becomes
-            hot and dense enough to ignite nuclear fusion. This marks the birth of a star.
+          <Section title="Birth: cloud, disk and outflows">
+            Stars form when dense regions of cold molecular clouds collapse under gravity. Rotation causes infalling gas to form an accretion disk. Magnetic fields can drive bipolar outflows that carry away angular momentum. A protostar is still contracting; sustained core hydrogen fusion begins later.
           </Section>
 
-          <Section title="The Main Sequence">
-            A star spends most of its life on the main sequence, steadily converting
-            hydrogen into helium in its core. This is a stable balance: gravity tries to
-            collapse the star, while fusion energy pushes outward. The more massive the
-            star, the hotter and brighter it burns — and the faster it runs out of fuel.
+          <Section title="Main-sequence balance">
+            During the main sequence, hydrogen fusion supplies energy to the star. The outward pressure gradient balances gravity in hydrostatic equilibrium. Higher-mass stars are hotter and much more luminous, so they use their core fuel faster.
           </Section>
 
-          <Section title="Mass Determines Destiny">
-            A star's initial mass is the single most important factor in its evolution.
-            A star like our Sun will burn for about 10 billion years. A star 25 times
-            more massive may live only a few million years. The mass determines not only
-            the lifespan but the final fate: white dwarf, neutron star, or black hole.
+          <Section title="Low- and intermediate-mass pathway">
+            A representative path is red giant branch, core helium burning, asymptotic giant branch, planetary nebula, then white dwarf. In the asymptotic giant branch, hydrogen and helium burn in shells around a carbon-oxygen core. Stellar winds expel the envelope. Ultraviolet light from the exposed hot core ionises the expanding gas.
           </Section>
 
-          <Section title="Low-Mass Stars" equation="0.1–8 M☉">
-            Sun-like stars swell into red giants when core hydrogen runs out. They ignite
-            helium fusion, then shed their outer layers as a planetary nebula. The exposed
-            core — a white dwarf — cools for trillions of years. No explosion, just a
-            gentle farewell.
+          <Section title="Very low-mass red dwarfs">
+            Stars below roughly half the Sun's mass can remain on the main sequence for times far longer than the current age of the Universe. A 0.1-solar-mass red dwarf can have a main-sequence lifetime of around 10 trillion years. The simulation therefore does not rush these stars through giant and remnant stages.
           </Section>
 
-          <Section title="High-Mass Stars" equation="8+ M☉">
-            Massive stars fuse elements all the way up to iron. But iron cannot release
-            energy through fusion — the chain stops. The core collapses in milliseconds,
-            rebounds in a supernova explosion, and leaves behind either a neutron star
-            (a ball of neutrons 20 km wide) or, for the most massive stars, a black hole.
+          <Section title="Massive-star pathway">
+            Massive stars can develop layered burning shells and build an iron-group core. When the core can no longer support itself, it collapses. A successful core-collapse supernova ejects outer material and may leave a neutron star or black hole. A red supergiant is one representative evolved phase, not the fate of every massive star.
           </Section>
 
-          <Section title="Why the Paths Diverge">
-            The key is electron degeneracy pressure — the quantum mechanical resistance of
-            electrons to being squeezed together. For cores below about 1.4 M☉ (the
-            Chandrasekhar limit), this pressure can support the remnant as a white dwarf.
-            Above that limit, gravity overwhelms it, leading to further collapse and
-            more exotic remnants.
+          <Section title="Neutron stars and pulsars">
+            A neutron star packs roughly a solar mass or more into a sphere only about 10–12 km in radius. It is supported by the physics of ultra-dense nuclear matter. A pulsar is a neutron star whose tilted magnetic axis produces beams that sweep across space as it rotates. We observe pulses only when the beam crosses our line of sight.
+          </Section>
+
+          <Section title="White dwarfs and black dwarfs">
+            Electron degeneracy pressure supports a white dwarf against gravity. It no longer sustains ordinary core fusion and slowly cools. A black dwarf is a hypothetical, fully cooled remnant; the Universe is not old enough for one to have formed.
+          </Section>
+
+          <Section title="Why mass thresholds are approximate">
+            Initial mass strongly influences stellar evolution, but it does not determine the final remnant through one exact universal cut-off. Metallicity, rotation, mass loss, binary interaction and the mass of the final collapsing core all matter. The slider uses simplified teaching thresholds to select representative pathways.
           </Section>
         </div>
       )}
@@ -68,23 +59,14 @@ export function StellarEducationalPanel() {
 
 function Section({
   title,
-  equation,
   children,
 }: {
   title: string;
-  equation?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="flex items-center gap-2">
-        <h4 className="font-display text-sm font-medium text-star-white">{title}</h4>
-        {equation && (
-          <code className="rounded border border-surface-border bg-space-900/50 px-1.5 py-0.5 font-mono text-[0.7rem] text-accent-ice">
-            {equation}
-          </code>
-        )}
-      </div>
+      <h4 className="font-display text-sm font-medium text-star-white">{title}</h4>
       <p className="font-body text-xs leading-relaxed text-star-white/45">{children}</p>
     </div>
   );

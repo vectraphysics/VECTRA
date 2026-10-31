@@ -23,7 +23,7 @@ export function StellarPlayback({ controls }: StellarPlaybackProps) {
           {isPlaying ? (
             <button
               onClick={togglePlay}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-accent-cyan/30 bg-accent-cyan/10 px-4 py-2.5 font-display text-sm font-medium text-accent-cyan transition-all hover:bg-accent-cyan/20"
+              className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-accent-cyan/30 bg-accent-cyan/10 px-4 py-2.5 font-display text-sm font-medium text-accent-cyan transition-all hover:bg-accent-cyan/20"
             >
               <Pause className="h-4 w-4" strokeWidth={2} />
               Pause
@@ -31,7 +31,7 @@ export function StellarPlayback({ controls }: StellarPlaybackProps) {
           ) : (
             <button
               onClick={togglePlay}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-accent-cyan/30 bg-accent-cyan/10 px-4 py-2.5 font-display text-sm font-medium text-accent-cyan transition-all hover:bg-accent-cyan/20"
+              className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-accent-cyan/30 bg-accent-cyan/10 px-4 py-2.5 font-display text-sm font-medium text-accent-cyan transition-all hover:bg-accent-cyan/20"
             >
               <Play className="h-4 w-4" strokeWidth={2} />
               {atEnd ? 'Replay' : 'Play Evolution'}
@@ -39,7 +39,7 @@ export function StellarPlayback({ controls }: StellarPlaybackProps) {
           )}
           <button
             onClick={reset}
-            className="flex items-center justify-center gap-2 rounded-lg border border-surface-border bg-space-700/30 px-4 py-2.5 font-display text-sm font-medium text-star-white/60 transition-all hover:border-surface-border-hover hover:text-star-white"
+            className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-surface-border bg-space-700/30 px-4 py-2.5 font-display text-sm font-medium text-star-white/60 transition-all hover:border-surface-border-hover hover:text-star-white"
           >
             <RotateCcw className="h-4 w-4" strokeWidth={1.5} />
             Reset
@@ -51,7 +51,7 @@ export function StellarPlayback({ controls }: StellarPlaybackProps) {
           <button
             onClick={prevStage}
             disabled={atStart}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-surface-border bg-space-700/30 px-3 py-2 font-mono text-xs text-star-white/50 transition-all hover:text-star-white disabled:cursor-not-allowed disabled:opacity-30"
+            className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-surface-border bg-space-700/30 px-3 py-2 font-mono text-xs text-star-white/50 transition-all hover:text-star-white disabled:cursor-not-allowed disabled:opacity-30"
           >
             <ChevronLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
             Prev
@@ -59,7 +59,7 @@ export function StellarPlayback({ controls }: StellarPlaybackProps) {
           <button
             onClick={nextStage}
             disabled={atEnd}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-surface-border bg-space-700/30 px-3 py-2 font-mono text-xs text-star-white/50 transition-all hover:text-star-white disabled:cursor-not-allowed disabled:opacity-30"
+            className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-surface-border bg-space-700/30 px-3 py-2 font-mono text-xs text-star-white/50 transition-all hover:text-star-white disabled:cursor-not-allowed disabled:opacity-30"
           >
             Next
             <ChevronRight className="h-3.5 w-3.5" strokeWidth={1.5} />
@@ -68,7 +68,7 @@ export function StellarPlayback({ controls }: StellarPlaybackProps) {
 
         <button
           onClick={resetCamera}
-          className="flex items-center justify-center gap-2 rounded-lg border border-surface-border bg-space-700/30 px-4 py-2.5 font-display text-sm font-medium text-star-white/60 transition-all hover:border-surface-border-hover hover:text-star-white"
+          className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-surface-border bg-space-700/30 px-4 py-2.5 font-display text-sm font-medium text-star-white/60 transition-all hover:border-surface-border-hover hover:text-star-white"
         >
           <Camera className="h-4 w-4" strokeWidth={1.5} />
           Reset Camera
@@ -83,7 +83,7 @@ export function StellarPlayback({ controls }: StellarPlaybackProps) {
               <button
                 key={s}
                 onClick={() => setSpeed(s)}
-                className={`sim-speed-btn flex-1 ${speed === s ? 'active' : ''}`}
+                className={`sim-speed-btn min-h-11 flex-1 ${speed === s ? 'active' : ''}`}
               >
                 {s}×
               </button>

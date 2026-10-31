@@ -21,6 +21,16 @@ export function StellarStageInfo({ stage }: StellarStageInfoProps) {
           <p className="font-body text-xs leading-relaxed text-star-white/45">
             {stage.description}
           </p>
+          {stage.visualNote && (
+            <div className="rounded-lg border border-accent-cyan/15 bg-accent-cyan/5 p-3">
+              <span className="font-mono text-[0.62rem] uppercase tracking-widest text-accent-cyan/70">
+                Scale and model note
+              </span>
+              <p className="mt-1 font-body text-xs leading-relaxed text-star-white/55">
+                {stage.visualNote}
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="h-px bg-surface-border" />

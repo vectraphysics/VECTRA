@@ -26,8 +26,9 @@ const ACCRETION_COLOR = 0xff8844;
  * protostar, stable main-sequence star, expanded giant, supernova flash,
  * compact remnant, or black hole with accretion disk.
  *
- * Transitions between stages interpolate the star's radius, color, and
- * emissive intensity smoothly over a transition duration.
+ * Stage-specific structures illustrate accretion, stellar outflows, envelope
+ * ejection, pulsar beams and compact remnants. The visuals are educational
+ * schematics, not hydrodynamic or relativistic numerical simulations.
  */
 export class StellarEngine {
   private renderer: THREE.WebGLRenderer;
@@ -52,12 +53,28 @@ export class StellarEngine {
   private starMaterial: THREE.MeshStandardMaterial;
   private starGlow: THREE.Sprite;
   private starGlowMaterial: THREE.SpriteMaterial;
+  private starSurfaceTexture: THREE.CanvasTexture;
   private nebulaPoints: THREE.Points;
   private nebulaMaterial: THREE.PointsMaterial;
   private supernovaShell: THREE.Mesh;
   private supernovaMaterial: THREE.MeshBasicMaterial;
   private accretionDisk: THREE.Mesh;
   private accretionMaterial: THREE.MeshBasicMaterial;
+  private protostellarJets: THREE.Group;
+  private protostellarJetMaterial: THREE.MeshBasicMaterial;
+  private planetaryNebulaPoints: THREE.Points;
+  private planetaryNebulaMaterial: THREE.PointsMaterial;
+  private planetaryNebulaShell: THREE.Mesh;
+  private planetaryNebulaShellMaterial: THREE.MeshBasicMaterial;
+  private planetaryEquatorialRing: THREE.Mesh;
+  private planetaryEquatorialRingMaterial: THREE.MeshBasicMaterial;
+  private neutronStarGroup: THREE.Group;
+  private neutronStarMaterial: THREE.MeshStandardMaterial;
+  private neutronBeamMaterial: THREE.MeshBasicMaterial;
+  private neutronFieldMaterials: THREE.MeshBasicMaterial[] = [];
+  private eventHorizon: THREE.Mesh;
+  private photonRing: THREE.Mesh;
+  private photonRingMaterial: THREE.MeshBasicMaterial;
   private ambientLight: THREE.AmbientLight;
   private pointLight: THREE.PointLight;
 
@@ -78,6 +95,28 @@ export class StellarEngine {
   private currentSupernovaOpacity = 0;
   private targetAccretionOpacity = 0;
   private currentAccretionOpacity = 0;
+  private targetProtostellarJetOpacity = 0;
+  private currentProtostellarJetOpacity = 0;
+  private targetPlanetaryOpacity = 0;
+  private currentPlanetaryOpacity = 0;
+  private targetPulsarOpacity = 0;
+  private currentPulsarOpacity = 0;
+  private targetBlackHoleOpacity = 0;
+  private currentBlackHoleOpacity = 0;
+
+  // Captured transition origins prevent repeated, asymptotic lerping.
+  private transitionStartRadius = 2.5;
+  private transitionStartColor = new THREE.Color(0xfff5e0);
+  private transitionStartEmissive = new THREE.Color(0xffddaa);
+  private transitionStartGlowIntensity = 1;
+  private transitionStartNebulaOpacity = 0;
+  private transitionStartSupernovaOpacity = 0;
+  private transitionStartAccretionOpacity = 0;
+  private transitionStartProtostellarJetOpacity = 0;
+  private transitionStartPlanetaryOpacity = 0;
+  private transitionStartPulsarOpacity = 0;
+  private transitionStartBlackHoleOpacity = 0;
+  private elapsedTime = 0;
 
   // Camera
   private cameraTarget = new THREE.Vector3(0, 0, 0);
@@ -85,6 +124,7 @@ export class StellarEngine {
   private camDamping = 0.12;
   private currentCamPos = new THREE.Vector3();
   private currentCamTarget = new THREE.Vector3();
+  private desiredCamPos = new THREE.Vector3();
 
   // Pointer
   private isPointerDown = false;
@@ -96,6 +136,9 @@ export class StellarEngine {
   // Animation
   private animationId = 0;
   private resizeObserver: ResizeObserver;
+  private intersectionObserver: IntersectionObserver | null = null;
+  private containerVisible = true;
+  private documentVisible = !document.hidden;
   private reducedMotion = false;
   private clock = new THREE.Clock();
 
@@ -109,7 +152,8 @@ export class StellarEngine {
 
     // Renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const pixelRatioLimit = window.innerWidth < 768 ? 1.5 : 2;
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, pixelRatioLimit));
     const initW = container.clientWidth || container.parentElement?.clientWidth || window.innerWidth;
     const initH = container.clientHeight || container.parentElement?.clientHeight || 400;
     this.renderer.setSize(initW, initH);
@@ -138,12 +182,15 @@ export class StellarEngine {
     this.scene.add(this.starfield);
 
     // Star mesh
-    const starGeom = new THREE.SphereGeometry(1, 48, 48);
+    const starGeom = new THREE.SphereGeometry(1, 64, 48);
+    this.starSurfaceTexture = this.createGranulationTexture();
     this.starMaterial = new THREE.MeshStandardMaterial({
       color: 0xfff5e0,
+      map: this.starSurfaceTexture,
       emissive: 0xffddaa,
+      emissiveMap: this.starSurfaceTexture,
       emissiveIntensity: 1.0,
-      roughness: 0.4,
+      roughness: 0.72,
       metalness: 0.0,
     });
     this.starMesh = new THREE.Mesh(starGeom, this.starMaterial);
@@ -196,7 +243,7 @@ export class StellarEngine {
       color: 0xffffff,
       transparent: true,
       opacity: 0,
-      side: THREE.BackSide,
+      side: THREE.DoubleSide,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
@@ -218,21 +265,271 @@ export class StellarEngine {
     this.accretionDisk.rotation.x = Math.PI / 2.5;
     this.scene.add(this.accretionDisk);
 
+    // Protostellar bipolar outflows. These are stylised gas jets, not light beams.
+    this.protostellarJets = new THREE.Group();
+    this.protostellarJetMaterial = new THREE.MeshBasicMaterial({
+      color: 0x78cdeb,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+    const protoJetGeometry = new THREE.CylinderGeometry(0.08, 0.65, 11, 16, 1, true);
+    const protoJetNorth = new THREE.Mesh(protoJetGeometry, this.protostellarJetMaterial);
+    protoJetNorth.position.y = 5.5;
+    const protoJetSouth = new THREE.Mesh(protoJetGeometry, this.protostellarJetMaterial);
+    protoJetSouth.position.y = -5.5;
+    protoJetSouth.rotation.x = Math.PI;
+    this.protostellarJets.add(protoJetNorth, protoJetSouth);
+    this.protostellarJets.rotation.z = 0.08;
+    this.scene.add(this.protostellarJets);
+
+    // Expelled planetary-nebula gas: a structured, mildly bipolar shell.
+    const planetaryCount = 1100;
+    const planetaryPositions = new Float32Array(planetaryCount * 3);
+    for (let i = 0; i < planetaryCount; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const cosPhi = 2 * Math.random() - 1;
+      const sinPhi = Math.sqrt(1 - cosPhi * cosPhi);
+      const radius = 8 + Math.random() * 2.3 + Math.abs(cosPhi) * 2.2;
+      planetaryPositions[i * 3] = radius * sinPhi * Math.cos(theta) * 0.82;
+      planetaryPositions[i * 3 + 1] = radius * cosPhi * 1.18;
+      planetaryPositions[i * 3 + 2] = radius * sinPhi * Math.sin(theta) * 0.82;
+    }
+    const planetaryGeometry = new THREE.BufferGeometry();
+    planetaryGeometry.setAttribute('position', new THREE.BufferAttribute(planetaryPositions, 3));
+    this.planetaryNebulaMaterial = new THREE.PointsMaterial({
+      color: 0x72cfff,
+      size: 0.2,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true,
+    });
+    this.planetaryNebulaPoints = new THREE.Points(planetaryGeometry, this.planetaryNebulaMaterial);
+    this.scene.add(this.planetaryNebulaPoints);
+
+    const planetaryShellGeometry = new THREE.SphereGeometry(1, 40, 28);
+    this.planetaryNebulaShellMaterial = new THREE.MeshBasicMaterial({
+      color: 0x63c7f2,
+      transparent: true,
+      opacity: 0,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    this.planetaryNebulaShell = new THREE.Mesh(planetaryShellGeometry, this.planetaryNebulaShellMaterial);
+    this.planetaryNebulaShell.scale.set(8, 10, 8);
+    this.scene.add(this.planetaryNebulaShell);
+
+    // Dense equatorial waist between the bipolar lobes.
+    const planetaryRingGeometry = new THREE.TorusGeometry(5.2, 0.28, 8, 80);
+    this.planetaryEquatorialRingMaterial = new THREE.MeshBasicMaterial({
+      color: 0xd78e72,
+      transparent: true,
+      opacity: 0,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    this.planetaryEquatorialRing = new THREE.Mesh(planetaryRingGeometry, this.planetaryEquatorialRingMaterial);
+    this.planetaryEquatorialRing.rotation.x = Math.PI / 2;
+    this.scene.add(this.planetaryEquatorialRing);
+
+    // Neutron star and pulsar structure. The magnetic axis is tilted relative
+    // to the spin axis, so the two radiation beams sweep around as it rotates.
+    this.neutronStarGroup = new THREE.Group();
+    this.neutronStarMaterial = new THREE.MeshStandardMaterial({
+      color: 0xbadfff,
+      emissive: 0x4d9fff,
+      emissiveIntensity: 1.7,
+      roughness: 0.28,
+      metalness: 0.05,
+    });
+    const neutronGeometry = new THREE.SphereGeometry(0.34, 40, 32);
+    const neutronSphere = new THREE.Mesh(neutronGeometry, this.neutronStarMaterial);
+    this.neutronStarGroup.add(neutronSphere);
+
+    const neutronGlowMaterial = new THREE.SpriteMaterial({
+      map: this.starGlowMaterial.map,
+      color: 0x65baff,
+      transparent: true,
+      opacity: 0.5,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const neutronGlow = new THREE.Sprite(neutronGlowMaterial);
+    neutronGlow.scale.setScalar(2.6);
+    this.neutronStarGroup.add(neutronGlow);
+
+    const magneticAxis = new THREE.Group();
+    magneticAxis.rotation.z = 0.48;
+    this.neutronBeamMaterial = new THREE.MeshBasicMaterial({
+      color: 0x73caff,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+    const beamGeometry = new THREE.CylinderGeometry(0.06, 0.72, 12, 20, 1, true);
+    const northBeam = new THREE.Mesh(beamGeometry, this.neutronBeamMaterial);
+    northBeam.position.y = 6;
+    const southBeam = new THREE.Mesh(beamGeometry, this.neutronBeamMaterial);
+    southBeam.position.y = -6;
+    southBeam.rotation.x = Math.PI;
+    magneticAxis.add(northBeam, southBeam);
+
+    const polarHotspotGeometry = new THREE.SphereGeometry(0.075, 16, 12);
+    const polarHotspotMaterial = new THREE.MeshBasicMaterial({ color: 0xf2fbff });
+    const northHotspot = new THREE.Mesh(polarHotspotGeometry, polarHotspotMaterial);
+    northHotspot.position.y = 0.31;
+    const southHotspot = new THREE.Mesh(polarHotspotGeometry, polarHotspotMaterial);
+    southHotspot.position.y = -0.31;
+    magneticAxis.add(northHotspot, southHotspot);
+
+    // A few dipole-like loops make the tilted magnetic structure legible.
+    for (let loopIndex = 0; loopIndex < 3; loopIndex++) {
+      const loopRadius = 2.6 + loopIndex * 1.25;
+      const footpointAngle = Math.asin(Math.sqrt(0.34 / loopRadius));
+      const points: THREE.Vector3[] = [];
+      for (let step = 0; step <= 80; step++) {
+        const theta = footpointAngle + (Math.PI - 2 * footpointAngle) * (step / 80);
+        const radius = loopRadius * Math.sin(theta) ** 2;
+        points.push(new THREE.Vector3(radius * Math.sin(theta), radius * Math.cos(theta), 0));
+      }
+      const curve = new THREE.CatmullRomCurve3(points);
+      const fieldGeometry = new THREE.TubeGeometry(curve, 72, 0.018, 5, false);
+      const fieldMaterial = new THREE.MeshBasicMaterial({
+        color: loopIndex === 1 ? 0x7ccfff : 0x488fda,
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+      const fieldLine = new THREE.Mesh(fieldGeometry, fieldMaterial);
+      fieldLine.rotation.y = loopIndex * Math.PI / 3;
+      magneticAxis.add(fieldLine);
+      this.neutronFieldMaterials.push(fieldMaterial);
+    }
+    this.neutronStarGroup.add(magneticAxis);
+    this.scene.add(this.neutronStarGroup);
+
+    // A black hole needs a dark horizon, not an invisible missing star.
+    const horizonGeometry = new THREE.SphereGeometry(1, 48, 36);
+    const horizonMaterial = new THREE.MeshBasicMaterial({ color: 0x010208 });
+    this.eventHorizon = new THREE.Mesh(horizonGeometry, horizonMaterial);
+    this.eventHorizon.scale.setScalar(1.6);
+    this.scene.add(this.eventHorizon);
+
+    const photonRingGeometry = new THREE.TorusGeometry(2.45, 0.045, 8, 96);
+    this.photonRingMaterial = new THREE.MeshBasicMaterial({
+      color: 0x9bdcf5,
+      transparent: true,
+      opacity: 0.72,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    this.photonRing = new THREE.Mesh(photonRingGeometry, this.photonRingMaterial);
+    this.photonRing.rotation.x = Math.PI / 2.5;
+    this.scene.add(this.photonRing);
+
     // Set initial stage
     this.applyStage(0, false);
 
     // Events
     this.bindEvents();
 
-    // Resize
+    // Resize and visibility lifecycle
     this.resizeObserver = new ResizeObserver(() => this.handleResize());
     this.resizeObserver.observe(container);
+    if (typeof IntersectionObserver !== 'undefined') {
+      this.intersectionObserver = new IntersectionObserver(
+        ([entry]) => {
+          this.containerVisible = entry.isIntersecting;
+          this.syncAnimationState();
+        },
+        { threshold: 0.01 }
+      );
+      this.intersectionObserver.observe(container);
+    }
+    document.addEventListener('visibilitychange', this.onDocumentVisibilityChange);
 
-    // Start
-    this.animate();
+    // Start only while the simulation viewport is visible.
+    this.syncAnimationState();
   }
 
-  // ---- Glow texture ----
+  // ---- Procedural stellar surface and glow textures ----
+
+  /**
+   * A subtle, deterministic granulation-like surface map. It adds broad,
+   * overlapping cells without claiming to solve stellar convection.
+   */
+  private createGranulationTexture(): THREE.CanvasTexture {
+    const width = 256;
+    const height = 128;
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d');
+    if (!context) {
+      throw new Error('Unable to create the stellar surface texture.');
+    }
+
+    let seed = 0x51a7e;
+    const nextRandom = (): number => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 0x100000000;
+    };
+    const layers = [8, 16, 32, 64].map((size, index) => ({
+      size,
+      weight: [0.48, 0.28, 0.16, 0.08][index],
+      values: Float32Array.from({ length: size * size }, nextRandom),
+    }));
+    const image = context.createImageData(width, height);
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        let noise = 0;
+        for (const layer of layers) {
+          const gx = (x / width) * layer.size;
+          const gy = (y / height) * layer.size;
+          const x0 = Math.floor(gx) % layer.size;
+          const y0 = Math.floor(gy) % layer.size;
+          const x1 = (x0 + 1) % layer.size;
+          const y1 = (y0 + 1) % layer.size;
+          const fx = gx - Math.floor(gx);
+          const fy = gy - Math.floor(gy);
+          const sx = fx * fx * (3 - 2 * fx);
+          const sy = fy * fy * (3 - 2 * fy);
+          const a = layer.values[y0 * layer.size + x0];
+          const b = layer.values[y0 * layer.size + x1];
+          const c = layer.values[y1 * layer.size + x0];
+          const d = layer.values[y1 * layer.size + x1];
+          const top = THREE.MathUtils.lerp(a, b, sx);
+          const bottom = THREE.MathUtils.lerp(c, d, sx);
+          noise += THREE.MathUtils.lerp(top, bottom, sy) * layer.weight;
+        }
+
+        const value = Math.round(188 + noise * 67);
+        const offset = (y * width + x) * 4;
+        image.data[offset] = value;
+        image.data[offset + 1] = value;
+        image.data[offset + 2] = value;
+        image.data[offset + 3] = 255;
+      }
+    }
+
+    context.putImageData(image, 0, 0);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.ClampToEdgeWrapping;
+    texture.anisotropy = 1;
+    return texture;
+  }
 
   private createGlowTexture(): THREE.Texture {
     const size = 128;
@@ -258,17 +555,68 @@ export class StellarEngine {
     this.currentStageIndex = index;
     const stage = this.stages[index];
 
+    this.transitionStartRadius = this.currentRadius;
+    this.transitionStartColor.copy(this.currentColor);
+    this.transitionStartEmissive.copy(this.currentEmissive);
+    this.transitionStartGlowIntensity = this.currentGlowIntensity;
+    this.transitionStartNebulaOpacity = this.currentNebulaOpacity;
+    this.transitionStartSupernovaOpacity = this.currentSupernovaOpacity;
+    this.transitionStartAccretionOpacity = this.currentAccretionOpacity;
+    this.transitionStartProtostellarJetOpacity = this.currentProtostellarJetOpacity;
+    this.transitionStartPlanetaryOpacity = this.currentPlanetaryOpacity;
+    this.transitionStartPulsarOpacity = this.currentPulsarOpacity;
+    this.transitionStartBlackHoleOpacity = this.currentBlackHoleOpacity;
+
     this.targetRadius = stage.radius;
     this.targetColor = new THREE.Color(stage.color);
     this.targetEmissive = new THREE.Color(stage.emissive);
     this.targetGlowIntensity = stage.glowIntensity;
 
     // Stage-specific visual elements
-    this.targetNebulaOpacity = stage.id === 'nebula' ? 0.7 : stage.id === 'protostar' ? 0.3 : 0;
-    this.targetSupernovaOpacity = stage.id === 'supernova' ? 0.9 : 0;
-    this.targetAccretionOpacity = stage.id === 'black-hole' ? 0.6 : 0;
+    // Nebula clouds remain visible during formation and are expelled again
+    // during the planetary-nebula phase.
+    this.targetNebulaOpacity =
+      stage.id === 'nebula' ? 0.7 :
+      stage.id === 'protostar' ? 0.3 :
+      stage.id === 'asymptotic-giant' ? 0.24 : 0;
 
-    if (animate) {
+    // Core-collapse ejecta are separate from the slower planetary-nebula shell.
+    this.targetSupernovaOpacity = stage.id === 'supernova' ? 0.9 : 0;
+
+    // A flattened accretion structure appears during protostellar formation
+    // and becomes hotter and brighter around a black hole.
+    this.targetAccretionOpacity =
+      stage.id === 'protostar' ? 0.52 :
+      stage.id === 'black-hole' ? 0.76 : 0;
+    this.targetProtostellarJetOpacity = stage.id === 'protostar' ? 0.52 : 0;
+    this.targetPlanetaryOpacity = stage.id === 'planetary-nebula' ? 0.82 : 0;
+    this.targetPulsarOpacity = stage.id === 'neutron-star' ? 1 : 0;
+    this.targetBlackHoleOpacity = stage.id === 'black-hole' ? 1 : 0;
+
+    this.accretionMaterial.color.setHex(
+      stage.id === 'protostar' ? 0xd9874b :
+      stage.id === 'black-hole' ? ACCRETION_COLOR : 0x66cde8
+    );
+    this.accretionDisk.scale.setScalar(stage.id === 'protostar' ? 2.15 : 1.25);
+    this.accretionDisk.rotation.x = stage.id === 'protostar' ? Math.PI / 2 : Math.PI / 2.5;
+    this.supernovaMaterial.color.setHex(0xffe1c5);
+    this.planetaryNebulaMaterial.color.setHex(0x72cfff);
+    this.planetaryNebulaShellMaterial.color.setHex(0x63c7f2);
+    this.eventHorizon.visible = stage.id === 'black-hole';
+    this.photonRing.visible = stage.id === 'black-hole';
+    if (stage.id === 'planetary-nebula') {
+      this.planetaryNebulaPoints.scale.setScalar(1);
+      this.planetaryNebulaShell.scale.set(8, 10, 8);
+      this.planetaryEquatorialRing.scale.setScalar(1);
+    }
+    if (stage.id === 'supernova') {
+      this.supernovaShell.scale.setScalar(5);
+    }
+    if (stage.id === 'neutron-star') {
+      this.neutronStarGroup.rotation.set(0, 0, 0);
+    }
+
+    if (animate && !this.reducedMotion) {
       this.transitionProgress = 0;
     } else {
       this.transitionProgress = 1;
@@ -279,6 +627,10 @@ export class StellarEngine {
       this.currentNebulaOpacity = this.targetNebulaOpacity;
       this.currentSupernovaOpacity = this.targetSupernovaOpacity;
       this.currentAccretionOpacity = this.targetAccretionOpacity;
+      this.currentProtostellarJetOpacity = this.targetProtostellarJetOpacity;
+      this.currentPlanetaryOpacity = this.targetPlanetaryOpacity;
+      this.currentPulsarOpacity = this.targetPulsarOpacity;
+      this.currentBlackHoleOpacity = this.targetBlackHoleOpacity;
       this.updateVisualState();
     }
 
@@ -299,17 +651,35 @@ export class StellarEngine {
     this.pointLight.intensity = 2 * this.currentGlowIntensity;
 
     this.nebulaMaterial.opacity = this.currentNebulaOpacity;
+    this.nebulaPoints.visible = this.currentNebulaOpacity > 0.01;
     this.supernovaMaterial.opacity = this.currentSupernovaOpacity;
+    this.supernovaShell.visible = this.currentSupernovaOpacity > 0.01;
     this.accretionMaterial.opacity = this.currentAccretionOpacity;
+    this.accretionDisk.visible = this.currentAccretionOpacity > 0.01;
 
-    // For black hole, make the star mesh invisible (it's the event horizon)
-    if (this.stages[this.currentStageIndex]?.id === 'black-hole') {
-      this.starMesh.visible = false;
-      this.starGlow.visible = false;
-    } else {
-      this.starMesh.visible = true;
-      this.starGlow.visible = true;
+    this.protostellarJetMaterial.opacity = this.currentProtostellarJetOpacity;
+    this.protostellarJets.visible = this.currentProtostellarJetOpacity > 0.01;
+
+    this.planetaryNebulaMaterial.opacity = this.currentPlanetaryOpacity;
+    this.planetaryNebulaShellMaterial.opacity = this.currentPlanetaryOpacity * 0.12;
+    this.planetaryEquatorialRingMaterial.opacity = this.currentPlanetaryOpacity * 0.28;
+    this.planetaryNebulaPoints.visible = this.currentPlanetaryOpacity > 0.01;
+    this.planetaryNebulaShell.visible = this.currentPlanetaryOpacity > 0.01;
+    this.planetaryEquatorialRing.visible = this.currentPlanetaryOpacity > 0.01;
+
+    this.neutronBeamMaterial.opacity = this.currentPulsarOpacity * 0.38;
+    for (const material of this.neutronFieldMaterials) {
+      material.opacity = this.currentPulsarOpacity * 0.42;
     }
+    this.neutronStarGroup.visible = this.currentPulsarOpacity > 0.01;
+
+    this.eventHorizon.visible = this.currentBlackHoleOpacity > 0.01;
+    this.photonRing.visible = this.currentBlackHoleOpacity > 0.01;
+
+    const activeStage = this.stages[this.currentStageIndex]?.id;
+    const showStellarBody = activeStage !== 'nebula' && activeStage !== 'neutron-star' && activeStage !== 'black-hole';
+    this.starMesh.visible = showStellarBody;
+    this.starGlow.visible = showStellarBody;
   }
 
   private updateTransition(dt: number): void {
@@ -317,13 +687,17 @@ export class StellarEngine {
     this.transitionProgress = Math.min(1, this.transitionProgress + dt * this.transitionSpeed);
     const t = this.easeInOutCubic(this.transitionProgress);
 
-    this.currentRadius = THREE.MathUtils.lerp(this.currentRadius, this.targetRadius, t * 0.1);
-    this.currentColor.lerp(this.targetColor, t * 0.1);
-    this.currentEmissive.lerp(this.targetEmissive, t * 0.1);
-    this.currentGlowIntensity = THREE.MathUtils.lerp(this.currentGlowIntensity, this.targetGlowIntensity, t * 0.1);
-    this.currentNebulaOpacity = THREE.MathUtils.lerp(this.currentNebulaOpacity, this.targetNebulaOpacity, t * 0.1);
-    this.currentSupernovaOpacity = THREE.MathUtils.lerp(this.currentSupernovaOpacity, this.targetSupernovaOpacity, t * 0.1);
-    this.currentAccretionOpacity = THREE.MathUtils.lerp(this.currentAccretionOpacity, this.targetAccretionOpacity, t * 0.1);
+    this.currentRadius = THREE.MathUtils.lerp(this.transitionStartRadius, this.targetRadius, t);
+    this.currentColor.copy(this.transitionStartColor).lerp(this.targetColor, t);
+    this.currentEmissive.copy(this.transitionStartEmissive).lerp(this.targetEmissive, t);
+    this.currentGlowIntensity = THREE.MathUtils.lerp(this.transitionStartGlowIntensity, this.targetGlowIntensity, t);
+    this.currentNebulaOpacity = THREE.MathUtils.lerp(this.transitionStartNebulaOpacity, this.targetNebulaOpacity, t);
+    this.currentSupernovaOpacity = THREE.MathUtils.lerp(this.transitionStartSupernovaOpacity, this.targetSupernovaOpacity, t);
+    this.currentAccretionOpacity = THREE.MathUtils.lerp(this.transitionStartAccretionOpacity, this.targetAccretionOpacity, t);
+    this.currentProtostellarJetOpacity = THREE.MathUtils.lerp(this.transitionStartProtostellarJetOpacity, this.targetProtostellarJetOpacity, t);
+    this.currentPlanetaryOpacity = THREE.MathUtils.lerp(this.transitionStartPlanetaryOpacity, this.targetPlanetaryOpacity, t);
+    this.currentPulsarOpacity = THREE.MathUtils.lerp(this.transitionStartPulsarOpacity, this.targetPulsarOpacity, t);
+    this.currentBlackHoleOpacity = THREE.MathUtils.lerp(this.transitionStartBlackHoleOpacity, this.targetBlackHoleOpacity, t);
   }
 
   private easeInOutCubic(t: number): number {
@@ -343,12 +717,12 @@ export class StellarEngine {
 
   private smoothCamera(): void {
     const { radius, theta, phi } = this.camSpherical;
-    const desiredPos = new THREE.Vector3(
+    this.desiredCamPos.set(
       radius * Math.sin(phi) * Math.cos(theta),
       radius * Math.cos(phi),
       radius * Math.sin(phi) * Math.sin(theta)
     ).add(this.cameraTarget);
-    this.currentCamPos.lerp(desiredPos, this.camDamping);
+    this.currentCamPos.lerp(this.desiredCamPos, this.camDamping);
     this.currentCamTarget.lerp(this.cameraTarget, this.camDamping);
     this.camera.position.copy(this.currentCamPos);
     this.camera.lookAt(this.currentCamTarget);
@@ -469,9 +843,36 @@ export class StellarEngine {
 
   // ---- Animation loop ----
 
+  private onDocumentVisibilityChange = (): void => {
+    this.documentVisible = !document.hidden;
+    this.syncAnimationState();
+  };
+
+  private syncAnimationState(): void {
+    if (this.containerVisible && this.documentVisible) {
+      if (this.animationId === 0) {
+        this.clock.start();
+        this.animationId = requestAnimationFrame(this.animate);
+      }
+      return;
+    }
+
+    if (this.animationId !== 0) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = 0;
+      this.clock.stop();
+    }
+  }
+
   private animate = (): void => {
+    if (!this.containerVisible || !this.documentVisible) {
+      this.animationId = 0;
+      this.clock.stop();
+      return;
+    }
     this.animationId = requestAnimationFrame(this.animate);
     const dt = Math.min(0.05, this.clock.getDelta());
+    this.elapsedTime += dt;
 
     // Stage auto-advancement
     if (this.isPlaying && this.transitionProgress >= 1) {
@@ -490,25 +891,58 @@ export class StellarEngine {
     this.updateTransition(dt);
     this.updateVisualState();
 
-    // Supernova shell expansion
+    // Expanding supernova ejecta shell (accelerated teaching time).
     if (this.currentSupernovaOpacity > 0.01) {
-      const expandScale = 1 + (this.stageTimer / this.stageDuration) * 3;
-      this.supernovaShell.scale.setScalar(expandScale * this.currentRadius);
+      const expansion = 5 + Math.min(this.stageTimer, this.stageDuration) * 2.8;
+      this.supernovaShell.scale.setScalar(expansion);
+      if (!this.reducedMotion) this.supernovaShell.rotation.y += dt * 0.08;
     }
 
-    // Nebula slow rotation
+    // Nebula dynamics remain deliberately subtle.
     if (this.currentNebulaOpacity > 0.01) {
-      this.nebulaPoints.rotation.y += dt * 0.05;
+      if (!this.reducedMotion) this.nebulaPoints.rotation.y += dt * 0.025;
     }
 
-    // Accretion disk rotation
-    if (this.currentAccretionOpacity > 0.01) {
-      this.accretionDisk.rotation.z += dt * 0.5;
+    if (this.currentPlanetaryOpacity > 0.01) {
+      const expansion = 1 + Math.min(this.stageTimer, this.stageDuration) * 0.018;
+      this.planetaryNebulaPoints.scale.setScalar(expansion);
+      this.planetaryNebulaShell.scale.set(8 * expansion, 10 * expansion, 8 * expansion);
+      this.planetaryEquatorialRing.scale.setScalar(expansion);
+      if (!this.reducedMotion) {
+        this.planetaryNebulaPoints.rotation.y += dt * 0.018;
+        this.planetaryNebulaShell.rotation.y += dt * 0.018;
+      }
     }
 
-    // Star slow rotation
+    // Disk material moves around the protostar or black hole.
+    if (this.currentAccretionOpacity > 0.01 && !this.reducedMotion) {
+      this.accretionDisk.rotation.z += dt * (this.currentBlackHoleOpacity > 0.1 ? 0.62 : 0.34);
+    }
+
+    if (this.currentProtostellarJetOpacity > 0.01 && !this.reducedMotion) {
+      this.protostellarJets.rotation.y += dt * 0.025;
+    }
+
+    // A pulsar is shown with a deliberately slowed spin so the tilted beams
+    // can be followed by eye. This is not its physical rotation period.
+    if (this.currentPulsarOpacity > 0.01 && !this.reducedMotion) {
+      this.neutronStarGroup.rotation.y += dt * 4.2;
+    }
+
+    if (this.currentBlackHoleOpacity > 0.01 && !this.reducedMotion) {
+      this.photonRing.rotation.z += dt * 0.025;
+    }
+
+    // Giants gently pulsate; ordinary main-sequence stars remain steadier.
     if (this.starMesh.visible) {
-      this.starMesh.rotation.y += dt * 0.1;
+      const activeStage = this.stages[this.currentStageIndex]?.id;
+      const pulsation = activeStage === 'red-giant' || activeStage === 'asymptotic-giant' || activeStage === 'red-supergiant'
+        ? 1 + Math.sin(this.elapsedTime * 1.2) * 0.022
+        : 1;
+      this.starMesh.scale.setScalar(this.currentRadius * pulsation);
+      if (!this.reducedMotion) {
+        this.starMesh.rotation.y += dt * (activeStage === 'main-sequence' ? 0.055 : 0.025);
+      }
     }
 
     // Camera
@@ -576,27 +1010,41 @@ export class StellarEngine {
   // ---- Cleanup ----
 
   dispose(): void {
-    cancelAnimationFrame(this.animationId);
-    this.unbindEvents();
+    if (this.animationId !== 0) cancelAnimationFrame(this.animationId);
+    this.animationId = 0;
+    document.removeEventListener('visibilitychange', this.onDocumentVisibilityChange);
+    this.intersectionObserver?.disconnect();
     this.resizeObserver.disconnect();
+    this.unbindEvents();
+
+    // Several visual pairs intentionally share geometry, materials or maps.
+    // Dispose each GPU resource once to keep mount/unmount cycles predictable.
+    const geometries = new Set<THREE.BufferGeometry>();
+    const materials = new Set<THREE.Material>();
+    const textures = new Set<THREE.Texture>();
 
     this.scene.traverse((obj) => {
-      if (obj instanceof THREE.Mesh) {
-        obj.geometry?.dispose();
-        if (Array.isArray(obj.material)) {
-          obj.material.forEach((m) => m.dispose());
-        } else {
-          obj.material?.dispose();
+      if (obj instanceof THREE.Mesh || obj instanceof THREE.Line || obj instanceof THREE.Points) {
+        geometries.add(obj.geometry);
+        const objectMaterials = Array.isArray(obj.material) ? obj.material : [obj.material];
+        for (const material of objectMaterials) {
+          materials.add(material);
+          for (const value of Object.values(material)) {
+            if (value instanceof THREE.Texture) textures.add(value);
+          }
+        }
+      } else if (obj instanceof THREE.Sprite) {
+        const material = obj.material;
+        materials.add(material);
+        for (const value of Object.values(material)) {
+          if (value instanceof THREE.Texture) textures.add(value);
         }
       }
-      if (obj instanceof THREE.Points) {
-        obj.geometry?.dispose();
-        (obj.material as THREE.Material)?.dispose();
-      }
-      if (obj instanceof THREE.Sprite) {
-        (obj.material as THREE.Material)?.dispose();
-      }
     });
+
+    for (const geometry of geometries) geometry.dispose();
+    for (const material of materials) material.dispose();
+    for (const texture of textures) texture.dispose();
 
     this.renderer.dispose();
     if (this.renderer.domElement.parentNode) {
