@@ -28,7 +28,6 @@
     background-color 220ms ease;
   transform: translateZ(0);
   transform-style: preserve-3d;
-  will-change: transform;
 }
 
 .spotlight-card::before {
