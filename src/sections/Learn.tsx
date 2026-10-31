@@ -9,6 +9,7 @@ const lessonLinks: Record<string, string> = {
   kinematics: '/lessons/kinematics',
   'newtons-laws': '/lessons/mechanics/newtons-laws',
   'energy-work-power': '/lessons/mechanics/energy-work-power',
+  'momentum-impulse': '/lessons/mechanics/momentum-impulse',
 };
 
 export function Learn() {
