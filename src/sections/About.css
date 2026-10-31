@@ -106,7 +106,7 @@
 
 .about-principle__body {
   display: grid;
-  grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
   align-items: start;
   gap: 0.9rem;
 }
@@ -138,17 +138,6 @@
   line-height: 1.65;
 }
 
-.about-principle__arrow {
-  margin-top: 0.35rem;
-  color: rgba(139, 233, 255, 0.35);
-  transition: color 220ms ease, transform 220ms ease;
-}
-
-.about-principle:hover .about-principle__arrow {
-  color: rgba(139, 233, 255, 0.9);
-  transform: translateX(3px);
-}
-
 @media (max-width: 900px) {
   .about-layout {
     grid-template-columns: minmax(0, 1fr);
@@ -176,10 +165,6 @@
     height: 2.25rem;
   }
 
-  .about-principle__arrow {
-    display: none;
-  }
-
   .about-manifesto {
     padding: 1.1rem;
   }
@@ -190,8 +175,3 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .about-principle__arrow {
-    transition: none;
-  }
-}
