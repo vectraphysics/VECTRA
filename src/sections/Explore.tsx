@@ -8,6 +8,10 @@ import './Explore.css';
 
 const filters = ['All disciplines', ...physicsTopics.map((topic) => topic.title)];
 
+function getDisciplineId(filter: string) {
+  return physicsTopics.find((topic) => topic.title === filter)?.id ?? 'all';
+}
+
 export function Explore() {
   const { ref, isVisible } = useReveal();
   const [activeFilter, setActiveFilter] = useState('All disciplines');
@@ -93,17 +97,22 @@ export function Explore() {
             </label>
 
             <div className="explore-filter-list" role="group" aria-label="Filter by physics discipline">
-              {filters.map((filter) => (
-                <button
-                  key={filter}
-                  type="button"
-                  className={`explore-filter ${activeFilter === filter ? 'is-active' : ''}`}
-                  onClick={() => setActiveFilter(filter)}
-                  aria-pressed={activeFilter === filter}
-                >
-                  {filter === 'All disciplines' ? 'All fields' : filter}
-                </button>
-              ))}
+              {filters.map((filter) => {
+                const disciplineId = getDisciplineId(filter);
+
+                return (
+                  <button
+                    key={filter}
+                    type="button"
+                    data-discipline={disciplineId}
+                    className={`explore-filter ${activeFilter === filter ? 'is-active' : ''}`}
+                    onClick={() => setActiveFilter(filter)}
+                    aria-pressed={activeFilter === filter}
+                  >
+                    {filter === 'All disciplines' ? 'All fields' : filter}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -113,10 +122,7 @@ export function Explore() {
         </p>
         <div className="mt-7 grid gap-5 sm:mt-8 sm:grid-cols-2 lg:grid-cols-3">
           {visibleTopics.map((topic, index) => (
-            <div
-              key={topic.id}
-              className="min-w-0"
-            >
+            <div key={topic.id} className="min-w-0">
               <TopicCard topic={topic} index={index} />
             </div>
           ))}
