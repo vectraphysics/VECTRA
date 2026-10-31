@@ -42,39 +42,48 @@ export interface StellarStage {
   visualNote?: string;
 }
 
+const LONG_LIVED_MAIN_SEQUENCE_MASS = 0.8;
 const CORE_COLLAPSE_HEURISTIC_MASS = 8;
 const BLACK_HOLE_HEURISTIC_MASS = 25;
 
 /**
  * Return a representative sequence for a star with the selected initial mass.
- * Stars below 0.5 solar masses remain on the main sequence for longer than the
- * current age of the Universe, so the simulator does not invent later stages.
+ * Stars below roughly 0.8 solar masses can have main-sequence lifetimes
+ * comparable to or longer than the current age of the Universe, so the
+ * simulator does not invent later stages for them.
  */
 export function getStagesForMass(mass: number): StellarStage[] {
   const initialMass = Number.isFinite(mass) ? Math.max(0.1, mass) : 1;
   const commonStages = getCommonStages(initialMass);
 
-  if (initialMass < 0.5) {
-    return [
-      commonStages[0],
-      commonStages[1],
-      {
-        ...commonStages[2],
-        id: 'red-dwarf',
-        name: 'Red Dwarf Main Sequence',
-        duration: 'Far longer than the current age of the Universe',
-        temperature: '~2,500–4,000 K (surface)',
-        coreProcess: 'Convection mixes much of the stellar interior',
-        fusionProcess: 'Hydrogen → helium through the proton-proton chain',
-        finalOutcome: 'Still burning hydrogen; later evolution is not shown',
-        color: 0xff884e,
-        emissive: 0xc64b20,
-        radius: 1.35,
-        glowIntensity: 0.65,
-        description: 'A very low-mass red dwarf burns hydrogen slowly. Efficient convection circulates material through much of the star, allowing it to use its fuel over an extraordinary timespan.',
-        visualNote: 'A 0.1 solar-mass red dwarf can remain on the main sequence for around 10 trillion years. The later stages lie far beyond the present age of the Universe.',
-      },
-    ];
+  if (initialMass < LONG_LIVED_MAIN_SEQUENCE_MASS) {
+    const longLivedStage: StellarStage = initialMass < 0.5
+      ? {
+          ...commonStages[2],
+          id: 'red-dwarf',
+          name: 'Red Dwarf Main Sequence',
+          duration: 'Far longer than the current age of the Universe',
+          temperature: '~2,500–4,000 K (surface)',
+          coreProcess: 'Convection mixes much of the stellar interior',
+          fusionProcess: 'Hydrogen → helium through the proton-proton chain',
+          finalOutcome: 'Still burning hydrogen; later evolution is not shown',
+          color: 0xff884e,
+          emissive: 0xc64b20,
+          radius: 1.35,
+          glowIntensity: 0.65,
+          description: 'A very low-mass red dwarf burns hydrogen slowly. Efficient convection circulates material through much of the star, allowing it to use its fuel over an extraordinary timespan.',
+          visualNote: 'A 0.1 solar-mass red dwarf can remain on the main sequence for around 10 trillion years. The later stages lie far beyond the present age of the Universe.',
+        }
+      : {
+          ...commonStages[2],
+          name: 'Long-Lived Main-Sequence Star',
+          duration: 'Comparable to or longer than the current age of the Universe',
+          finalOutcome: 'Still on the main sequence at the present cosmic age',
+          description: 'This low-mass star consumes its hydrogen slowly. Its main-sequence lifetime is so long that a star of this mass may not yet have reached its giant phases in the present age of the Universe.',
+          visualNote: 'The approximate 0.8 M☉ boundary is a teaching guide, not a sharp physical cut-off. Composition and stellar models affect the lifetime.',
+        };
+
+    return [commonStages[0], commonStages[1], longLivedStage];
   }
 
   return initialMass >= CORE_COLLAPSE_HEURISTIC_MASS
