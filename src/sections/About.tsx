@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, FunctionSquare, Lightbulb } from 'lucide-react';
+import { BookOpen, FunctionSquare, Lightbulb } from 'lucide-react';
 import SpotlightCard from '@/components/SpotlightCard';
 import { SectionHeading } from '@/components/SectionHeading';
 import { useReveal } from '@/hooks/useReveal';
@@ -90,7 +90,6 @@ export function About() {
                         <h3>{principle.title}</h3>
                         <p>{principle.description}</p>
                       </div>
-                      <ArrowRight className="about-principle__arrow h-4 w-4" aria-hidden="true" />
                     </div>
                   </SpotlightCard>
                 </div>
