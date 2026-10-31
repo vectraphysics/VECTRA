@@ -315,7 +315,7 @@ export function useWaveCanvas(
 
     const schedule = () => {
       if (isVisible && !document.hidden && animRef.current === 0) {
-        schedule();
+        animRef.current = requestAnimationFrame(render);
       }
     };
 
@@ -353,7 +353,7 @@ export function useWaveCanvas(
       // Measurements
       if (cfg.showMeasurements) drawMeasurements(cy);
 
-      animRef.current = requestAnimationFrame(render);
+      schedule();
     }
 
     resize();
