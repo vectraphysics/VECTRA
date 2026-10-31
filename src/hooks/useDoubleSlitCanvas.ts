@@ -92,6 +92,7 @@ export function useDoubleSlitCanvas(
     let width = 0;
     let height = 0;
     let dpr = 1;
+    let isVisible = false;
 
     // Layout positions — computed from canvas size
     let sourceX = 0, barrierX = 0, screenX = 0, centerY = 0;
@@ -395,8 +396,15 @@ export function useDoubleSlitCanvas(
       particlesRef.current = remaining;
     }
 
+    const schedule = () => {
+      if (isVisible && !document.hidden && animRef.current === 0) {
+        animRef.current = requestAnimationFrame(render);
+      }
+    };
+
     function render(now: number) {
-      if (!ctx) return;
+      animRef.current = 0;
+      if (!ctx || !isVisible || document.hidden) return;
       const cfg = configRef.current;
 
       const dt = lastFrameRef.current > 0 ? Math.min(0.05, (now - lastFrameRef.current) / 1000) : 0;
@@ -429,17 +437,37 @@ export function useDoubleSlitCanvas(
       drawProbabilityOverlay();
       drawParticles();
 
-      animRef.current = requestAnimationFrame(render);
+      schedule();
     }
 
     resize();
     const ro = new ResizeObserver(() => resize());
     ro.observe(container);
-
-    animRef.current = requestAnimationFrame(render);
+    const intersection = new IntersectionObserver((entries) => {
+      isVisible = entries.some((entry) => entry.isIntersecting);
+      lastFrameRef.current = 0;
+      if (isVisible) schedule();
+      else {
+        cancelAnimationFrame(animRef.current);
+        animRef.current = 0;
+      }
+    });
+    intersection.observe(container);
+    const onVisibilityChange = () => {
+      lastFrameRef.current = 0;
+      if (document.hidden) {
+        cancelAnimationFrame(animRef.current);
+        animRef.current = 0;
+      } else {
+        schedule();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
 
     return () => {
       cancelAnimationFrame(animRef.current);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      intersection.disconnect();
       ro.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

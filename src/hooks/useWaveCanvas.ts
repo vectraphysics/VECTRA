@@ -58,6 +58,7 @@ export function useWaveCanvas(
 
     let width = 0;
     let height = 0;
+    let isVisible = false;
 
     function resize() {
       if (!canvas || !container || !ctx) return;
@@ -312,8 +313,15 @@ export function useWaveCanvas(
       ctx.globalAlpha = 1;
     }
 
+    const schedule = () => {
+      if (isVisible && !document.hidden && animRef.current === 0) {
+        animRef.current = requestAnimationFrame(render);
+      }
+    };
+
     function render(now: number) {
-      if (!ctx) return;
+      animRef.current = 0;
+      if (!ctx || !isVisible || document.hidden) return;
       const cfg = configRef.current;
 
       // Time advancement
@@ -345,17 +353,37 @@ export function useWaveCanvas(
       // Measurements
       if (cfg.showMeasurements) drawMeasurements(cy);
 
-      animRef.current = requestAnimationFrame(render);
+      schedule();
     }
 
     resize();
     const ro = new ResizeObserver(() => resize());
     ro.observe(container);
-
-    animRef.current = requestAnimationFrame(render);
+    const intersection = new IntersectionObserver((entries) => {
+      isVisible = entries.some((entry) => entry.isIntersecting);
+      lastFrameRef.current = 0;
+      if (isVisible) schedule();
+      else {
+        cancelAnimationFrame(animRef.current);
+        animRef.current = 0;
+      }
+    });
+    intersection.observe(container);
+    const onVisibilityChange = () => {
+      lastFrameRef.current = 0;
+      if (document.hidden) {
+        cancelAnimationFrame(animRef.current);
+        animRef.current = 0;
+      } else {
+        schedule();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
 
     return () => {
       cancelAnimationFrame(animRef.current);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      intersection.disconnect();
       ro.disconnect();
     };
   }, [containerRef]);

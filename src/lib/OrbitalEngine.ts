@@ -61,6 +61,8 @@ export class OrbitalEngine {
   private camDamping = 0.12;
   private currentCamPos = new THREE.Vector3();
   private currentCamTarget = new THREE.Vector3();
+  private velocityScratch = new THREE.Vector3();
+  private velocityDirectionScratch = new THREE.Vector3();
 
   // Pointer interaction
   private isPointerDown = false;
@@ -88,15 +90,27 @@ export class OrbitalEngine {
 
   // Animation
   private animationId = 0;
+  private isVisible = true;
+  private intersectionObserver: IntersectionObserver;
 
   private onVisibilityChange = (): void => {
-    if (document.hidden) {
+    if (document.hidden || !this.isVisible) {
       cancelAnimationFrame(this.animationId);
       this.animationId = 0;
       return;
     }
 
     if (this.animationId === 0) this.animate();
+  };
+
+  private onIntersectionChange = (entries: IntersectionObserverEntry[]): void => {
+    this.isVisible = entries.some((entry) => entry.isIntersecting);
+    if (this.isVisible && !document.hidden) {
+      if (this.animationId === 0) this.animate();
+    } else {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = 0;
+    }
   };
   private resizeObserver: ResizeObserver;
   private reducedMotion = false;
@@ -181,6 +195,8 @@ export class OrbitalEngine {
     // Resize observer
     this.resizeObserver = new ResizeObserver(() => this.handleResize());
     this.resizeObserver.observe(container);
+    this.intersectionObserver = new IntersectionObserver(this.onIntersectionChange);
+    this.intersectionObserver.observe(container);
 
     // Start render loop
     document.addEventListener('visibilitychange', this.onVisibilityChange);
@@ -400,14 +416,14 @@ export class OrbitalEngine {
 
     // Update velocity vector
     if (this.showVelocity) {
-      const vel = new THREE.Vector3(
+      const vel = this.velocityScratch.set(
         this.state.velocity.x,
         this.state.velocity.y,
         this.state.velocity.z
       );
       const speed = vel.length();
       if (speed > 1e-8) {
-        const dir = vel.clone().normalize();
+        const dir = this.velocityDirectionScratch.copy(vel).normalize();
         const len = Math.min(speed * 0.3, 8);
         this.viz.velocityArrow.position.copy(this.testBody.group.position);
         this.viz.velocityArrow.setDirection(dir);
@@ -419,7 +435,7 @@ export class OrbitalEngine {
   // ---- Animation loop ----
 
   private animate = (): void => {
-    if (document.hidden) {
+    if (document.hidden || !this.isVisible) {
       this.animationId = 0;
       return;
     }
@@ -430,9 +446,11 @@ export class OrbitalEngine {
       this.stepPhysics();
     }
 
+    // Calculate orbital data once for all visual updates and callbacks
+    const data = computeOrbitalData(this.state, this.gm, this.simTime, this.centralRadius);
+
     // Update visualizations
     if (this.showPlane) {
-      const data = computeOrbitalData(this.state, this.gm, this.simTime, this.centralRadius);
       orientPlane(this.viz.plane, data.angularMomentum);
     }
 
@@ -450,7 +468,6 @@ export class OrbitalEngine {
     }
 
     // Emit data update
-    const data = computeOrbitalData(this.state, this.gm, this.simTime, this.centralRadius);
     this.callbacks.onDataUpdate(data);
 
     this.renderer.render(this.scene, this.camera);
@@ -558,6 +575,7 @@ export class OrbitalEngine {
     this.animationId = 0;
     this.unbindEvents();
     this.resizeObserver.disconnect();
+    this.intersectionObserver.disconnect();
 
     // Dispose Three.js resources
     this.scene.traverse((obj) => {

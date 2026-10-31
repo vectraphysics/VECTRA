@@ -95,15 +95,27 @@ export class StellarEngine {
 
   // Animation
   private animationId = 0;
+  private isVisible = true;
+  private intersectionObserver: IntersectionObserver;
 
   private onVisibilityChange = (): void => {
-    if (document.hidden) {
+    if (document.hidden || !this.isVisible) {
       cancelAnimationFrame(this.animationId);
       this.animationId = 0;
       return;
     }
 
     if (this.animationId === 0) this.animate();
+  };
+
+  private onIntersectionChange = (entries: IntersectionObserverEntry[]): void => {
+    this.isVisible = entries.some((entry) => entry.isIntersecting);
+    if (this.isVisible && !document.hidden) {
+      if (this.animationId === 0) this.animate();
+    } else {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = 0;
+    }
   };
   private resizeObserver: ResizeObserver;
   private reducedMotion = false;
@@ -237,6 +249,8 @@ export class StellarEngine {
     // Resize
     this.resizeObserver = new ResizeObserver(() => this.handleResize());
     this.resizeObserver.observe(container);
+    this.intersectionObserver = new IntersectionObserver(this.onIntersectionChange);
+    this.intersectionObserver.observe(container);
 
     // Start
     document.addEventListener('visibilitychange', this.onVisibilityChange);
@@ -481,7 +495,7 @@ export class StellarEngine {
   // ---- Animation loop ----
 
   private animate = (): void => {
-    if (document.hidden) {
+    if (document.hidden || !this.isVisible) {
       this.animationId = 0;
       return;
     }
@@ -597,6 +611,7 @@ export class StellarEngine {
     this.animationId = 0;
     this.unbindEvents();
     this.resizeObserver.disconnect();
+    this.intersectionObserver.disconnect();
 
     this.scene.traverse((obj) => {
       if (obj instanceof THREE.Mesh) {
