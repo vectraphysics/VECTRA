@@ -259,8 +259,8 @@ export function DoublePendulumPage() {
                 A double pendulum consists of two masses connected by two rigid rods, with the first rod attached to a fixed pivot.
               </canvas>
               <div className="dp-canvas-readout">
-                <span><i className="dp-dot dp-dot--cyan" /> M₁ / first mass</span>
-                <span><i className="dp-dot dp-dot--violet" /> M₂ / second mass</span>
+                <span><i className="dp-dot dp-dot--cyan" /> θ₁ {metrics.theta1Degrees.toFixed(1)}°</span>
+                <span><i className="dp-dot dp-dot--violet" /> θ₂ {metrics.theta2Degrees.toFixed(1)}°</span>
               </div>
               <div className="dp-canvas-footnote">
                 Planar model · massless rods · frictionless pivots
@@ -272,7 +272,7 @@ export function DoublePendulumPage() {
               <Metric label="Kinetic energy" value={formatEnergy(metrics.kineticEnergy)} unit="J" />
               <Metric label="Potential energy" value={formatEnergy(metrics.potentialEnergy)} unit="J" />
               <Metric label="Total energy" value={formatEnergy(metrics.totalEnergy)} unit="J" />
-              <Metric label="Energy drift" value={formatDrift(metrics.energyDrift)} unit="J" />
+              <Metric label="Energy change (ΔE)" value={formatDrift(metrics.energyDrift)} unit="J" />
             </div>
             <p className="dp-energy-note">
               Energy drift is measured against the total mechanical energy at the current starting configuration. In this ideal lossless model, total energy should remain constant; small numerical drift is expected from finite-step integration.
