@@ -81,9 +81,9 @@ function DisciplineGlyph({ disciplineId }: { disciplineId: string }) {
     case 'electricity':
       return (
         <svg viewBox="0 0 320 112" className="discipline-glyph" aria-hidden="true">
-          <path d="M24 27H104M216 27H296V88H24V27" className="discipline-glyph__primary" />
+          <path d="M24 27H104M216 27H296V88H168M140 88H24V27" className="discipline-glyph__primary" />
           <path d="M104 27L116 14L132 40L148 14L164 40L180 14L196 40L216 27" className="discipline-glyph__primary" />
-          <path d="M139 88V73M157 88V65" className="discipline-glyph__primary" />
+          <path d="M140 70V106M168 78V98" className="discipline-glyph__primary" />
           <circle cx="24" cy="27" r="3.5" className="discipline-glyph__point" />
           <circle cx="296" cy="27" r="3.5" className="discipline-glyph__point" />
           <path d="M43 46H83M237 46H277" className="discipline-glyph__guide" />
