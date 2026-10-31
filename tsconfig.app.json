@@ -27,4 +27,17 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src"]
+,
+  "exclude": [
+    "src/router.tsx",
+    "src/routeTree.gen.ts",
+    "src/routes",
+    "src/layouts/shared-app-layout.tsx",
+    "src/Shell.tsx",
+    "src/components/AppSidebarShell.tsx",
+    "src/components/ClientOnlyBoundary.tsx",
+    "src/components/BlinkClientBoundary.tsx",
+    "src/components/ui",
+    "src/lib/utils.ts"
+  ]
 }
