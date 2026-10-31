@@ -20,6 +20,7 @@ export function Learn() {
         <div ref={ref} className={`reveal reveal-up ${isVisible ? 'is-visible' : ''}`}>
           <SectionHeading
             eyebrow="Guided learning"
+            sectionIndex="03 / 04"
             title="Build understanding, one idea at a time"
             description="Follow structured learning modules that connect core equations with physical intuition and practice."
           />
