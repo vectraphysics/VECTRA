@@ -20,7 +20,7 @@ export function SliderInput({
   precision = 2,
 }: SliderInputProps) {
   const clampedValue = Math.max(min, Math.min(max, value));
-  const displayValue = precision === 0 ? value.toFixed(0) : value.toFixed(precision);
+  const displayValue = value.toFixed(precision);
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -29,7 +29,7 @@ export function SliderInput({
         <div className="flex items-center gap-1">
           <input
             type="number"
-            value={Number.isFinite(value) ? value : 0}
+            value={Number.isFinite(value) ? displayValue : '0'}
             min={min}
             max={max}
             step={step}
