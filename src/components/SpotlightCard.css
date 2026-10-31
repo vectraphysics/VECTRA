@@ -1,8 +1,10 @@
-/* Dark, fine-grained glass surface for VECTRA. Spotlight interaction follows React Bits. */
+/* Dark, fine-grained glass surface for VECTRA. Pointer response is driven by SpotlightCard.tsx. */
 .spotlight-card {
   --mouse-x: 50%;
   --mouse-y: 50%;
   --spotlight-opacity: 0;
+  --pointer-tilt-x: 0deg;
+  --pointer-tilt-y: 0deg;
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -25,6 +27,8 @@
     transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1),
     background-color 220ms ease;
   transform: translateZ(0);
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 
 .spotlight-card::before {
@@ -91,17 +95,24 @@
   border-radius: inherit;
 }
 
-.spotlight-card.glass-panel-hover:hover,
-.spotlight-card.glass-panel-hover:focus-within {
-  border-color: rgba(154, 185, 255, 0.48);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.11),
-    inset 0 -1px 0 rgba(1, 4, 14, 0.8),
-    0 22px 48px -28px rgba(0, 0, 0, 0.95),
-    0 0 0 1px rgba(115, 150, 225, 0.12),
-    0 0 26px -10px rgba(80, 125, 235, 0.32),
-    0 0 54px -24px rgba(88, 123, 219, 0.28);
-  transform: translateY(-3px) translateZ(0);
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .spotlight-card.glass-panel-hover:hover,
+  .spotlight-card.glass-panel-hover:focus-within {
+    border-color: rgba(154, 185, 255, 0.48);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.11),
+      inset 0 -1px 0 rgba(1, 4, 14, 0.8),
+      0 22px 48px -28px rgba(0, 0, 0, 0.95),
+      0 0 0 1px rgba(115, 150, 225, 0.12),
+      0 0 26px -10px rgba(80, 125, 235, 0.32),
+      0 0 54px -24px rgba(88, 123, 219, 0.28);
+    transform:
+      perspective(900px)
+      rotateX(var(--pointer-tilt-y))
+      rotateY(var(--pointer-tilt-x))
+      translateY(-2px)
+      translateZ(0);
+  }
 }
 
 @media (hover: none), (pointer: coarse) {
@@ -111,14 +122,9 @@
     opacity: 0;
   }
 
-  .spotlight-card.glass-panel-hover:hover {
-    transform: none;
-  }
-}
-
-@media (max-width: 640px) {
   .spotlight-card {
-    border-radius: 1rem;
+    transform: none;
+    will-change: auto;
     -webkit-backdrop-filter: blur(14px) saturate(145%);
     backdrop-filter: blur(14px) saturate(145%);
     box-shadow:
@@ -127,10 +133,18 @@
   }
 }
 
+@media (max-width: 640px) {
+  .spotlight-card {
+    border-radius: 1rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .spotlight-card,
   .spotlight-card::before,
   .spotlight-card::after {
     transition: none;
+    transform: none;
+    will-change: auto;
   }
 }
