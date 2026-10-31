@@ -14,7 +14,7 @@ export interface StellarControls {
   isPlaying: boolean;
   speed: number;
   path: 'low-mass' | 'high-mass';
-  remnantType: 'white-dwarf' | 'neutron-star' | 'black-hole';
+  remnantType: 'white-dwarf' | 'neutron-star' | 'black-hole' | 'uncertain-compact-remnant';
   // Actions
   togglePlay: () => void;
   reset: () => void;

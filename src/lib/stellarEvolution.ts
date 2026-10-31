@@ -4,11 +4,14 @@
  * A star's life cycle is determined primarily by its initial mass.
  * The two main pathways are:
  *
- * Low / Sun-like mass (0.1–8 M☉):
- *   Nebula → Protostar → Main Sequence → Red Giant → Planetary Nebula → White Dwarf → Cooling
+ * Simplified teaching pathways (initial mass in solar masses):
+ *   Below roughly 8 M☉: giant phase → envelope loss → white dwarf
+ *   Around 8–10 M☉: super-AGB evolution; the outcome can be an ONe white dwarf
+ *     or an electron-capture supernova, depending on the stellar model.
+ *   Higher masses: core-collapse supernova; the remnant may be a neutron star
+ *     or black hole depending on the final core, mass loss, and fallback.
  *
- * High mass (8+ M☉):
- *   Nebula → Protostar → Massive Main Sequence → Red Supergiant → Supernova → Neutron Star / Black Hole
+ * The boundaries below are illustrative, not universal physical cut-offs.
  */
 
 export type StellarStageId =
@@ -46,9 +49,12 @@ export interface StellarStage {
  * Returns the ordered list of stages for a given initial mass (in solar masses).
  */
 export function getStagesForMass(mass: number): StellarStage[] {
-  const isHighMass = mass >= 8;
-  const baseStages = getCommonStages(mass);
-  return isHighMass ? [...baseStages, ...getHighMassStages(mass)] : [...baseStages, ...getLowMassStages(mass)];
+  const safeMass = Number.isFinite(mass) ? Math.max(0.1, mass) : 1;
+  const isHighMass = safeMass >= 8;
+  const baseStages = getCommonStages(safeMass);
+  return isHighMass
+    ? [...baseStages, ...getHighMassStages(safeMass)]
+    : [...baseStages, ...getLowMassStages(safeMass)];
 }
 
 function getCommonStages(mass: number): StellarStage[] {
@@ -212,8 +218,10 @@ function getHighMassStages(mass: number): StellarStage[] {
       radius: mass >= 25 ? 2.5 : 0.8,
       glowIntensity: mass >= 25 ? 0.0 : 1.2,
       description: mass >= 25
-        ? 'Gravity overwhelms all forces. The core collapses past the neutron star stage into a singularity, surrounded by an event horizon.'
-        : 'The core compresses to a ball of neutrons ~20 km across, with the mass of several suns. It spins rapidly and emits beams of radiation.',
+        ? 'In this simplified high-mass model, the collapsing core forms a black hole with an event horizon. Whether a real star forms a black hole depends on its final core mass, mass loss, and fallback, not initial mass alone.'
+        : mass >= 8 && mass < 10
+          ? 'A possible compact-remnant outcome near the super-AGB boundary. Some stars in this range instead leave oxygen-neon white dwarfs; electron-capture supernova outcomes depend on detailed stellar evolution.'
+          : 'The collapsed core is compressed into a roughly 20 km-wide remnant, commonly around 1.4 solar masses. Rapid rotation and a strong magnetic field can produce pulsar emission beams.'
     },
   ];
 }
@@ -222,14 +230,20 @@ function getHighMassStages(mass: number): StellarStage[] {
  * Determine which path a star takes based on its initial mass.
  */
 export function getPathForMass(mass: number): StellarPath {
-  return mass >= 8 ? 'high-mass' : 'low-mass';
+  return Number.isFinite(mass) && mass >= 8 ? 'high-mass' : 'low-mass';
 }
 
 /**
  * Determine the final remnant type for a given mass.
  */
-export function getRemnantType(mass: number): 'white-dwarf' | 'neutron-star' | 'black-hole' {
+/**
+ * Approximate outcome selector for this educational model.
+ * The 8 and 25 M☉ boundaries are deliberately treated as illustrative:
+ * real remnant type depends on the evolved core and mass-loss history.
+ */
+export function getRemnantType(mass: number): 'white-dwarf' | 'neutron-star' | 'black-hole' | 'uncertain-compact-remnant' {
+  if (!Number.isFinite(mass) || mass < 8) return 'white-dwarf';
   if (mass >= 25) return 'black-hole';
-  if (mass >= 8) return 'neutron-star';
-  return 'white-dwarf';
+  if (mass < 10) return 'uncertain-compact-remnant';
+  return 'neutron-star';
 }

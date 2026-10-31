@@ -14,7 +14,8 @@ import { createVisualizations, orientPlane } from '@/three/createVisualizations'
 
 const PHYS_DT = 0.008; // Fixed physics timestep
 const MAX_SUBSTEPS = 20;
-const TRAIL_INTERVAL = 2; // Add a trail point every N physics steps
+const TRAIL_INTERVAL = 2;
+const DATA_UPDATE_INTERVAL_MS = 50; // Add a trail point every N physics steps
 
 export interface EngineCallbacks {
   onDataUpdate: (data: OrbitalData) => void;
@@ -39,6 +40,9 @@ export class OrbitalEngine {
   private gm: number;
   private centralRadius: number;
   private simTime = 0;
+  private physicsAccumulator = 0;
+  private lastFrameTime = 0;
+  private lastDataUpdateTime = 0;
   private isPlaying = false;
   private speedMultiplier = 1;
   private hasCollided = false;
@@ -111,7 +115,7 @@ export class OrbitalEngine {
       alpha: false,
       powerPreference: 'high-performance',
     });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     const initW = container.clientWidth || container.parentElement?.clientWidth || window.innerWidth;
     const initH = container.clientHeight || container.parentElement?.clientHeight || 400;
     this.renderer.setSize(initW, initH);
@@ -142,7 +146,7 @@ export class OrbitalEngine {
     this.scene.add(this.pointLight);
 
     // Starfield
-    this.starfield = createStarfield(3000, 800);
+    this.starfield = createStarfield(1800, 800);
     this.scene.add(this.starfield);
 
     // Central body
@@ -338,46 +342,68 @@ export class OrbitalEngine {
   private stepPhysics(): void {
     if (this.hasCollided) return;
 
-    const totalDt = PHYS_DT * this.speedMultiplier;
-    const subSteps = Math.min(MAX_SUBSTEPS, Math.max(1, Math.ceil(this.speedMultiplier)));
-    const subDt = totalDt / subSteps;
+    const previousPosition = new THREE.Vector3(
+      this.state.position.x,
+      this.state.position.y,
+      this.state.position.z
+    );
 
-    for (let i = 0; i < subSteps; i++) {
-      // Safety: check distance before stepping
-      const r = Math.sqrt(
-        this.state.position.x ** 2 +
-          this.state.position.y ** 2 +
-          this.state.position.z ** 2
+    // Reject invalid states before passing them into the integrator.
+    const values = [
+      this.state.position.x, this.state.position.y, this.state.position.z,
+      this.state.velocity.x, this.state.velocity.y, this.state.velocity.z,
+      this.gm,
+    ];
+    if (!values.every(Number.isFinite) || this.gm <= 0) {
+      this.finishCollision();
+      return;
+    }
+
+    const nextState = rk4Step(this.state, this.gm, PHYS_DT);
+    const nextPosition = new THREE.Vector3(
+      nextState.position.x,
+      nextState.position.y,
+      nextState.position.z
+    );
+
+    // Detect a body crossing the central-body surface between fixed steps.
+    const segment = nextPosition.clone().sub(previousPosition);
+    const a = segment.lengthSq();
+    const b = 2 * previousPosition.dot(segment);
+    const c = previousPosition.lengthSq() - this.centralRadius * this.centralRadius;
+    const discriminant = b * b - 4 * a * c;
+    const crossedSurface = nextPosition.length() <= this.centralRadius ||
+      (a > 0 && discriminant >= 0 && (-b - Math.sqrt(discriminant)) / (2 * a) >= 0 &&
+        (-b - Math.sqrt(discriminant)) / (2 * a) <= 1);
+
+    if (crossedSurface) {
+      if (a > 0 && discriminant >= 0) {
+        const t = THREE.MathUtils.clamp((-b - Math.sqrt(discriminant)) / (2 * a), 0, 1);
+        const impact = previousPosition.clone().addScaledVector(segment, t);
+        nextState.position = { x: impact.x, y: impact.y, z: impact.z };
+      }
+      this.state = nextState;
+      this.testBody.group.position.set(
+        this.state.position.x,
+        this.state.position.y,
+        this.state.position.z
       );
+      this.finishCollision();
+      return;
+    }
 
-      if (r <= this.centralRadius) {
-        this.hasCollided = true;
-        this.isPlaying = false;
-        this.callbacks.onCollision();
-        break;
-      }
+    this.state = nextState;
+    this.simTime += PHYS_DT;
 
-      // Safety: check for NaN/Infinity
-      if (!isFinite(this.state.position.x) || !isFinite(this.state.velocity.x)) {
-        this.hasCollided = true;
-        this.isPlaying = false;
-        this.callbacks.onCollision();
-        break;
-      }
-
-      this.state = rk4Step(this.state, this.gm, subDt);
-      this.simTime += subDt;
-
-      // Add trail point at intervals
-      this.stepCounter++;
-      if (this.trailEnabled && this.stepCounter % TRAIL_INTERVAL === 0) {
-        addTrailPoint(
-          this.trail,
-          this.state.position.x,
-          this.state.position.y,
-          this.state.position.z
-        );
-      }
+    // Add trail point at intervals
+    this.stepCounter++;
+    if (this.trailEnabled && this.stepCounter % TRAIL_INTERVAL === 0) {
+      addTrailPoint(
+        this.trail,
+        this.state.position.x,
+        this.state.position.y,
+        this.state.position.z
+      );
     }
 
     // Update test body position
@@ -405,13 +431,33 @@ export class OrbitalEngine {
     }
   }
 
+  private finishCollision(): void {
+    if (this.hasCollided) return;
+    this.hasCollided = true;
+    this.isPlaying = false;
+    this.physicsAccumulator = 0;
+    this.callbacks.onCollision();
+  }
+
   // ---- Animation loop ----
 
-  private animate = (): void => {
+  private animate = (timestamp = performance.now()): void => {
     this.animationId = requestAnimationFrame(this.animate);
+    const frameDelta = this.lastFrameTime === 0
+      ? 0
+      : Math.min((timestamp - this.lastFrameTime) / 1000, 0.05);
+    this.lastFrameTime = timestamp;
 
     if (this.isPlaying && !this.hasCollided) {
-      this.stepPhysics();
+      this.physicsAccumulator += frameDelta * Math.max(0.05, this.speedMultiplier);
+      let steps = 0;
+      while (this.physicsAccumulator >= PHYS_DT && steps < MAX_SUBSTEPS && !this.hasCollided) {
+        this.stepPhysics();
+        this.physicsAccumulator -= PHYS_DT;
+        steps++;
+      }
+      // Prevent a long background-tab pause from creating an unbounded catch-up loop.
+      this.physicsAccumulator = Math.min(this.physicsAccumulator, PHYS_DT * MAX_SUBSTEPS);
     }
 
     // Update visualizations
@@ -434,8 +480,11 @@ export class OrbitalEngine {
     }
 
     // Emit data update
-    const data = computeOrbitalData(this.state, this.gm, this.simTime, this.centralRadius);
-    this.callbacks.onDataUpdate(data);
+    if (timestamp - this.lastDataUpdateTime >= DATA_UPDATE_INTERVAL_MS) {
+      const data = computeOrbitalData(this.state, this.gm, this.simTime, this.centralRadius);
+      this.callbacks.onDataUpdate(data);
+      this.lastDataUpdateTime = timestamp;
+    }
 
     this.renderer.render(this.scene, this.camera);
   };
@@ -459,6 +508,8 @@ export class OrbitalEngine {
     };
     this.gm = this.initialConditions.gm;
     this.simTime = 0;
+    this.physicsAccumulator = 0;
+    this.lastFrameTime = 0;
     this.hasCollided = false;
     this.isPlaying = false;
     this.stepCounter = 0;
@@ -478,6 +529,8 @@ export class OrbitalEngine {
       velocity: { ...ic.velocity },
     };
     this.simTime = 0;
+    this.physicsAccumulator = 0;
+    this.lastFrameTime = 0;
     this.hasCollided = false;
     this.isPlaying = false;
     this.stepCounter = 0;

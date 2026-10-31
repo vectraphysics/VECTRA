@@ -9,7 +9,13 @@ export function StellarMassControl({ controls }: StellarMassControlProps) {
   const { mass, setMass, path, remnantType } = controls;
 
   const pathLabel = path === 'high-mass' ? 'HIGH MASS' : 'LOW / SUN-LIKE';
-  const remnantLabel = remnantType === 'black-hole' ? 'Black Hole' : remnantType === 'neutron-star' ? 'Neutron Star' : 'White Dwarf';
+  const remnantLabel = remnantType === 'black-hole'
+    ? 'Black Hole'
+    : remnantType === 'neutron-star'
+      ? 'Neutron Star'
+      : remnantType === 'uncertain-compact-remnant'
+        ? 'Uncertain: ONe white dwarf / neutron star'
+        : 'White Dwarf';
 
   return (
     <div className="sim-panel">
@@ -38,8 +44,10 @@ export function StellarMassControl({ controls }: StellarMassControlProps) {
           </div>
           <p className="mt-1 font-body text-xs leading-relaxed text-star-white/50">
             {path === 'high-mass'
-              ? 'A massive star burns fast and dies young. It will end in a supernova, leaving behind a neutron star or black hole.'
-              : 'A sun-like star burns slowly for billions of years. It will end as a red giant, shedding its outer layers to become a white dwarf.'}
+              ? mass < 10
+                ? 'Around 8–10 solar masses, super-AGB evolution can leave an oxygen-neon white dwarf or lead to an electron-capture supernova. The outcome is model-dependent.'
+                : 'A massive star burns fast and dies young. Core collapse can leave a neutron star or black hole; the outcome depends on the evolved core and mass loss.'
+              : 'A lower-mass star burns slowly, expands into a giant, and sheds its outer layers. Its exposed core becomes a white dwarf.'}
           </p>
           <div className="mt-2 flex items-center gap-2 border-t border-surface-border pt-2">
             <span className="font-mono text-[0.7rem] text-star-white/35">Remnant:</span>
