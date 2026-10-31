@@ -111,7 +111,7 @@ async function waitForServer(url, timeoutMs = 30000) {
 
         const scrollCheck = await page.evaluate(() => {
           const before = window.scrollY;
-          window.scrollTo(0, document.body.scrollHeight);
+          window.scrollTo(0, document.documentElement.scrollHeight);
           const after = window.scrollY;
           window.scrollTo(0, 0);
           return { before, after };
