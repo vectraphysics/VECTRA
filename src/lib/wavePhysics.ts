@@ -53,6 +53,25 @@ export function waveValue(x: number, t: number, p: WaveParameters, derived: Wave
   return p.amplitude * Math.sin(derived.waveNumber * x + sign * derived.angularFrequency * t + p.phase);
 }
 
+/**
+ * Return the x-coordinate of the first crest in [0, wavelength).
+ * This uses the same phase convention as waveValue, so the measurement
+ * remains aligned for either propagation direction and every phase/time.
+ */
+export function firstCrestPosition(
+  t: number,
+  p: WaveParameters,
+  derived: WaveDerivedData
+): number {
+  const { wavelength, phase, direction } = p;
+  if (wavelength <= 0 || derived.waveNumber <= 0) return 0;
+
+  const timeSign = direction === 1 ? -1 : 1;
+  const phaseAtOrigin = timeSign * derived.angularFrequency * t + phase;
+  const rawPosition = (Math.PI / 2 - phaseAtOrigin) / derived.waveNumber;
+  return ((rawPosition % wavelength) + wavelength) % wavelength;
+}
+
 export interface WavePreset {
   id: string;
   label: string;
