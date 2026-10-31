@@ -614,7 +614,7 @@ export class StellarEngine {
       this.neutronStarGroup.rotation.set(0, 0, 0);
     }
 
-    if (animate) {
+    if (animate && !this.reducedMotion) {
       this.transitionProgress = 0;
     } else {
       this.transitionProgress = 1;
