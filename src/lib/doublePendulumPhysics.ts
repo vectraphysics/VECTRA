@@ -44,10 +44,35 @@ export const DEFAULT_DOUBLE_PENDULUM_PARAMETERS: DoublePendulumParameters = {
 
 export const DOUBLE_PENDULUM_TIMESTEP = 1 / 480;
 
+function validateParameters(parameters: DoublePendulumParameters): void {
+  const { mass1, mass2, length1, length2, gravity } = parameters;
+  const values = [mass1, mass2, length1, length2, gravity];
+
+  if (!values.every(Number.isFinite)) {
+    throw new RangeError('Double-pendulum parameters must all be finite numbers.');
+  }
+
+  if (mass1 <= 0 || mass2 <= 0 || length1 <= 0 || length2 <= 0 || gravity < 0) {
+    throw new RangeError(
+      'Masses and rod lengths must be positive, and gravitational field strength cannot be negative.'
+    );
+  }
+}
+
+function validateState(state: DoublePendulumState): void {
+  if (![state.theta1, state.theta2, state.omega1, state.omega2].every(Number.isFinite)) {
+    throw new RangeError('Double-pendulum angles and angular velocities must be finite.');
+  }
+}
+
 export function createDoublePendulumState(
   theta1Degrees: number,
   theta2Degrees: number
-): DoublePendulumState {
+ ): DoublePendulumState {
+  if (!Number.isFinite(theta1Degrees) || !Number.isFinite(theta2Degrees)) {
+    throw new RangeError('Initial angles must be finite numbers.');
+  }
+
   const degreesToRadians = Math.PI / 180;
 
   return {
@@ -128,6 +153,9 @@ export function rk4DoublePendulumStep(
   parameters: DoublePendulumParameters,
   dt = DOUBLE_PENDULUM_TIMESTEP
 ): DoublePendulumState {
+  validateParameters(parameters);
+  validateState(state);
+
   if (!(dt > 0) || !Number.isFinite(dt)) {
     throw new RangeError('The integration timestep must be finite and positive.');
   }
@@ -164,6 +192,9 @@ export function calculateDoublePendulumEnergy(
   state: DoublePendulumState,
   parameters: DoublePendulumParameters
 ): DoublePendulumEnergy {
+  validateParameters(parameters);
+  validateState(state);
+
   const { theta1, theta2, omega1, omega2 } = state;
   const { mass1: m1, mass2: m2, length1: l1, length2: l2, gravity: g } = parameters;
   const delta = theta1 - theta2;
