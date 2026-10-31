@@ -39,6 +39,7 @@ export function About() {
             <div ref={ref} className={`reveal reveal-up ${isVisible ? 'is-visible' : ''}`}>
               <SectionHeading
                 eyebrow="The VECTRA approach"
+                sectionIndex="04 / 04"
                 title="Understand the physics behind the formula"
                 description="VECTRA brings mathematical reasoning, visual explanations, and interactive models into one learning environment."
               />
