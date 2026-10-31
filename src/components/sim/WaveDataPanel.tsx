@@ -71,6 +71,10 @@ export function WaveDataPanel({ params, derived }: WaveDataPanelProps) {
             <span className="sim-data-unit">rad/px</span>
           </div>
         </div>
+        <p className="font-body text-[0.65rem] leading-relaxed text-star-white/35">
+          Spatial values use canvas pixels. The displayed speed is in px/s, not a measured
+          speed for a real material or medium.
+        </p>
       </div>
     </div>
   );

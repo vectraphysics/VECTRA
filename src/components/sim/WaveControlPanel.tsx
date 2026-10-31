@@ -80,8 +80,9 @@ export function WaveControlPanel({ controls }: WaveControlPanelProps) {
         {/* Wave speed note */}
         <div className="rounded-lg border border-surface-border bg-space-900/40 p-3">
           <p className="font-mono text-[0.7rem] leading-relaxed text-star-white/35">
-            Wave speed <span className="text-accent-ice">v = fλ</span> is derived from
-            frequency and wavelength. Adjust those to change how fast the wave propagates.
+            The model calculates <span className="text-accent-ice">v = fλ</span>. Frequency
+            and wavelength can be varied independently here. In a real fixed medium, wave
+            speed is set by the medium, so changing frequency also changes wavelength.
           </p>
         </div>
       </div>

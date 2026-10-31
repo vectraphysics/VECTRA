@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import type { WaveParameters, WaveDerivedData } from '@/lib/wavePhysics';
-import { waveValue } from '@/lib/wavePhysics';
+import { firstCrestPosition, waveValue } from '@/lib/wavePhysics';
 
 export interface WaveCanvasConfig {
   params: WaveParameters;
@@ -12,26 +12,16 @@ export interface WaveCanvasConfig {
   showEquilibrium: boolean;
 }
 
-interface Star {
-  x: number;
-  y: number;
-  radius: number;
-  twinkle: number;
-  phase: number;
-}
-
-const WAVE_COLOR = '#5ec8d8';
-const WAVE_GLOW = 'rgba(94, 200, 216, 0.15)';
+const WAVE_COLOR = '#65cbd8';
+const WAVE_GLOW = 'rgba(101, 203, 216, 0.13)';
 const ACCENT_GOLD = '#e8c87a';
-const GRID_COLOR = 'rgba(120, 150, 200, 0.06)';
-const EQUILIBRIUM_COLOR = 'rgba(168, 213, 232, 0.15)';
+const GRID_COLOR = 'rgba(120, 150, 200, 0.055)';
+const EQUILIBRIUM_COLOR = 'rgba(168, 213, 232, 0.2)';
 
 /**
- * Canvas-based wave renderer. Draws a travelling sinusoidal wave with glow,
- * optional grid, equilibrium line, and measurement indicators.
- *
- * Uses requestAnimationFrame with a single animation loop. All draw operations
- * are done on a 2D canvas — no DOM elements are created per frame.
+ * Canvas renderer for a travelling sinusoidal wave.
+ * Measurement geometry is calculated from the same phase equation as the
+ * plotted curve. No decorative crest markers are drawn.
  */
 export function useWaveCanvas(
   containerRef: React.RefObject<HTMLDivElement | null>,
@@ -41,66 +31,46 @@ export function useWaveCanvas(
   const animRef = useRef<number>(0);
   const timeRef = useRef(0);
   const lastFrameRef = useRef(0);
-  const starsRef = useRef<Star[]>([]);
   const configRef = useRef(config);
-  const dprRef = useRef(1);
 
-  // Keep configRef in sync without re-creating the animation loop
   configRef.current = config;
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const container = containerRef.current;
-    if (!canvas || !container) return;
+    const canvasNode = canvasRef.current;
+    const containerNode = containerRef.current;
+    if (!canvasNode || !containerNode) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const context = canvasNode.getContext('2d');
+    if (!context) return;
+
+    // Explicit non-null aliases are safe after the guards above and remain
+    // narrowed inside the nested renderer callbacks used by this effect.
+    const canvas: HTMLCanvasElement = canvasNode;
+    const container: HTMLDivElement = containerNode;
+    const ctx: CanvasRenderingContext2D = context;
 
     let width = 0;
     let height = 0;
+    let reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function resize() {
-      if (!canvas || !container || !ctx) return;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      dprRef.current = dpr;
       width = container.clientWidth;
       height = container.clientHeight;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
+      if (width <= 0 || height <= 0) return;
+
+      // A 1.5 DPR cap limits fill-rate and memory use on lower-powered phones.
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      generateStars();
-    }
-
-    function generateStars() {
-      const count = Math.floor((width * height) / 8000);
-      starsRef.current = Array.from({ length: count }, () => ({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        radius: Math.random() * 1.1 + 0.2,
-        twinkle: Math.random() * 0.02 + 0.005,
-        phase: Math.random() * Math.PI * 2,
-      }));
-    }
-
-    function drawStars(t: number) {
-      if (!ctx) return;
-      for (const s of starsRef.current) {
-        const opacity = 0.15 + Math.sin(t * s.twinkle + s.phase) * 0.12;
-        const clamped = Math.max(0.05, Math.min(0.4, opacity));
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(232, 237, 245, ${clamped})`;
-        ctx.fill();
-      }
     }
 
     function drawGrid() {
-      if (!ctx) return;
       ctx.strokeStyle = GRID_COLOR;
       ctx.lineWidth = 1;
-      const gridSize = 40;
+      const gridSize = 50;
       ctx.beginPath();
       for (let x = 0; x <= width; x += gridSize) {
         ctx.moveTo(x, 0);
@@ -114,10 +84,9 @@ export function useWaveCanvas(
     }
 
     function drawEquilibrium(cy: number) {
-      if (!ctx) return;
       ctx.strokeStyle = EQUILIBRIUM_COLOR;
       ctx.lineWidth = 1;
-      ctx.setLineDash([6, 8]);
+      ctx.setLineDash([5, 8]);
       ctx.beginPath();
       ctx.moveTo(0, cy);
       ctx.lineTo(width, cy);
@@ -126,237 +95,236 @@ export function useWaveCanvas(
     }
 
     function drawWave(cy: number) {
-      if (!ctx) return;
-      const cfg = configRef.current;
-      const { params, derived } = cfg;
+      const { params, derived } = configRef.current;
       const t = timeRef.current;
+      const step = 2;
 
-      // Glow layer — thick, low-opacity stroke
+      // A restrained under-stroke gives the curve separation without particle effects.
+      ctx.beginPath();
+      for (let x = 0; x <= width; x += step) {
+        const y = cy + waveValue(x, t, params, derived);
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
       ctx.strokeStyle = WAVE_GLOW;
-      ctx.lineWidth = 8;
+      ctx.lineWidth = 7;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      ctx.beginPath();
-      const step = 2;
-      let first = true;
-      for (let x = 0; x <= width; x += step) {
-        const y = cy + waveValue(x, t, params, derived);
-        if (first) { ctx.moveTo(x, y); first = false; }
-        else ctx.lineTo(x, y);
-      }
       ctx.stroke();
 
-      // Main wave line
-      ctx.strokeStyle = WAVE_COLOR;
-      ctx.lineWidth = 2;
-      ctx.shadowColor = WAVE_COLOR;
-      ctx.shadowBlur = 12;
+      const gradient = ctx.createLinearGradient(0, 0, width, 0);
+      gradient.addColorStop(0, '#55c5d4');
+      gradient.addColorStop(0.55, '#86d8dc');
+      gradient.addColorStop(1, '#b7d9d4');
+
       ctx.beginPath();
-      first = true;
       for (let x = 0; x <= width; x += step) {
         const y = cy + waveValue(x, t, params, derived);
-        if (first) { ctx.moveTo(x, y); first = false; }
+        if (x === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       }
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = 2.4;
+      ctx.shadowColor = 'rgba(101, 203, 216, 0.28)';
+      ctx.shadowBlur = 7;
       ctx.stroke();
       ctx.shadowBlur = 0;
+    }
 
-      // Crest dots for visual polish
-      ctx.fillStyle = WAVE_COLOR;
-      const k = derived.waveNumber;
-      if (k > 0) {
-        // Crests occur where sin(kx - ωt + φ) = 1, i.e. kx - ωt + φ = π/2 + 2nπ
-        const sign = params.direction === 1 ? -1 : 1;
-        const phaseTerm = sign * derived.angularFrequency * t + params.phase;
-        // Find first crest: kx = π/2 - phaseTerm + 2nπ
-        let firstCrestX = (Math.PI / 2 - phaseTerm) / k;
-        // Normalize to [0, wavelength)
-        const lambda = params.wavelength;
-        firstCrestX = ((firstCrestX % lambda) + lambda) % lambda;
+    function drawLabel(text: string, x: number, y: number, align: CanvasTextAlign = 'left') {
+      ctx.font = '500 10px "JetBrains Mono", monospace';
+      ctx.textAlign = align;
+      const metrics = ctx.measureText(text);
+      const textX = align === 'center' ? x - metrics.width / 2 : align === 'right' ? x - metrics.width : x;
+      ctx.fillStyle = 'rgba(4, 6, 13, 0.88)';
+      ctx.fillRect(textX - 5, y - 11, metrics.width + 10, 16);
+      ctx.fillStyle = ACCENT_GOLD;
+      ctx.fillText(text, x, y);
+    }
 
-        for (let cx = firstCrestX; cx <= width; cx += lambda) {
-          ctx.beginPath();
-          ctx.arc(cx, cy - params.amplitude, 2.5, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
+    function drawArrowHead(x: number, y: number, direction: 1 | -1) {
+      const size = 4;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x - size, y + direction * size);
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + size, y + direction * size);
+      ctx.stroke();
     }
 
     function drawMeasurements(cy: number) {
-      if (!ctx) return;
-      const cfg = configRef.current;
-      const { params, derived } = cfg;
-      const t = timeRef.current;
-      const lambda = params.wavelength;
-      const A = params.amplitude;
-      const k = derived.waveNumber;
+      const { params, derived } = configRef.current;
+      const { amplitude, wavelength, direction } = params;
+      if (amplitude <= 0 || wavelength <= 0 || derived.waveNumber <= 0) return;
 
-      if (k <= 0 || lambda <= 0) return;
+      // Amplitude is the maximum displacement from equilibrium, not the
+      // instantaneous displacement at an arbitrary point on the curve.
+      const crestY = cy - amplitude;
+      const troughY = cy + amplitude;
+      const amplitudeX = 24;
 
-      // Find crest positions
-      const sign = params.direction === 1 ? -1 : 1;
-      const phaseTerm = sign * derived.angularFrequency * t + params.phase;
-      let firstCrestX = (Math.PI / 2 - phaseTerm) / k;
-      firstCrestX = ((firstCrestX % lambda) + lambda) % lambda;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(232, 200, 122, 0.38)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 6]);
+      ctx.beginPath();
+      ctx.moveTo(12, crestY);
+      ctx.lineTo(width - 12, crestY);
+      ctx.moveTo(12, troughY);
+      ctx.lineTo(width - 12, troughY);
+      ctx.stroke();
+      ctx.setLineDash([]);
 
-      // Pick two crests within view for wavelength measurement
-      let c1 = firstCrestX;
-      let c2 = c1 + lambda;
-      if (c2 > width - 40) {
-        // Shift back so both are visible
-        while (c1 > 40 && c2 > width - 40) {
-          c1 -= lambda;
-          c2 -= lambda;
-        }
+      ctx.strokeStyle = ACCENT_GOLD;
+      ctx.globalAlpha = 0.9;
+      ctx.beginPath();
+      ctx.moveTo(amplitudeX, cy);
+      ctx.lineTo(amplitudeX, crestY);
+      ctx.stroke();
+      drawArrowHead(amplitudeX, cy, -1);
+      drawArrowHead(amplitudeX, crestY, 1);
+      drawLabel(`A = ${amplitude.toFixed(0)} px`, amplitudeX + 12, cy - amplitude / 2 + 3);
+      ctx.restore();
+
+      // Find two consecutive mathematical crests that both fit in the view.
+      // Their separation is exactly lambda, regardless of phase or direction.
+      const firstCrest = firstCrestPosition(timeRef.current, params, derived);
+      const leftMargin = 26;
+      const rightMargin = width - 26;
+      const cycleOffset = Math.ceil((leftMargin - firstCrest) / wavelength);
+      const crest1 = firstCrest + cycleOffset * wavelength;
+      const crest2 = crest1 + wavelength;
+
+      ctx.save();
+      ctx.strokeStyle = ACCENT_GOLD;
+      ctx.fillStyle = ACCENT_GOLD;
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.78;
+
+      if (crest1 >= leftMargin && crest2 <= rightMargin) {
+        // Keep the bracket inside the canvas even at the maximum amplitude.
+        const measureY = Math.min(height - 28, cy + amplitude + 38);
+        ctx.beginPath();
+        ctx.moveTo(crest1, crestY);
+        ctx.lineTo(crest1, measureY);
+        ctx.moveTo(crest2, crestY);
+        ctx.lineTo(crest2, measureY);
+        ctx.moveTo(crest1, measureY);
+        ctx.lineTo(crest2, measureY);
+        ctx.stroke();
+
+        const head = 5;
+        ctx.beginPath();
+        ctx.moveTo(crest1, measureY);
+        ctx.lineTo(crest1 + head, measureY - head);
+        ctx.moveTo(crest1, measureY);
+        ctx.lineTo(crest1 + head, measureY + head);
+        ctx.moveTo(crest2, measureY);
+        ctx.lineTo(crest2 - head, measureY - head);
+        ctx.moveTo(crest2, measureY);
+        ctx.lineTo(crest2 - head, measureY + head);
+        ctx.stroke();
+
+        drawLabel(`\u03bb = ${wavelength.toFixed(0)} px`, (crest1 + crest2) / 2, measureY - 8, 'center');
+      } else {
+        // Do not draw a shortened bracket that could be mistaken for lambda.
+        drawLabel(
+          `\u03bb = ${wavelength.toFixed(0)} px · full span outside view`,
+          width / 2,
+          height - 14,
+          'center'
+        );
       }
-      if (c1 < 20) {
-        c1 += lambda;
-        c2 += lambda;
-      }
+      ctx.restore();
 
-      const measureY = cy + A + 45;
-
-      // Wavelength bracket
-      if (c2 <= width - 10) {
-        ctx.strokeStyle = ACCENT_GOLD;
-        ctx.lineWidth = 1;
-        ctx.globalAlpha = 0.5;
-        // Vertical lines from crests down to measurement line
-        ctx.beginPath();
-        ctx.moveTo(c1, cy - A);
-        ctx.lineTo(c1, measureY);
-        ctx.moveTo(c2, cy - A);
-        ctx.lineTo(c2, measureY);
-        ctx.stroke();
-        // Horizontal bracket
-        ctx.beginPath();
-        ctx.moveTo(c1, measureY);
-        ctx.lineTo(c2, measureY);
-        ctx.stroke();
-        // Arrowheads
-        const ah = 5;
-        ctx.beginPath();
-        ctx.moveTo(c1, measureY);
-        ctx.lineTo(c1 + ah, measureY - ah);
-        ctx.moveTo(c1, measureY);
-        ctx.lineTo(c1 + ah, measureY + ah);
-        ctx.moveTo(c2, measureY);
-        ctx.lineTo(c2 - ah, measureY - ah);
-        ctx.moveTo(c2, measureY);
-        ctx.lineTo(c2 - ah, measureY + ah);
-        ctx.stroke();
-        // Label
-        ctx.globalAlpha = 0.8;
-        ctx.fillStyle = ACCENT_GOLD;
-        ctx.font = '500 11px "JetBrains Mono", monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText(`λ = ${lambda.toFixed(0)}px`, (c1 + c2) / 2, measureY + 16);
-        ctx.globalAlpha = 1;
-      }
-
-      // Amplitude measurement — at the first visible crest
-      const ampX = c1 < width - 60 ? c1 : firstCrestX;
-      if (ampX >= 20 && ampX <= width - 20) {
-        ctx.strokeStyle = ACCENT_GOLD;
-        ctx.lineWidth = 1;
-        ctx.globalAlpha = 0.5;
-        // Double-headed arrow from equilibrium to crest
-        ctx.beginPath();
-        ctx.moveTo(ampX, cy);
-        ctx.lineTo(ampX, cy - A);
-        ctx.stroke();
-        // Arrowheads
-        const ah = 4;
-        ctx.beginPath();
-        ctx.moveTo(ampX, cy);
-        ctx.lineTo(ampX - ah, cy - ah);
-        ctx.moveTo(ampX, cy);
-        ctx.lineTo(ampX + ah, cy - ah);
-        ctx.moveTo(ampX, cy - A);
-        ctx.lineTo(ampX - ah, cy - A + ah);
-        ctx.moveTo(ampX, cy - A);
-        ctx.lineTo(ampX + ah, cy - A + ah);
-        ctx.stroke();
-        // Label
-        ctx.globalAlpha = 0.8;
-        ctx.fillStyle = ACCENT_GOLD;
-        ctx.font = '500 11px "JetBrains Mono", monospace';
-        ctx.textAlign = 'left';
-        ctx.fillText(`A = ${A.toFixed(0)}px`, ampX + 8, cy - A / 2 + 4);
-        ctx.globalAlpha = 1;
-      }
-
-      // Direction arrow — at top right area
-      const dirX = width - 80;
-      const dirY = 40;
-      const dir = params.direction;
+      // Propagation direction indicator.
+      const arrowX = width - 44;
+      const arrowY = 32;
+      const sign = direction;
+      ctx.save();
       ctx.strokeStyle = WAVE_COLOR;
       ctx.fillStyle = WAVE_COLOR;
-      ctx.globalAlpha = 0.4;
       ctx.lineWidth = 1.5;
+      ctx.globalAlpha = 0.85;
       ctx.beginPath();
-      ctx.moveTo(dirX - 20 * dir, dirY);
-      ctx.lineTo(dirX + 20 * dir, dirY);
+      ctx.moveTo(arrowX - 17 * sign, arrowY);
+      ctx.lineTo(arrowX + 17 * sign, arrowY);
       ctx.stroke();
-      // Arrowhead
       ctx.beginPath();
-      ctx.moveTo(dirX + 20 * dir, dirY);
-      ctx.lineTo(dirX + (20 - 6) * dir, dirY - 4);
-      ctx.lineTo(dirX + (20 - 6) * dir, dirY + 4);
+      ctx.moveTo(arrowX + 17 * sign, arrowY);
+      ctx.lineTo(arrowX + 10 * sign, arrowY - 4);
+      ctx.lineTo(arrowX + 10 * sign, arrowY + 4);
       ctx.closePath();
       ctx.fill();
-      ctx.globalAlpha = 0.7;
       ctx.font = '500 10px "JetBrains Mono", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(dir === 1 ? '→ v' : '← v', dirX, dirY + 16);
-      ctx.globalAlpha = 1;
+      ctx.fillText(direction === 1 ? 'RIGHT' : 'LEFT', arrowX, arrowY + 17);
+      ctx.restore();
     }
 
     function render(now: number) {
-      if (!ctx) return;
       const cfg = configRef.current;
-
-      // Time advancement
-      const dt = lastFrameRef.current > 0 ? (now - lastFrameRef.current) / 1000 : 0;
+      const dt = lastFrameRef.current > 0
+        ? Math.min((now - lastFrameRef.current) / 1000, 0.05)
+        : 0;
       lastFrameRef.current = now;
-      if (cfg.isPlaying) {
+
+      if (cfg.isPlaying && !reducedMotion) {
         timeRef.current += dt * cfg.speedMultiplier;
       }
 
-      // Background
       ctx.fillStyle = '#04060d';
       ctx.fillRect(0, 0, width, height);
 
-      // Stars
-      drawStars(now / 1000);
-
-      // Center Y
       const cy = height / 2;
-
-      // Grid
       if (cfg.showGrid) drawGrid();
-
-      // Equilibrium
       if (cfg.showEquilibrium) drawEquilibrium(cy);
-
-      // Wave
       drawWave(cy);
-
-      // Measurements
       if (cfg.showMeasurements) drawMeasurements(cy);
 
+      if (!document.hidden) {
+        animRef.current = requestAnimationFrame(render);
+      } else {
+        animRef.current = 0;
+        lastFrameRef.current = 0;
+      }
+    }
+
+    function startAnimation() {
+      if (document.hidden || animRef.current !== 0) return;
+      lastFrameRef.current = 0;
       animRef.current = requestAnimationFrame(render);
     }
 
-    resize();
-    const ro = new ResizeObserver(() => resize());
-    ro.observe(container);
+    function handleVisibilityChange() {
+      if (document.hidden) {
+        cancelAnimationFrame(animRef.current);
+        animRef.current = 0;
+        lastFrameRef.current = 0;
+      } else {
+        startAnimation();
+      }
+    }
 
-    animRef.current = requestAnimationFrame(render);
+    function handleReducedMotionChange(event: MediaQueryListEvent) {
+      reducedMotion = event.matches;
+      lastFrameRef.current = 0;
+    }
+
+    resize();
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(container);
+
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    motionQuery.addEventListener('change', handleReducedMotionChange);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    startAnimation();
 
     return () => {
       cancelAnimationFrame(animRef.current);
-      ro.disconnect();
+      resizeObserver.disconnect();
+      motionQuery.removeEventListener('change', handleReducedMotionChange);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [containerRef]);
 
