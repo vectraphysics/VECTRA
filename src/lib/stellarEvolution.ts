@@ -88,7 +88,7 @@ export function getStagesForMass(mass: number): StellarStage[] {
 
   return initialMass >= CORE_COLLAPSE_HEURISTIC_MASS
     ? [...commonStages, ...getHighMassStages(initialMass)]
-    : [...commonStages, ...getIntermediateMassStages()];
+    : [...commonStages, ...getIntermediateMassStages(initialMass)];
 }
 
 function getCommonStages(mass: number): StellarStage[] {
@@ -143,12 +143,12 @@ function getCommonStages(mass: number): StellarStage[] {
       radius: isMassive ? 3.8 : isLowMass ? 1.7 : 2.5,
       glowIntensity: 1,
       description: 'The star spends most of its life fusing hydrogen in its core. Energy flowing outward maintains a balance against gravity. Hot, massive stars are generally larger and much more luminous, but they consume their fuel faster.',
-      visualNote: 'Colour follows approximate surface temperature. The displayed radii are deliberately exaggerated and are not a common physical scale.',
+      visualNote: 'Colour follows approximate surface temperature. The displayed radii are deliberately exaggerated and are not a common physical scale. The mottled surface texture is a visual cue for granulation, not a convection simulation.',
     },
   ];
 }
 
-function getIntermediateMassStages(): StellarStage[] {
+function getIntermediateMassStages(mass: number): StellarStage[] {
   const remnantMass = 'Typically about 0.5–1.3 M☉; depends on the progenitor';
   return [
     {
@@ -156,7 +156,7 @@ function getIntermediateMassStages(): StellarStage[] {
       name: 'Red Giant Branch',
       duration: 'Tens to hundreds of millions of years (mass-dependent)',
       temperature: '~3,000–5,000 K (surface)',
-      mass: 'The envelope expands while stellar winds remove mass',
+      mass: `Progenitor: ${mass.toFixed(1)} M☉; current mass decreases through stellar winds`,
       coreProcess: 'Contracting, helium-rich core surrounded by hydrogen-burning shell',
       fusionProcess: 'Hydrogen → helium in a shell around the core',
       finalOutcome: 'Helium ignition in the core',
@@ -172,7 +172,7 @@ function getIntermediateMassStages(): StellarStage[] {
       name: 'Core Helium Burning',
       duration: 'Tens to hundreds of millions of years',
       temperature: '~4,000–6,000 K (surface; mass-dependent)',
-      mass: 'The star continues to lose mass through its outer layers',
+      mass: `Progenitor: ${mass.toFixed(1)} M☉; mass loss continues`,
       coreProcess: 'Helium fusion in the core after helium ignition',
       fusionProcess: 'Helium → carbon and oxygen through the triple-alpha process',
       finalOutcome: 'Core helium becomes depleted',
@@ -188,7 +188,7 @@ function getIntermediateMassStages(): StellarStage[] {
       name: 'Asymptotic Giant Branch',
       duration: 'Hundreds of thousands to a few million years',
       temperature: '~2,500–3,500 K (cool outer surface)',
-      mass: 'Strong stellar winds remove much of the remaining envelope',
+      mass: `Progenitor: ${mass.toFixed(1)} M☉; envelope is being expelled`,
       coreProcess: 'Compact carbon-oxygen core with hydrogen- and helium-burning shells',
       fusionProcess: 'Alternating shell burning; helium-shell thermal pulses can occur',
       finalOutcome: 'Outer envelope is expelled',
@@ -292,7 +292,7 @@ function getHighMassStages(mass: number): StellarStage[] {
       name: 'Evolved Massive Star',
       duration: 'Final stages: hundreds of thousands to a few million years',
       temperature: '~3,000–4,500 K if in a red-supergiant phase',
-      mass: 'Strong winds and possible eruptions remove mass',
+      mass: `Progenitor: ${mass.toFixed(1)} M☉; current mass may be substantially lower after winds`,
       coreProcess: 'Layered burning shells develop around an increasingly dense core',
       fusionProcess: 'Advanced burning can build elements up to the iron group',
       finalOutcome: 'Core becomes unstable and collapses',
@@ -308,7 +308,7 @@ function getHighMassStages(mass: number): StellarStage[] {
       name: 'Core-Collapse Supernova',
       duration: 'Core collapse occurs in seconds; ejecta remain visible for much longer',
       temperature: 'The collapsing core reaches billions of kelvin',
-      mass: 'A large fraction of the envelope is ejected; the amount varies',
+      mass: `Ejected mass is model-dependent; initial mass was ${mass.toFixed(1)} M☉`,
       coreProcess: 'Core collapse, shock formation and neutrino-driven dynamics',
       fusionProcess: 'Explosive nucleosynthesis in the ejecta',
       finalOutcome: 'A neutron star or black hole may remain',
