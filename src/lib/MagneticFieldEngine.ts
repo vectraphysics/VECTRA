@@ -644,7 +644,6 @@ export class MagneticFieldEngine {
   private animate = (): void => {
     this.animationId = requestAnimationFrame(this.animate);
 
-    const now = performance.now() / 1000;
     const dt = 1 / 60; // Approximate — could use clock for exact dt
     if (this.isPlaying) {
       this.simTime += dt * this.speedMultiplier;

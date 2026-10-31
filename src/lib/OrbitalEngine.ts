@@ -3,7 +3,6 @@ import {
   type PhysicsState,
   type OrbitalData,
   type InitialConditions,
-  computeAcceleration,
   rk4Step,
   computeOrbitalData,
 } from '@/lib/orbitalPhysics';

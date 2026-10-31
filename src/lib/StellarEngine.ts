@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import {
   type StellarStage,
-  type StellarStageId,
   getStagesForMass,
 } from '@/lib/stellarEvolution';
 import { createStarfield } from '@/three/createStarfield';
