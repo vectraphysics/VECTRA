@@ -39,3 +39,18 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## PhysicsHub Runge–Kutta integrator reference
+
+VECTRA's fixed-size, typed RK4 step follows the classical four-stage Runge–Kutta
+method also demonstrated in PhysicsHub's integrator module:
+
+- Source file: [`app/(core)/engine/integrators.js`](https://github.com/physicshub/physicshub.github.io/blob/bf7637238edf40e7b34021c43dc2abf45248f4db/app/(core)/engine/integrators.js)
+- Source revision: `bf7637238edf40e7b34021c43dc2abf45248f4db`
+- Licence: MIT, Copyright (c) 2025 physicshub.
+
+The mathematical RK4 method is a standard numerical integration method. VECTRA
+uses its own TypeScript implementation adapted to a fixed four-component state
+tuple rather than copying the upstream generic JavaScript array implementation.
+The MIT notice above is retained as attribution to the consulted upstream
+project; no PhysicsHub UI or runtime code is included.
