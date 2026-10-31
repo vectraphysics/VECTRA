@@ -115,6 +115,8 @@ export function CollisionLab() {
   const finalVelocityB = data?.finalVelocityBMps ?? 0;
   const hasCollision = mode === 'explosion' || approaching;
   const phase = progress < 0.5 ? 'Before impact' : 'After impact';
+  const widthA = objectWidth(massA);
+  const widthB = objectWidth(massB);
   const contactSeparation = (widthA + widthB) / 4;
   const aStartsLeft = relativeVelocity > 0;
   const contactA = TRACK_CENTER + (aStartsLeft ? -contactSeparation : contactSeparation);
@@ -146,8 +148,6 @@ export function CollisionLab() {
 
   const displayedVelocityA = mode === 'explosion' ? finalVelocityA : progress < 0.5 ? velocityA : finalVelocityA;
   const displayedVelocityB = mode === 'explosion' ? finalVelocityB : progress < 0.5 ? velocityB : finalVelocityB;
-  const widthA = objectWidth(massA);
-  const widthB = objectWidth(massB);
   const status = mode === 'explosion'
     ? 'An internal impulse sends the two objects in opposite directions. Total momentum remains zero.'
     : !approaching
