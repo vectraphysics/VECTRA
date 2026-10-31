@@ -187,3 +187,70 @@
     transition: none;
   }
 }
+
+
+/* The selected discipline takes its colour from the same visual key as its catalogue card. */
+.explore-filter[data-discipline='mechanics'] {
+  --filter-accent: 219, 166, 91;
+}
+
+.explore-filter[data-discipline='waves'] {
+  --filter-accent: 89, 194, 218;
+}
+
+.explore-filter[data-discipline='electricity'] {
+  --filter-accent: 218, 190, 91;
+}
+
+.explore-filter[data-discipline='electromagnetism'] {
+  --filter-accent: 157, 128, 226;
+}
+
+.explore-filter[data-discipline='thermodynamics'] {
+  --filter-accent: 222, 117, 102;
+}
+
+.explore-filter[data-discipline='modern-physics'] {
+  --filter-accent: 89, 190, 164;
+}
+
+.explore-filter[data-discipline='astrophysics'] {
+  --filter-accent: 105, 146, 228;
+}
+
+.explore-filter:not([data-discipline='all']):hover {
+  border-color: rgba(var(--filter-accent), 0.48);
+}
+
+.explore-filter.is-active:not([data-discipline='all']) {
+  border-color: rgba(var(--filter-accent), 0.48);
+  background: rgba(var(--filter-accent), 0.11);
+  color: rgb(var(--filter-accent));
+  box-shadow: inset 0 0 18px rgba(var(--filter-accent), 0.05);
+}
+
+
+/* Mobile ergonomics: clear horizontal filter navigation and comfortable controls. */
+@media (max-width: 640px) {
+  .explore-filter-list {
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 0.8rem;
+    touch-action: pan-x;
+    padding-block: 0.2rem 0.4rem;
+  }
+
+  .explore-filter {
+    min-height: 2.75rem;
+    padding-inline: 0.9rem;
+    scroll-snap-align: start;
+  }
+
+  .explore-search__clear {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .explore-reset {
+    min-height: 2.75rem;
+  }
+}

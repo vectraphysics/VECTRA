@@ -32,13 +32,14 @@ export function About() {
   const { ref, isVisible } = useReveal();
 
   return (
-    <section id="about" className="relative isolate vectra-section-flow about-section py-20 sm:py-28 lg:py-32">
+    <section id="about" className="relative isolate vectra-section-flow about-section py-16 sm:py-24 lg:py-32">
       <div className="container-vectra">
         <div className="about-layout">
           <div className="about-intro">
             <div ref={ref} className={`reveal reveal-up ${isVisible ? 'is-visible' : ''}`}>
               <SectionHeading
                 eyebrow="The VECTRA approach"
+                sectionIndex="04 / 04"
                 title="Understand the physics behind the formula"
                 description="VECTRA brings mathematical reasoning, visual explanations, and interactive models into one learning environment."
               />

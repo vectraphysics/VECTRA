@@ -18,7 +18,7 @@ export function Simulations() {
   const { ref, isVisible } = useReveal();
 
   return (
-    <section id="simulations" className="relative isolate vectra-section-flow py-20 sm:py-28 lg:py-32">
+    <section id="simulations" className="relative isolate vectra-section-flow py-16 sm:py-24 lg:py-32">
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div className="absolute left-1/2 top-0 h-[300px] w-full max-w-[600px] -translate-x-1/2 rounded-full opacity-10 blur-[120px] pulse-glow-soft" style={{ background: 'radial-gradient(ellipse, #2d4a7a 0%, transparent 70%)' }} />
       </div>
@@ -26,12 +26,13 @@ export function Simulations() {
         <div ref={ref} className={`reveal reveal-up ${isVisible ? 'is-visible' : ''}`}>
           <SectionHeading
             eyebrow="Simulations"
+            sectionIndex="02 / 04"
             title="Learn by doing"
             description="Explore interactive physics experiences and see how changing a system's conditions changes what happens."
           />
         </div>
 
-        <div className="mt-12 grid gap-4 sm:mt-14 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3">
+        <div className="mt-9 grid gap-3.5 sm:mt-14 sm:gap-4 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3">
           {simulationItems.map((sim, index) => {
             const Icon = sim.icon;
 
@@ -44,7 +45,7 @@ export function Simulations() {
                 style={{ transitionDelay: `${index * 75}ms` }}
               >
                 <SpotlightCard
-                  className="simulation-card flex h-full min-h-[248px] min-w-0 flex-col gap-5 p-5 sm:p-6"
+                  className="simulation-card flex h-full min-h-[224px] min-w-0 flex-col gap-4 p-5 sm:min-h-[248px] sm:gap-5 sm:p-6"
                   spotlightColor="rgba(48, 68, 136, 0.72)"
                   intensity={0.12}
                   spotlightSize={230}
